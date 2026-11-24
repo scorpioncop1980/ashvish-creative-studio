@@ -51,6 +51,8 @@
       button,[role="button"]{min-height:2.75rem}
       .wrap{max-width:1060px;margin:0 auto;padding:18px 16px 40px}
       header.top{text-align:center;padding:8px 4px 4px}
+      .back-link{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:2px solid var(--line);border-radius:999px;padding:8px 16px;font-weight:800;font-size:.95rem;color:var(--ink);text-decoration:none;box-shadow:var(--shadow)}
+      .back-link:hover{transform:translateY(-1px)}
       header.top h1{
         font-family:"Baloo 2",system-ui,sans-serif;
         font-size:clamp(1.9rem,5.5vw,3rem);
@@ -144,6 +146,7 @@
     <canvas id="confetti" aria-hidden="true"></canvas>
     <div class="wrap">
       <header class="top">
+        <a class="back-link" href="index.html">← Back</a>
         <h1>Tap, <span class="c1">Colour</span>, <span class="c2">Smile</span> <span class="c3">!</span></h1>
         <p>Friendly animals waiting for your colours. Pick an animal, pick a colour, then tap a part of the picture to fill it in.</p>
         <div class="steps" aria-hidden="true">
