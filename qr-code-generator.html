@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:,">
+<title>QR Code Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<style>
+:root{
+  --bg:#FFFBF1; --surface:#FFFFFF; --surface2:#FFF7E6; --ink:#1C1917; --muted:#78716C; --line:#E7DDC8; --accent:#C2410C; --accent2:#9A3412; --accent-soft:#FFEDD5; --teal:#0F766E; --radius:18px;
+  --shadow:0 12px 32px rgba(28,25,23,.08);
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#141210; --surface:#1E1B18; --surface2:#26221E; --ink:#FAF5EB; --muted:#A8A29E; --line:#3A3530; --accent:#FB923C; --accent2:#FDBA74; --accent-soft:#431407; --shadow:0 12px 32px rgba(0,0,0,.35); }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Public Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--accent)}
+.wrap{max-width:1120px;margin:0 auto;padding:20px 18px 36px}
+.top{padding:10px 0 18px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);border:1px solid var(--line);padding:7px 10px;border-radius:999px}
+.eyebrow i{width:7px;height:7px;background:var(--accent);border-radius:50%;display:block}
+h1{font-family:"Bricolage Grotesque",sans-serif;font-size:clamp(36px,6vw,58px);line-height:.95;letter-spacing:-.02em;margin:14px 0 10px;max-width:700px}
+h1 em{font-style:normal;color:var(--accent)}
+.sub{font-size:16px;line-height:1.6;color:var(--muted);max-width:640px;margin:0}
+.sub strong{color:var(--ink)}
+/* Type tabs */
+.types{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin:22px 0 16px}
+@media(max-width:860px){.types{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:520px){.types{grid-template-columns:repeat(3,1fr)}}
+.type-btn{appearance:none;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:14px;padding:12px 6px 10px;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;font-family:inherit}
+.type-btn svg{width:20px;height:20px;stroke:currentColor}
+.type-btn span{font-size:12.5px;font-weight:600;line-height:1}
+.type-btn.active{border-color:var(--accent);background:var(--accent);color:#fff;box-shadow:0 8px 20px rgba(194,65,12,.25)}
+.type-btn.active svg{stroke:#fff}
+/* Layout */
+.layout{display:grid;grid-template-columns:1.08fr .92fr;gap:18px;align-items:start}
+@media(max-width:860px){.layout{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
+.card-pad{padding:20px}
+.card h2{font-size:15px;margin:0 0 4px;letter-spacing:-.01em}
+.card p.hint{margin:0 0 16px;font-size:13.5px;line-height:1.5;color:var(--muted)}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:13px;font-weight:600;margin-bottom:7px}
+.field label small{font-weight:400;color:var(--muted)}
+.input, textarea.input, select.input{width:100%;padding:12px 13px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);font:inherit;font-size:15px;outline:none}
+.input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+textarea.input{resize:vertical;min-height:84px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.row2{grid-template-columns:1fr}}
+.group{display:none}
+.group.active{display:block}
+.examples{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.chip{border:1px solid var(--line);background:var(--surface2);padding:7px 10px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--ink)}
+.chip:hover{border-color:var(--accent)}
+.error{display:none;background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;padding:10px 12px;border-radius:10px;font-size:13.5px;line-height:1.5;margin-top:12px}
+@media(prefers-color-scheme:dark){.error{background:#450A0A;border-color:#7F1D1D;color:#FECACA}}
+.error.show{display:block}
+.payload{margin-top:16px;border-top:1px dashed var(--line);padding-top:14px}
+.payload label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.payload code{display:block;margin-top:7px;font-family:"JetBrains Mono",monospace;font-size:12px;line-height:1.6;word-break:break-all;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:10px 11px;max-height:88px;overflow:auto}
+/* Preview */
+.preview-card{position:sticky;top:16px;overflow:hidden}
+@media(max-width:860px){.preview-card{position:static}}
+.qr-stage{background:
+  radial-gradient(circle at 1px 1px, var(--line) 1px, transparent 0);background-size:18px 18px;background-color:var(--surface2);padding:22px;display:flex;flex-direction:column;align-items:center}
+.qr-box{background:#fff;padding:16px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.12);line-height:0;position:relative}
+.qr-box canvas{width:min(280px,68vw)!important;height:auto!important;aspect-ratio:1}
+.qr-label{margin-top:12px;font-weight:700;font-size:14px;text-align:center;max-width:300px;line-height:1.4;min-height:20px}
+.qr-caption{font-size:12.5px;color:var(--muted);text-align:center;margin-top:4px}
+.controls{padding:18px 20px 20px}
+.controls-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.color-field{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:12px;padding:8px 10px}
+.color-field input[type=color]{width:36px;height:36px;border:none;padding:0;background:none;cursor:pointer;border-radius:8px;overflow:hidden}
+.color-field div{line-height:1.2}
+.color-field b{font-size:13px;display:block}
+.color-field span{font-size:11px;color:var(--muted);font-family:"JetBrains Mono",monospace}
+.swatches{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.swatch{width:26px;height:26px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.btn{appearance:none;border:none;cursor:pointer;font-family:inherit;font-weight:700;border-radius:12px;padding:13px 14px;font-size:14.5px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn-primary{background:var(--accent);color:#fff;grid-column:1/-1;padding:15px}
+.btn-primary:active{transform:scale(.99)}
+.btn-secondary{background:var(--surface);border:1.5px solid var(--line);color:var(--ink)}
+.btn svg{width:18px;height:18px}
+.toast{margin-top:10px;text-align:center;font-size:13px;font-weight:600;color:var(--teal);min-height:18px}
+/* Uses */
+.uses{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+@media(max-width:700px){.uses{grid-template-columns:1fr}}
+.use{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px}
+.use b{font-size:14px;display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.use p{margin:0;font-size:13.5px;line-height:1.6;color:var(--muted)}
+.use .num{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:13px;flex-shrink:0}
+.foot{margin-top:18px;text-align:center;font-size:12.5px;color:var(--muted);line-height:1.6}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="eyebrow"><i></i> Free tool · No sign-up · Works on your phone</div>
+    <h1>Make a QR code<br>in <em>seconds.</em></h1>
+    <p class="sub">For your <strong>books, posters, cards and videos</strong> — anyone scans it with their phone camera and lands exactly where you want. Print-ready PNG, made right here on your device.</p>
+  </div>
+
+  <!-- Type selector -->
+  <div class="types" role="tablist" aria-label="QR type">
+    <button class="type-btn active" data-type="url"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span>Link</span></button>
+    <button class="type-btn" data-type="text"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg><span>Text</span></button>
+    <button class="type-btn" data-type="upi"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M6 3h12M6 8h12M6 13l8.5 8M6 13h3.5M9.5 13a5 5 0 0 0 0-10"/></svg><span>UPI Pay</span></button>
+    <button class="type-btn" data-type="whatsapp"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg><span>WhatsApp</span></button>
+    <button class="type-btn" data-type="wifi"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg><span>Wi-Fi</span></button>
+    <button class="type-btn" data-type="email"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg><span>Email</span></button>
+    <button class="type-btn" data-type="phone"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.08 4.18 2 2 0 0 1 4.06 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>Phone</span></button>
+  </div>
+
+  <div class="layout">
+    <!-- LEFT: FORM -->
+    <section class="card"><div class="card-pad">
+      <!-- URL -->
+      <div class="group active" id="group-url">
+        <h2>Website / video link</h2><p class="hint">Scan karte hi ye link khul jayega — website, YouTube video, Amazon book page, kuch bhi.</p>
+        <div class="field"><label for="f-url">Link</label><input class="input" id="f-url" type="url" inputmode="url" placeholder="https://ashvishcreativestudio.com" value="https://ashvishcreativestudio.com"></div>
+        <div class="examples">
+          <button class="chip" data-fill='{"url":"https://ashvishcreativestudio.com"}'>My website</button>
+          <button class="chip" data-fill='{"url":"https://www.youtube.com/@StoryMasalaOfficial"}'>Story Masala channel</button>
+          <button class="chip" data-fill='{"url":"https://www.youtube.com/@StoryMasalaOfficial"}'>Try a channel link</button>
+        </div>
+      </div>
+      <!-- TEXT -->
+      <div class="group" id="group-text">
+        <h2>Plain text</h2><p class="hint">Scan karne par ye text phone par dikhega. Address, coupon code ya chhota message ke liye best hai.</p>
+        <div class="field"><label for="f-text">Your text</label><textarea class="input" id="f-text" placeholder="Type anything — e.g. Thank you for buying this book! Visit ashvishcreativestudio.com for free colouring pages."></textarea></div>
+      </div>
+      <!-- UPI -->
+      <div class="group" id="group-upi">
+        <h2>UPI payment</h2><p class="hint">Scan karte hi GPay / PhonePe / Paytm me payment screen khul jayegi. Amount khali chhodo to payer khud daalega.</p>
+        <div class="field"><label for="f-upi-id">UPI ID <small>— e.g. yourname@okhdfcbank</small></label><input class="input" id="f-upi-id" type="text" placeholder="yourname@upi" autocomplete="off"></div>
+        <div class="row2">
+          <div class="field"><label for="f-upi-name">Name <small>(optional)</small></label><input class="input" id="f-upi-name" type="text" placeholder="Ashvish Creative Studio"></div>
+          <div class="field"><label for="f-upi-amount">Amount ₹ <small>(optional)</small></label><input class="input" id="f-upi-amount" type="number" min="1" placeholder="149"></div>
+        </div>
+        <div class="field"><label for="f-upi-note">Note <small>(optional)</small></label><input class="input" id="f-upi-note" type="text" placeholder="Book payment"></div>
+      </div>
+      <!-- WHATSAPP -->
+      <div class="group" id="group-whatsapp">
+        <h2>WhatsApp chat</h2><p class="hint">Scan karte hi tumhare number par WhatsApp chat khul jayegi — order ya enquiry ke liye perfect.</p>
+        <div class="field"><label for="f-wa-num">WhatsApp number <small>— country code ke saath</small></label><input class="input" id="f-wa-num" type="tel" placeholder="919876543210"></div>
+        <div class="field"><label for="f-wa-msg">Ready-made message <small>(optional)</small></label><input class="input" id="f-wa-msg" type="text" placeholder="Hi! I want to know more about your books."></div>
+      </div>
+      <!-- WIFI -->
+      <div class="group" id="group-wifi">
+        <h2>Wi-Fi connect</h2><p class="hint">Scan karte hi phone Wi-Fi se connect ho jayega — password type nahi karna padega. Shop, cafe ya ghar ke liye.</p>
+        <div class="field"><label for="f-wifi-ssid">Wi-Fi name (SSID)</label><input class="input" id="f-wifi-ssid" type="text" placeholder="MyHomeWiFi"></div>
+        <div class="row2">
+          <div class="field"><label for="f-wifi-pass">Password</label><input class="input" id="f-wifi-pass" type="text" placeholder="Wi-Fi password"></div>
+          <div class="field"><label for="f-wifi-enc">Security</label><select class="input" id="f-wifi-enc"><option value="WPA">WPA / WPA2 (most common)</option><option value="WEP">WEP</option><option value="nopass">No password</option></select></div>
+        </div>
+        <div class="field"><label for="f-wifi-hidden">Hidden network?</label><select class="input" id="f-wifi-hidden"><option value="false">No — normal network</option><option value="true">Yes — hidden</option></select></div>
+      </div>
+      <!-- EMAIL -->
+      <div class="group" id="group-email">
+        <h2>Email</h2><p class="hint">Scan karte hi email app khul jayega, address aur subject pehle se bhara hoga.</p>
+        <div class="field"><label for="f-email">Email address</label><input class="input" id="f-email" type="email" placeholder="you@example.com"></div>
+        <div class="field"><label for="f-email-sub">Subject <small>(optional)</small></label><input class="input" id="f-email-sub" type="text" placeholder="Book enquiry"></div>
+        <div class="field"><label for="f-email-body">Message <small>(optional)</small></label><textarea class="input" id="f-email-body" placeholder="Hi, I want to ask about…"></textarea></div>
+      </div>
+      <!-- PHONE -->
+      <div class="group" id="group-phone">
+        <h2>Phone call</h2><p class="hint">Scan karte hi number dialer me aa jayega — call karna ek tap ka kaam.</p>
+        <div class="field"><label for="f-phone">Phone number <small>— country code ke saath</small></label><input class="input" id="f-phone" type="tel" placeholder="+91 98765 43210"></div>
+      </div>
+
+      <div class="error" id="form-error"></div>
+
+      <div class="payload"><label>Scan karne par ye khulega</label><code id="payload-view">https://ashvishcreativestudio.com</code></div>
+    </div></section>
+
+    <!-- RIGHT: PREVIEW -->
+    <aside class="card preview-card">
+      <div class="qr-stage">
+        <div class="qr-box"><canvas id="qr-canvas" width="1024" height="1024"></canvas></div>
+        <div class="qr-label" id="qr-label-view"></div>
+        <div class="qr-caption" id="qr-status">Point any phone camera at it to test</div>
+      </div>
+      <div class="controls">
+        <div class="controls-grid">
+          <div>
+            <div class="color-field"><input type="color" id="c-fg" value="#1C1917"><div><b>QR colour</b><span id="c-fg-val">#1C1917</span></div></div>
+            <div class="swatches" data-target="fg">
+              <button class="swatch" data-color="#1C1917" style="background:#1C1917" aria-label="Black"></button>
+              <button class="swatch" data-color="#9A3412" style="background:#9A3412" aria-label="Kumkum"></button>
+              <button class="swatch" data-color="#1E3A5F" style="background:#1E3A5F" aria-label="Navy"></button>
+              <button class="swatch" data-color="#0F766E" style="background:#0F766E" aria-label="Teal"></button>
+              <button class="swatch" data-color="#7C2D12" style="background:#7C2D12" aria-label="Maroon"></button>
+            </div>
+          </div>
+          <div>
+            <div class="color-field"><input type="color" id="c-bg" value="#FFFFFF"><div><b>Background</b><span id="c-bg-val">#FFFFFF</span></div></div>
+            <div class="swatches" data-target="bg">
+              <button class="swatch" data-color="#FFFFFF" style="background:#FFFFFF" aria-label="White"></button>
+              <button class="swatch" data-color="#FFFBEB" style="background:#FFFBEB" aria-label="Cream"></button>
+              <button class="swatch" data-color="#FEF3C7" style="background:#FEF3C7" aria-label="Light yellow"></button>
+              <button class="swatch" data-color="#ECFDF5" style="background:#ECFDF5" aria-label="Mint"></button>
+            </div>
+          </div>
+          <div class="field" style="margin:0"><label for="opt-size">Download size</label><select class="input" id="opt-size"><option value="512">512 px — WhatsApp / screen</option><option value="1024" selected>1024 px — poster / card</option><option value="2048">2048 px — big print</option></select></div>
+          <div class="field" style="margin:0"><label for="opt-ec">Scan safety</label><select class="input" id="opt-ec"><option value="M" selected>Normal (M)</option><option value="Q">Stronger (Q)</option><option value="H">Strongest (H) — if logo/damage</option><option value="L">Basic (L) — shortest link</option></select></div>
+        </div>
+        <div class="field" style="margin-top:14px"><label for="opt-label">Text below QR <small style="font-weight:400;color:var(--muted)">(optional — print ke liye achha lagta hai)</small></label><input class="input" id="opt-label" type="text" placeholder="e.g. Scan to visit our website" maxlength="60"></div>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="btn-download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download PNG</button>
+          <button class="btn btn-secondary" id="btn-copy">Copy image</button>
+          <button class="btn btn-secondary" id="btn-svg">Download SVG</button>
+        </div>
+        <div class="toast" id="toast"></div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="uses">
+    <div class="use"><b><span class="num">1</span> Book ke pichle page par</b><p>Colouring book ya story book ke last page par QR lagao — scan karke reader seedha tumhari website ya next book par jayega.</p></div>
+    <div class="use"><b><span class="num">2</span> Poster &amp; Pinterest pin par</b><p>Poster ke corner me chhota QR — dekhne wala turant channel ya shop tak pahunchega, link type nahi karna padega.</p></div>
+    <div class="use"><b><span class="num">3</span> Visiting card &amp; dukaan par</b><p>UPI payment QR ya WhatsApp QR card par chhapo — payment aur baat-cheet dono ek scan me.</p></div>
+  </div>
+
+  <p class="foot">Sab kuch tumhare phone / computer par hi banta hai — koi link ya number kahin upload nahi hota.<br>Print se pehle ek baar apne phone se scan karke test zaroor kar lena.</p>
+</div>
+
+<script>
+(function(){
+  var state={type:'url'};
+  var $=function(id){return document.getElementById(id)};
+  var canvas=$('qr-canvas'), payloadView=$('payload-view'), errBox=$('form-error'), toast=$('toast'), statusEl=$('qr-status'), labelView=$('qr-label-view');
+  var inputs=['f-url','f-text','f-upi-id','f-upi-name','f-upi-amount','f-upi-note','f-wa-num','f-wa-msg','f-wifi-ssid','f-wifi-pass','f-wifi-enc','f-wifi-hidden','f-email','f-email-sub','f-email-body','f-phone','c-fg','c-bg','opt-size','opt-ec','opt-label'];
+  function escWifi(s){return (s||'').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/:/g,'\\:').replace(/"/g,'\\"')}
+  function buildPayload(){
+    var t=state.type;
+    if(t==='url'){var v=$('f-url').value.trim(); if(!v) return {err:'Link daalo — khali QR nahi banega.'}; if(!/^https?:\/\//i.test(v)) v='https://'+v; return {text:v}}
+    if(t==='text'){var v2=$('f-text').value.trim(); if(!v2) return {err:'Kuch text likho pehle.'}; return {text:v2}}
+    if(t==='upi'){var id=$('f-upi-id').value.trim(); if(!id||id.indexOf('@')<1) return {err:'Sahi UPI ID daalo — usme @ hona chahiye, jaise name@okhdfcbank.'}; var p='upi://pay?pa='+encodeURIComponent(id); var nm=$('f-upi-name').value.trim(); if(nm) p+='&pn='+encodeURIComponent(nm); var am=$('f-upi-amount').value.trim(); if(am){var n=parseFloat(am); if(!(n>0)) return {err:'Amount sahi daalo, ya khali chhod do.'}; p+='&am='+n.toFixed(2)+'&cu=INR'} var nt=$('f-upi-note').value.trim(); if(nt) p+='&tn='+encodeURIComponent(nt); return {text:p}}
+    if(t==='whatsapp'){var num=$('f-wa-num').value.replace(/[^0-9]/g,''); if(num.length<10) return {err:'WhatsApp number country code ke saath daalo — jaise 919876543210.'}; var w='https://wa.me/'+num; var msg=$('f-wa-msg').value.trim(); if(msg) w+='?text='+encodeURIComponent(msg); return {text:w}}
+    if(t==='wifi'){var ssid=$('f-wifi-ssid').value.trim(); if(!ssid) return {err:'Wi-Fi ka naam (SSID) daalo.'}; var enc=$('f-wifi-enc').value; var pass=$('f-wifi-pass').value; var hid=$('f-wifi-hidden').value; var wifi='WIFI:T:'+enc+';S:'+escWifi(ssid)+';'; if(enc!=='nopass') wifi+='P:'+escWifi(pass)+';'; if(hid==='true') wifi+='H:true;'; wifi+=';'; return {text:wifi}}
+    if(t==='email'){var em=$('f-email').value.trim(); if(!em||em.indexOf('@')<1) return {err:'Sahi email address daalo.'}; var e='mailto:'+em; var q=[]; var s=$('f-email-sub').value.trim(); if(s) q.push('subject='+encodeURIComponent(s)); var b=$('f-email-body').value.trim(); if(b) q.push('body='+encodeURIComponent(b)); if(q.length) e+='?'+q.join('&'); return {text:e}}
+    if(t==='phone'){var ph=$('f-phone').value.trim(); if(ph.replace(/[^0-9]/g,'').length<7) return {err:'Sahi phone number daalo.'}; return {text:'tel:'+ph.replace(/\s/g,'')}}
+    return {text:''};
+  }
+  var lastPayload='';
+  function render(){
+    // colour labels
+    $('c-fg-val').textContent=$('c-fg').value.toUpperCase();
+    $('c-bg-val').textContent=$('c-bg').value.toUpperCase();
+    labelView.textContent=$('opt-label').value.trim();
+    var res=buildPayload();
+    if(res.err){ errBox.textContent=res.err; errBox.classList.add('show'); payloadView.textContent='—'; statusEl.textContent='Details complete karo, QR yahin banega'; drawPlaceholder(); lastPayload=''; return; }
+    errBox.classList.remove('show');
+    payloadView.textContent=res.text;
+    lastPayload=res.text;
+    if(typeof QRCode==='undefined'){ statusEl.textContent='QR engine load nahi hua — net check karke page reload karo'; return; }
+    var size=parseInt($('opt-size').value,10)||1024;
+    // render at download size on same canvas (CSS scales it down)
+    QRCode.toCanvas(canvas, res.text, {width:size, margin:2, errorCorrectionLevel:$('opt-ec').value, color:{dark:$('c-fg').value, light:$('c-bg').value}}, function(err){
+      if(err){ errBox.textContent='Ye content QR ke liye zyada lamba hai — thoda chhota karke try karo.'; errBox.classList.add('show'); }
+      else statusEl.textContent='Ready — phone camera se scan karke test kar lo';
+    });
+  }
+  function drawPlaceholder(){
+    var ctx=canvas.getContext('2d'); var s=canvas.width; ctx.fillStyle='#F5F0E6'; ctx.fillRect(0,0,s,s); ctx.fillStyle='#D6CDB8';
+    var cell=s/8; for(var y=0;y<8;y++)for(var x=0;x<8;x++){ if((x+y)%2===0) ctx.fillRect(x*cell+6,y*cell+6,cell-12,cell-12); }
+    ctx.fillStyle='#78716C'; ctx.font='600 '+(s*0.045)+'px sans-serif'; ctx.textAlign='center';
+  }
+  // type switching
+  document.querySelectorAll('.type-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      document.querySelectorAll('.type-btn').forEach(function(b){b.classList.remove('active')});
+      btn.classList.add('active'); state.type=btn.getAttribute('data-type');
+      document.querySelectorAll('.group').forEach(function(g){g.classList.remove('active')});
+      $('group-'+state.type).classList.add('active'); render();
+    });
+  });
+  // example chips
+  document.querySelectorAll('.chip').forEach(function(chip){
+    chip.addEventListener('click',function(){
+      try{var d=JSON.parse(chip.getAttribute('data-fill')); if(d.url) $('f-url').value=d.url;}catch(e){}
+      render();
+    });
+  });
+  // swatches
+  document.querySelectorAll('.swatches').forEach(function(sw){
+    sw.addEventListener('click',function(e){
+      var b=e.target.closest('.swatch'); if(!b) return;
+      var target=sw.getAttribute('data-target');
+      if(target==='fg') $('c-fg').value=b.getAttribute('data-color'); else $('c-bg').value=b.getAttribute('data-color');
+      render();
+    });
+  });
+  inputs.forEach(function(id){ var el=$(id); if(el) el.addEventListener('input',render); el && el.addEventListener('change',render); });
+  function showToast(msg){ toast.textContent=msg; setTimeout(function(){toast.textContent=''},2600); }
+  function compositeCanvas(cb){
+    if(!lastPayload){ showToast('Pehle details bharo'); return; }
+    var size=parseInt($('opt-size').value,10)||1024; var label=$('opt-label').value.trim();
+    var tmp=document.createElement('canvas');
+    QRCode.toCanvas(tmp, lastPayload, {width:size, margin:2, errorCorrectionLevel:$('opt-ec').value, color:{dark:$('c-fg').value, light:$('c-bg').value}}, function(err){
+      if(err){showToast('QR nahi bana'); return;}
+      if(!label){ cb(tmp, 'qr-code.png'); return; }
+      var pad=Math.round(size*0.04); var labelH=Math.round(size*0.11);
+      var out=document.createElement('canvas'); out.width=tmp.width+pad*2; out.height=tmp.height+pad*2+labelH;
+      var ctx=out.getContext('2d'); ctx.fillStyle=$('c-bg').value; ctx.fillRect(0,0,out.width,out.height);
+      ctx.drawImage(tmp,pad,pad);
+      ctx.fillStyle=$('c-fg').value; ctx.font='700 '+Math.round(size*0.042)+'px "Public Sans",sans-serif'; ctx.textAlign='center';
+      ctx.fillText(label, out.width/2, pad+tmp.height+labelH*0.68);
+      cb(out,'qr-code.png');
+    });
+  }
+  $('btn-download').addEventListener('click',function(){
+    compositeCanvas(function(cnv,name){
+      cnv.toBlob(function(blob){ var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){URL.revokeObjectURL(a.href)},2000); showToast('PNG download ho gaya ✓'); },'image/png');
+    });
+  });
+  $('btn-copy').addEventListener('click',function(){
+    compositeCanvas(function(cnv){
+      if(!navigator.clipboard||typeof ClipboardItem==='undefined'){ showToast('Is browser me copy nahi chalega — Download use karo'); return; }
+      cnv.toBlob(function(blob){
+        var item={}; item[blob.type]=blob;
+        navigator.clipboard.write([new ClipboardItem(item)]).then(function(){showToast('Image copy ho gaya — kahin bhi paste kar lo ✓')}).catch(function(){showToast('Copy nahi hua — Download use karo')});
+      },'image/png');
+    });
+  });
+  $('btn-svg').addEventListener('click',function(){
+    if(!lastPayload||typeof QRCode==='undefined') return;
+    QRCode.toString(lastPayload,{type:'svg',width:parseInt($('opt-size').value,10)||1024,margin:2,errorCorrectionLevel:$('opt-ec').value,color:{dark:$('c-fg').value,light:$('c-bg').value}},function(err,svg){
+      if(err){showToast('SVG nahi bana');return;}
+      var blob=new Blob([svg],{type:'image/svg+xml'}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='qr-code.svg'; document.body.appendChild(a); a.click(); a.remove(); showToast('SVG download ho gaya ✓');
+    });
+  });
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Passport Photo Maker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f7; --surface:#ffffff; --surface2:#edf1f2; --ink:#14201f; --ink2:#4c5b59;
+    --line:#d7dede; --accent:#0e6b5c; --accent-ink:#ffffff; --accent-soft:#e2f1ed;
+    --warn:#b45309; --warn-soft:#fdf0dd; --danger:#b3261e; --shadow:0 10px 30px rgba(16,40,36,.10);
+    --chip:#eef3f2;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#101615; --surface:#182120; --surface2:#1f2a29; --ink:#e8efed; --ink2:#a9bab6;
+      --line:#2c3a38; --accent:#2ea88f; --accent-ink:#06231d; --accent-soft:#173b34;
+      --warn:#f0b269; --warn-soft:#3a2b16; --danger:#ff9d94; --shadow:0 10px 30px rgba(0,0,0,.45);
+      --chip:#22302e;
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.5}
+  h1,h2,h3{font-family:"Archivo",sans-serif;margin:0;line-height:1.15}
+  button{font:inherit;cursor:pointer}
+  input,select{font:inherit}
+  .wrap{max-width:1240px;margin:0 auto;padding:20px 16px 56px}
+
+  .intro{max-width:760px;margin:6px 0 18px}
+  .intro h1{font-size:clamp(26px,4.5vw,38px);font-weight:800;letter-spacing:-.01em}
+  .intro p{color:var(--ink2);margin:8px 0 0;font-size:16px}
+  .steps{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .steps span{background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600}
+  .steps b{color:var(--accent)}
+
+  .layout{display:grid;grid-template-columns:300px minmax(0,1fr) 300px;gap:16px;align-items:start}
+  @media (max-width:1020px){.layout{grid-template-columns:280px minmax(0,1fr)} .panel-out{grid-column:1/-1}}
+  @media (max-width:680px){.layout{grid-template-columns:1fr}}
+
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+  .panel h2{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);margin-bottom:12px}
+  .panel h2 .n{color:var(--accent)}
+  .group{margin-bottom:18px}
+  .group:last-child{margin-bottom:0}
+  label.lbl{display:block;font-size:13px;font-weight:600;margin:0 0 6px}
+  .hint{font-size:12.5px;color:var(--ink2);margin-top:5px}
+
+  /* dropzone */
+  .drop{border:2px dashed var(--line);border-radius:12px;padding:18px 12px;text-align:center;background:var(--surface2);transition:border-color .15s, background .15s}
+  .drop.over{border-color:var(--accent);background:var(--accent-soft)}
+  .drop svg{width:34px;height:34px;stroke:var(--accent)}
+  .drop p{margin:6px 0 10px;font-size:13.5px;color:var(--ink2)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:9px 14px;font-weight:600;font-size:14px;transition:transform .08s, background .15s}
+  .btn:active{transform:scale(.98)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .btn.block{width:100%}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.small{padding:6px 10px;font-size:13px;border-radius:7px}
+  .linkbtn{background:none;border:none;color:var(--accent);font-weight:600;padding:4px 0;text-decoration:underline;text-underline-offset:3px}
+
+  /* presets */
+  .preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .preset{border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 10px;text-align:left}
+  .preset .t{font-weight:700;font-size:13.5px;display:block}
+  .preset .s{font-size:12px;color:var(--ink2);display:block}
+  .preset[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .numin{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+
+  /* swatches */
+  .swatches{display:flex;flex-wrap:wrap;gap:8px}
+  .sw{width:34px;height:34px;border-radius:8px;border:2px solid var(--line);padding:0}
+  .sw[aria-pressed="true"]{border-color:var(--accent);outline:2px solid var(--accent);outline-offset:2px}
+
+  /* sliders */
+  .slider-row{margin-bottom:12px}
+  .slider-row .top{display:flex;justify-content:space-between;font-size:13px;font-weight:600}
+  .slider-row .val{color:var(--ink2);font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;accent-color:var(--accent);margin:4px 0 0}
+  .toolrow{display:flex;gap:8px;flex-wrap:wrap}
+
+  /* stage */
+  .stage-panel{padding:16px}
+  .stage-head{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .stage-head h2{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2)}
+  .spec-chip{background:var(--accent-soft);color:var(--ink);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:700}
+  .stage{background:
+      repeating-conic-gradient(var(--surface2) 0% 25%, var(--surface) 0% 50%) 0 0/22px 22px;
+    border:1px solid var(--line);border-radius:12px;display:flex;align-items:center;justify-content:center;padding:22px;min-height:340px}
+  .framebox{position:relative;box-shadow:0 14px 34px rgba(0,0,0,.25);line-height:0;touch-action:none}
+  canvas#editor{display:block;width:100%;height:auto;cursor:grab}
+  canvas#editor:active{cursor:grabbing}
+  .empty-msg{text-align:center;color:var(--ink2);max-width:340px;line-height:1.55}
+  .empty-msg strong{color:var(--ink);display:block;font-size:17px;margin-bottom:6px;font-family:"Archivo",sans-serif}
+  .stage-foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-top:12px}
+  .zoombox{display:flex;align-items:center;gap:8px;flex:1;min-width:210px}
+  .zoombox input{flex:1}
+  .checkline{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}
+  .checkline label{display:flex;gap:6px;align-items:center;font-size:13.5px;font-weight:600;cursor:pointer}
+  .checkline input{accent-color:var(--accent);width:17px;height:17px}
+
+  /* output */
+  .copies-row{display:flex;gap:8px;flex-wrap:wrap}
+  .copies-row .btn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+  .summary{background:var(--surface2);border-radius:10px;padding:11px 12px;font-size:13.5px;margin-bottom:12px}
+  .summary div{display:flex;justify-content:space-between;gap:10px;padding:2px 0}
+  .summary dt{color:var(--ink2)} .summary dd{margin:0;font-weight:700;font-variant-numeric:tabular-nums}
+  .sheet-preview{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;line-height:0;margin-bottom:12px;display:none}
+  .sheet-preview img{width:100%;height:auto;display:block}
+  .downloads{display:grid;gap:9px}
+  .note{background:var(--warn-soft);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--ink);margin-top:14px}
+  .rules{font-size:13.5px;color:var(--ink2);padding-left:18px;margin:8px 0 0}
+  .rules li{margin:3px 0}
+  .rules li::marker{color:var(--accent)}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;z-index:50;max-width:92vw;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .hidden{display:none !important}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="intro">
+    <h1>Passport Photo Maker</h1>
+    <p>Apni photo upload karo, country ka size chuno, frame me sahi se set karo — phir print-ready photo aur poori photo-sheet download karo. Sab kuch isi page par hota hai; photo device se bahar nahi jaati.</p>
+    <div class="steps">
+      <span><b>1</b> · Photo upload</span>
+      <span><b>2</b> · Size + background</span>
+      <span><b>3</b> · Frame set karo</span>
+      <span><b>4</b> · Download / print sheet</span>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <!-- LEFT : upload + size -->
+    <section class="panel" aria-label="Photo and size">
+      <div class="group">
+        <h2><span class="n">1</span> · Photo</h2>
+        <div class="drop" id="drop">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"/><path d="M4 16v3a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 19v-3"/></svg>
+          <p>Photo yahan drag &amp; drop karo,<br>ya browse karke chuno</p>
+          <button class="btn primary" id="browseBtn" type="button">Photo chuno</button>
+          <input type="file" id="fileInput" accept="image/*" class="hidden">
+          <div><button class="linkbtn" id="sampleBtn" type="button">Pehle sample photo se try karo</button></div>
+        </div>
+        <p class="hint" id="fileInfo">Koi photo nahi chuni gayi. JPG / PNG chalega.</p>
+      </div>
+
+      <div class="group">
+        <h2><span class="n">2</span> · Size (Preset)</h2>
+        <div class="preset-grid" id="presetGrid"></div>
+        <div id="customBox" class="hidden" style="margin-top:10px">
+          <div class="row2">
+            <div><label class="lbl" for="cw">Width (mm)</label><input class="numin" id="cw" type="number" min="15" max="120" value="35"></div>
+            <div><label class="lbl" for="ch">Height (mm)</label><input class="numin" id="ch" type="number" min="15" max="150" value="45"></div>
+          </div>
+        </div>
+        <p class="hint" id="presetNote"></p>
+      </div>
+
+      <div class="group">
+        <h2>Background colour</h2>
+        <div class="swatches" id="bgSwatches"></div>
+        <p class="hint">Ye colour photo ke peeche ka background banta hai. Studio wali plain-background photo par "Background replace" sabse achha kaam karta hai.</p>
+        <div style="margin-top:10px">
+          <button class="btn small" id="bgReplaceBtn" type="button" disabled>Background replace karo</button>
+          <button class="btn small hidden" id="bgUndoBtn" type="button">Original wapas</button>
+        </div>
+        <div class="slider-row" style="margin-top:10px">
+          <div class="top"><span>Replace sensitivity</span><span class="val" id="tolVal">32</span></div>
+          <input type="range" id="tol" min="8" max="90" value="32">
+        </div>
+      </div>
+    </section>
+
+    <!-- CENTRE : editor -->
+    <section class="panel stage-panel" aria-label="Editor">
+      <div class="stage-head">
+        <h2><span style="color:var(--accent)">3</span> · Frame set karo</h2>
+        <span class="spec-chip" id="specChip">35 × 45 mm · 413 × 531 px</span>
+      </div>
+      <div class="stage" id="stage">
+        <div class="empty-msg" id="emptyMsg">
+          <strong>Photo yahan dikhegi</strong>
+          Pehle left se ek photo upload karo — phir use drag karke aur zoom karke guide ke andar set karna hai. Sir (head) upar wali line se neeche aur thuddi (chin) neeche wali line ke aas-paas honi chahiye.
+        </div>
+        <div class="framebox hidden" id="frameBox">
+          <canvas id="editor" width="413" height="531"></canvas>
+        </div>
+      </div>
+      <div class="stage-foot">
+        <div class="zoombox">
+          <button class="btn small" id="zoomOut" type="button" aria-label="Zoom out">−</button>
+          <input type="range" id="zoom" min="20" max="400" value="100" aria-label="Zoom">
+          <button class="btn small" id="zoomIn" type="button" aria-label="Zoom in">+</button>
+        </div>
+        <div class="toolrow">
+          <button class="btn small" id="fitBtn" type="button">Fit karo</button>
+          <button class="btn small" id="centerBtn" type="button">Centre</button>
+          <button class="btn small" id="rotBtn" type="button">90° ghumao</button>
+          <button class="btn small" id="flipBtn" type="button">Flip</button>
+        </div>
+      </div>
+      <div class="checkline">
+        <label><input type="checkbox" id="guideToggle" checked> Guide lines dikhao</label>
+        <label><input type="checkbox" id="gridToggle"> Thirds grid</label>
+      </div>
+
+      <div class="group" style="margin-top:18px">
+        <h2>Photo sudharo (light)</h2>
+        <div class="slider-row"><div class="top"><span>Brightness</span><span class="val" id="brVal">0</span></div><input type="range" id="br" min="-60" max="60" value="0"></div>
+        <div class="slider-row"><div class="top"><span>Contrast</span><span class="val" id="ctVal">0</span></div><input type="range" id="ct" min="-60" max="60" value="0"></div>
+        <div class="slider-row"><div class="top"><span>Colour (saturation)</span><span class="val" id="stVal">0</span></div><input type="range" id="st" min="-60" max="60" value="0"></div>
+        <button class="btn small" id="resetAdj" type="button">Sudhaar reset</button>
+      </div>
+    </section>
+
+    <!-- RIGHT : output -->
+    <section class="panel panel-out" aria-label="Download and print">
+      <h2><span class="n">4</span> · Download</h2>
+      <dl class="summary">
+        <div><dt>Photo size</dt><dd id="sumSize">35 × 45 mm</dd></div>
+        <div><dt>Pixels (300 DPI)</dt><dd id="sumPx">413 × 531</dd></div>
+        <div><dt>Background</dt><dd id="sumBg">White</dd></div>
+      </dl>
+
+      <div class="group">
+        <label class="lbl">Photo sheet ka paper</label>
+        <div class="copies-row" id="paperRow">
+          <button class="btn small" type="button" data-paper="4x6" aria-pressed="true">4 × 6 inch</button>
+          <button class="btn small" type="button" data-paper="5x7" aria-pressed="false">5 × 7 inch</button>
+          <button class="btn small" type="button" data-paper="a4" aria-pressed="false">A4</button>
+          <button class="btn small" type="button" data-paper="a5" aria-pressed="false">A5</button>
+        </div>
+        <p class="hint" id="sheetInfo">4 × 6 inch sheet par is size ki 8 copies aayengi (kaatne ke nishan ke saath).</p>
+      </div>
+
+      <div class="sheet-preview" id="sheetPreview"><img id="sheetImg" alt="Print sheet preview — passport photos arranged on the selected paper size"></div>
+
+      <div class="downloads">
+        <button class="btn primary block" id="dlSingle" type="button" disabled>Single photo download (JPG)</button>
+        <button class="btn block" id="dlSheet" type="button" disabled>Photo sheet download (JPG)</button>
+        <button class="btn block" id="dlPng" type="button" disabled>Single photo (PNG)</button>
+      </div>
+
+      <div class="note"><strong>Print tip:</strong> Studio/lab me sheet print karwate time "Actual size / 100%" bolna — "Fit to page" se size badal jata hai. Ghar ke printer par bhi scale 100% rakho.</div>
+
+      <div class="group" style="margin-top:18px">
+        <h2>Aam niyam (sabhi IDs ke liye)</h2>
+        <ul class="rules">
+          <li>Photo 6 mahine se purani na ho; chehra saaf dikhe, band/blur na ho.</li>
+          <li>Chashma, topi/cap aur chehra dhakne wali cheezein hata do (dharmik karan alag).</li>
+          <li>Dono aankhein khuli, munh band, seedha camera ki taraf dekho.</li>
+          <li>Final acceptance office/embassy ke haath me hai — unki latest guideline hi final hai.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+"use strict";
+var DPI = 300, MM = DPI/25.4;
+function mm2px(mm){ return Math.round(mm*MM); }
+
+var PRESETS = [
+  {id:'in-passport', name:'India Passport', sub:'35 × 45 mm', w:35, h:45, bg:'#ffffff', note:'Indian passport / visa ke liye sabse aam size. Safed background, chehra photo ka 70–80% hissa.'},
+  {id:'in-pan', name:'PAN / Aadhaar', sub:'25 × 35 mm', w:25, h:35, bg:'#ffffff', note:'Chhota ID size — PAN card, Aadhaar aur kai sarkari forms me chalta hai.'},
+  {id:'us', name:'US Passport / Visa', sub:'2 × 2 inch · 51 × 51', w:51, h:51, bg:'#ffffff', note:'US passport aur visa dono ke liye 2×2 inch square photo, safed background.'},
+  {id:'uk', name:'UK Passport', sub:'35 × 45 mm', w:35, h:45, bg:'#e8e8e8', note:'UK ke liye halka grey ya cream background bhi chalta hai; yahan light grey set hai.'},
+  {id:'schengen', name:'Europe (Schengen)', sub:'35 × 45 mm', w:35, h:45, bg:'#e8e8e8', note:'Schengen visa ke liye 35×45 mm, halka (light) background.'},
+  {id:'china', name:'China Visa', sub:'33 × 48 mm', w:33, h:48, bg:'#ffffff', note:'China visa ka apna size hai — 33×48 mm, safed background.'},
+  {id:'canada', name:'Canada', sub:'50 × 70 mm', w:50, h:70, bg:'#ffffff', note:'Canada passport/visa photo bada hota hai — 50×70 mm.'},
+  {id:'custom', name:'Custom size', sub:'Apna mm daalo', w:35, h:45, bg:'#ffffff', note:'Form me jo size manga ho, wahi mm yahan daal do.'}
+];
+var BGS = [
+  {name:'White', hex:'#ffffff'},
+  {name:'Light grey', hex:'#e8e8e8'},
+  {name:'Passport blue', hex:'#438edb'},
+  {name:'Sky blue', hex:'#a8c8e8'},
+  {name:'Red', hex:'#c0272d'},
+  {name:'Dark blue', hex:'#1f4e79'}
+];
+var PAPERS = {
+  '4x6':{name:'4 × 6 inch', w:101.6, h:152.4},
+  '5x7':{name:'5 × 7 inch', w:127, h:177.8},
+  'a4':{name:'A4', w:210, h:297},
+  'a5':{name:'A5', w:148, h:210}
+};
+
+var state = {
+  img:null,            // HTMLImageElement or canvas (current source)
+  srcCanvas:null,      // replaced-background canvas, if any
+  preset:PRESETS[0],
+  bg:'#ffffff', bgName:'White',
+  paper:'4x6',
+  scale:1, minScale:1, ox:0, oy:0, rot:0, flip:1,
+  br:0, ct:0, st:0,
+  guides:true, grid:false
+};
+
+var $ = function(id){ return document.getElementById(id); };
+var editor = $('editor'), ectx = editor.getContext('2d');
+var toastTimer=null;
+function toast(msg){ var t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(function(){t.classList.remove('show');},2600); }
+
+/* ---------- presets UI ---------- */
+var grid=$('presetGrid');
+PRESETS.forEach(function(p){
+  var b=document.createElement('button');
+  b.type='button'; b.className='preset'; b.setAttribute('aria-pressed', p.id===state.preset.id?'true':'false');
+  b.innerHTML='<span class="t"></span><span class="s"></span>';
+  b.querySelector('.t').textContent=p.name; b.querySelector('.s').textContent=p.sub;
+  b.addEventListener('click',function(){ setPreset(p); });
+  grid.appendChild(b);
+});
+function setPreset(p){
+  state.preset=p;
+  Array.prototype.forEach.call(grid.children,function(c,i){ c.setAttribute('aria-pressed', PRESETS[i].id===p.id?'true':'false'); });
+  $('customBox').classList.toggle('hidden', p.id!=='custom');
+  if(p.id==='custom'){ p.w=parseFloat($('cw').value)||35; p.h=parseFloat($('ch').value)||45; }
+  if(p.bg){ setBg(p.bg, true); }
+  $('presetNote').textContent=p.note;
+  layoutEditor(true);
+}
+$('cw').addEventListener('input',function(){ if(state.preset.id==='custom'){ state.preset.w=parseFloat(this.value)||35; layoutEditor(true);} });
+$('ch').addEventListener('input',function(){ if(state.preset.id==='custom'){ state.preset.h=parseFloat(this.value)||45; layoutEditor(true);} });
+
+/* ---------- background swatches ---------- */
+var swBox=$('bgSwatches');
+BGS.forEach(function(c){
+  var b=document.createElement('button');
+  b.type='button'; b.className='sw'; b.title=c.name; b.style.background=c.hex;
+  b.setAttribute('aria-pressed', c.hex===state.bg?'true':'false'); b.dataset.hex=c.hex; b.dataset.name=c.name;
+  b.addEventListener('click',function(){ setBg(c.hex,false); state.bgName=c.name; $('sumBg').textContent=c.name; });
+  swBox.appendChild(b);
+});
+function setBg(hex, fromPreset){
+  state.bg=hex;
+  Array.prototype.forEach.call(swBox.children,function(c){
+    var on=c.dataset.hex.toLowerCase()===hex.toLowerCase();
+    c.setAttribute('aria-pressed', on?'true':'false');
+    if(on && !fromPreset){ state.bgName=c.dataset.name; }
+    if(on && fromPreset){ state.bgName=c.dataset.name; $('sumBg').textContent=c.dataset.name; }
+  });
+  draw();
+}
+
+/* ---------- image loading ---------- */
+var fileInput=$('fileInput');
+$('browseBtn').addEventListener('click',function(){ fileInput.click(); });
+fileInput.addEventListener('change',function(){ if(this.files && this.files[0]) loadFile(this.files[0]); this.value=''; });
+var drop=$('drop');
+['dragenter','dragover'].forEach(function(ev){ drop.addEventListener(ev,function(e){ e.preventDefault(); drop.classList.add('over'); }); });
+['dragleave','drop'].forEach(function(ev){ drop.addEventListener(ev,function(e){ e.preventDefault(); drop.classList.remove('over'); }); });
+drop.addEventListener('drop',function(e){ var f=e.dataTransfer.files && e.dataTransfer.files[0]; if(f) loadFile(f); });
+document.addEventListener('paste',function(e){
+  var items=e.clipboardData && e.clipboardData.items; if(!items) return;
+  for(var i=0;i<items.length;i++){ if(items[i].type.indexOf('image')===0){ loadFile(items[i].getAsFile()); break; } }
+});
+function loadFile(f){
+  if(!/^image\//.test(f.type)){ toast('Ye image file nahi hai — JPG ya PNG chuno.'); return; }
+  var url=URL.createObjectURL(f);
+  var img=new Image();
+  img.onload=function(){
+    state.img=img; state.srcCanvas=null; $('bgUndoBtn').classList.add('hidden');
+    $('fileInfo').textContent=f.name+' · '+img.naturalWidth+' × '+img.naturalHeight+' px';
+    onNewImage();
+    URL.revokeObjectURL(url);
+    toast('Photo load ho gayi — ab frame set karo.');
+  };
+  img.onerror=function(){ URL.revokeObjectURL(url); toast('Photo khul nahi payi — dusri file try karo.'); };
+  img.src=url;
+}
+function onNewImage(){
+  $('emptyMsg').classList.add('hidden'); $('frameBox').classList.remove('hidden');
+  $('bgReplaceBtn').disabled=false;
+  $('dlSingle').disabled=false; $('dlSheet').disabled=false; $('dlPng').disabled=false;
+  state.rot=0; state.flip=1;
+  layoutEditor(true);
+  fitImage();
+  buildSheet();
+}
+function srcSize(){
+  var s=state.srcCanvas||state.img; if(!s) return {w:0,h:0};
+  return { w: s.naturalWidth||s.width, h: s.naturalHeight||s.height };
+}
+
+/* sample photo: a drawn illustration (not a real person) so the tool can be tried instantly */
+$('sampleBtn').addEventListener('click',function(){
+  var c=document.createElement('canvas'); c.width=900; c.height=1150; var x=c.getContext('2d');
+  var g=x.createLinearGradient(0,0,0,1150); g.addColorStop(0,'#bcd6e6'); g.addColorStop(1,'#8fb2cc');
+  x.fillStyle=g; x.fillRect(0,0,900,1150);
+  // shoulders / shirt
+  x.fillStyle='#31556e'; x.beginPath(); x.moveTo(90,1150); x.bezierCurveTo(140,880,300,800,450,800); x.bezierCurveTo(600,800,760,880,810,1150); x.closePath(); x.fill();
+  x.fillStyle='#27455a'; x.beginPath(); x.moveTo(390,810); x.lineTo(450,920); x.lineTo(510,810); x.lineTo(510,1150); x.lineTo(390,1150); x.closePath(); x.fill();
+  // neck + face
+  x.fillStyle='#c98d64'; x.fillRect(408,640,84,130);
+  x.fillStyle='#dca173'; x.beginPath(); x.ellipse(450,470,150,185,0,0,Math.PI*2); x.fill();
+  // ears
+  x.beginPath(); x.ellipse(298,490,26,44,0,0,Math.PI*2); x.ellipse(602,490,26,44,0,0,Math.PI*2); x.fill();
+  // hair
+  x.fillStyle='#20242a'; x.beginPath(); x.ellipse(450,330,158,105,-0.06,Math.PI,Math.PI*2); x.fill();
+  x.fillRect(292,320,26,110); x.fillRect(582,320,26,110);
+  // eyes / brows / nose / mouth
+  x.strokeStyle='#20242a'; x.lineWidth=9; x.lineCap='round';
+  x.beginPath(); x.moveTo(352,420); x.lineTo(408,416); x.moveTo(492,416); x.lineTo(548,420); x.stroke();
+  x.fillStyle='#20242a';
+  x.beginPath(); x.ellipse(380,478,13,17,0,0,Math.PI*2); x.ellipse(520,478,13,17,0,0,Math.PI*2); x.fill();
+  x.lineWidth=6; x.beginPath(); x.moveTo(452,500); x.lineTo(440,556); x.lineTo(458,562); x.stroke();
+  x.strokeStyle='#8a4b2d'; x.lineWidth=8; x.beginPath(); x.moveTo(398,618); x.quadraticCurveTo(450,640,502,618); x.stroke();
+  state.img=c; state.srcCanvas=null; $('bgUndoBtn').classList.add('hidden');
+  $('fileInfo').textContent='Sample illustration (asli photo nahi) — tool try karne ke liye.';
+  onNewImage();
+});
+
+/* ---------- editor layout & drawing ---------- */
+function outDims(){
+  var p=state.preset;
+  if(p.id==='custom'){ p.w=parseFloat($('cw').value)||35; p.h=parseFloat($('ch').value)||45; }
+  return { w: mm2px(p.w), h: mm2px(p.h), mmw:p.w, mmh:p.h };
+}
+function layoutEditor(refit){
+  var d=outDims();
+  editor.width=d.w; editor.height=d.h;
+  var maxW=Math.min(430, d.w), scaleDisp=maxW/d.w;
+  editor.style.width=(d.w*scaleDisp)+'px'; editor.style.height=(d.h*scaleDisp)+'px';
+  $('specChip').textContent=d.mmw+' × '+d.mmh+' mm · '+d.w+' × '+d.h+' px';
+  $('sumSize').textContent=d.mmw+' × '+d.mmh+' mm';
+  $('sumPx').textContent=d.w+' × '+d.h;
+  if(state.img && refit) fitImage(); else draw();
+}
+function fitImage(){
+  if(!state.img) return;
+  var s=srcSize(), d=outDims();
+  var iw=s.w, ih=s.h;
+  if(state.rot%180!==0){ var t=iw; iw=ih; ih=t; }
+  state.minScale=Math.max(d.w/iw, d.h/ih);
+  state.scale=state.minScale; state.ox=0; state.oy=0;
+  $('zoom').value=100;
+  draw();
+}
+function clampOffset(){
+  var s=srcSize(), d=outDims(); if(!s.w) return;
+  var iw=s.w, ih=s.h; if(state.rot%180!==0){ var t=iw; iw=ih; ih=t; }
+  var dw=iw*state.scale, dh=ih*state.scale;
+  var mx=Math.max(0,(dw-d.w)/2), my=Math.max(0,(dh-d.h)/2);
+  state.ox=Math.max(-mx,Math.min(mx,state.ox));
+  state.oy=Math.max(-my,Math.min(my,state.oy));
+}
+function draw(){
+  var d=outDims();
+  ectx.save();
+  ectx.fillStyle=state.bg; ectx.fillRect(0,0,d.w,d.h);
+  if(state.img){
+    clampOffset();
+    ectx.filter='brightness('+(100+state.br)+'%) contrast('+(100+state.ct)+'%) saturate('+(100+state.st)+'%)';
+    var s=srcSize();
+    ectx.translate(d.w/2+state.ox, d.h/2+state.oy);
+    ectx.rotate(state.rot*Math.PI/180);
+    ectx.scale(state.flip*state.scale, state.scale);
+    ectx.drawImage(state.srcCanvas||state.img, -s.w/2, -s.h/2);
+    ectx.filter='none';
+  }
+  ectx.restore();
+  if(state.img && state.guides) drawGuides(d);
+  if(state.img && state.grid) drawGrid(d);
+}
+function drawGuides(d){
+  var x=ectx; x.save();
+  x.strokeStyle='rgba(14,107,92,.85)'; x.lineWidth=Math.max(2,d.w*0.005); x.setLineDash([10,8]);
+  // face oval: head height approx 70% of photo height, centred
+  var ow=d.w*0.52, oh=d.h*0.62, cx=d.w/2, cy=d.h*0.44;
+  x.beginPath(); x.ellipse(cx,cy,ow/2,oh/2,0,0,Math.PI*2); x.stroke();
+  x.setLineDash([]);
+  x.strokeStyle='rgba(179,38,30,.8)';
+  x.beginPath(); x.moveTo(0,cy-oh/2); x.lineTo(d.w,cy-oh/2); x.stroke();      // top of head
+  x.beginPath(); x.moveTo(0,cy+oh/2); x.lineTo(d.w,cy+oh/2); x.stroke();      // chin
+  x.strokeStyle='rgba(14,107,92,.55)';
+  x.beginPath(); x.moveTo(cx,0); x.lineTo(cx,d.h); x.stroke();                // centre line
+  x.restore();
+}
+function drawGrid(d){
+  var x=ectx; x.save(); x.strokeStyle='rgba(20,32,31,.35)'; x.lineWidth=1.5;
+  for(var i=1;i<3;i++){
+    x.beginPath(); x.moveTo(d.w*i/3,0); x.lineTo(d.w*i/3,d.h); x.stroke();
+    x.beginPath(); x.moveTo(0,d.h*i/3); x.lineTo(d.w,d.h*i/3); x.stroke();
+  }
+  x.restore();
+}
+
+/* ---------- pan / zoom interactions ---------- */
+var dragging=false, lastX=0, lastY=0, pinchD=0;
+function dispScale(){ var r=editor.getBoundingClientRect(); return editor.width/r.width; }
+editor.addEventListener('pointerdown',function(e){ if(!state.img) return; dragging=true; lastX=e.clientX; lastY=e.clientY; editor.setPointerCapture(e.pointerId); });
+editor.addEventListener('pointermove',function(e){
+  if(!dragging||!state.img) return;
+  var k=dispScale();
+  state.ox+=(e.clientX-lastX)*k; state.oy+=(e.clientY-lastY)*k;
+  lastX=e.clientX; lastY=e.clientY; draw();
+});
+['pointerup','pointercancel'].forEach(function(ev){ editor.addEventListener(ev,function(){ dragging=false; }); });
+editor.addEventListener('wheel',function(e){
+  if(!state.img) return; e.preventDefault();
+  setZoom(state.scale*(e.deltaY<0?1.07:0.93));
+},{passive:false});
+editor.addEventListener('touchmove',function(e){
+  if(e.touches.length===2){
+    var dx=e.touches[0].clientX-e.touches[1].clientX, dy=e.touches[0].clientY-e.touches[1].clientY;
+    var dist=Math.hypot(dx,dy);
+    if(pinchD) setZoom(state.scale*dist/pinchD);
+    pinchD=dist;
+  }
+},{passive:true});
+editor.addEventListener('touchend',function(){ pinchD=0; });
+function setZoom(ns){
+  state.scale=Math.max(state.minScale*0.5, Math.min(state.minScale*6, ns));
+  $('zoom').value=Math.round(state.scale/state.minScale*100);
+  draw();
+}
+$('zoom').addEventListener('input',function(){ if(!state.img) return; state.scale=state.minScale*(this.value/100); draw(); });
+$('zoomIn').addEventListener('click',function(){ setZoom(state.scale*1.15); });
+$('zoomOut').addEventListener('click',function(){ setZoom(state.scale/1.15); });
+$('fitBtn').addEventListener('click',function(){ fitImage(); buildSheetSoon(); });
+$('centerBtn').addEventListener('click',function(){ state.ox=0; state.oy=0; draw(); buildSheetSoon(); });
+$('rotBtn').addEventListener('click',function(){ state.rot=(state.rot+90)%360; fitImage(); buildSheetSoon(); });
+$('flipBtn').addEventListener('click',function(){ state.flip*=-1; draw(); buildSheetSoon(); });
+$('guideToggle').addEventListener('change',function(){ state.guides=this.checked; draw(); });
+$('gridToggle').addEventListener('change',function(){ state.grid=this.checked; draw(); });
+
+/* adjustments */
+function bindAdj(id, valId, key){
+  $(id).addEventListener('input',function(){ state[key]=parseInt(this.value,10); $(valId).textContent=this.value; draw(); buildSheetSoon(); });
+}
+bindAdj('br','brVal','br'); bindAdj('ct','ctVal','ct'); bindAdj('st','stVal','st');
+$('resetAdj').addEventListener('click',function(){
+  state.br=state.ct=state.st=0;
+  ['br','ct','st'].forEach(function(id){ $(id).value=0; });
+  ['brVal','ctVal','stVal'].forEach(function(id){ $(id).textContent='0'; });
+  draw(); buildSheetSoon();
+});
+editor.addEventListener('pointerup',buildSheetSoon);
+
+/* ---------- background replace (flood fill from edges) ---------- */
+$('tol').addEventListener('input',function(){ $('tolVal').textContent=this.value; });
+$('bgReplaceBtn').addEventListener('click',function(){
+  if(!state.img) return;
+  var src=state.img;
+  var sw=src.naturalWidth||src.width, sh=src.naturalHeight||src.height;
+  var cap=1400, k=Math.min(1, cap/Math.max(sw,sh));
+  var W=Math.round(sw*k), H=Math.round(sh*k);
+  var c=document.createElement('canvas'); c.width=W; c.height=H;
+  var x=c.getContext('2d'); x.drawImage(src,0,0,W,H);
+  var imgData; try{ imgData=x.getImageData(0,0,W,H); }catch(err){ toast('Is photo par replace nahi ho paya.'); return; }
+  var data=imgData.data, tol=parseInt($('tol').value,10)*2.6;
+  // reference colour = average of the 4 corners
+  function px(i){ return [data[i],data[i+1],data[i+2]]; }
+  var corners=[px(0), px((W-1)*4), px((H-1)*W*4), px(((H-1)*W+W-1)*4)];
+  var ref=[0,0,0]; corners.forEach(function(cc){ ref[0]+=cc[0]/4; ref[1]+=cc[1]/4; ref[2]+=cc[2]/4; });
+  function similar(i){
+    var dr=data[i]-ref[0], dg=data[i+1]-ref[1], db=data[i+2]-ref[2];
+    return (dr*dr+dg*dg+db*db) < tol*tol;
+  }
+  var visited=new Uint8Array(W*H), stack=[];
+  function push(xx,yy){ if(xx<0||yy<0||xx>=W||yy>=H) return; var idx=yy*W+xx; if(visited[idx]) return; visited[idx]=1; if(similar(idx*4)) stack.push(idx); }
+  var xx,yy;
+  for(xx=0;xx<W;xx++){ push(xx,0); push(xx,H-1); }
+  for(yy=0;yy<H;yy++){ push(0,yy); push(W-1,yy); }
+  var bgc=hexRgb(state.bg);
+  while(stack.length){
+    var idx=stack.pop(), i4=idx*4;
+    data[i4]=bgc[0]; data[i4+1]=bgc[1]; data[i4+2]=bgc[2]; data[i4+3]=255;
+    var cxp=idx%W, cyp=(idx/W)|0;
+    push(cxp+1,cyp); push(cxp-1,cyp); push(cxp,cyp+1); push(cxp,cyp-1);
+  }
+  x.putImageData(imgData,0,0);
+  state.srcCanvas=c;
+  $('bgUndoBtn').classList.remove('hidden');
+  fitImage(); buildSheet();
+  toast('Background replace ho gaya. Kinare theek na lagein to sensitivity badal kar dobara try karo.');
+});
+$('bgUndoBtn').addEventListener('click',function(){
+  state.srcCanvas=null; this.classList.add('hidden'); fitImage(); buildSheet();
+});
+function hexRgb(hex){
+  var n=parseInt(hex.slice(1),16);
+  return [(n>>16)&255,(n>>8)&255,n&255];
+}
+
+/* ---------- export: single photo ---------- */
+function renderPhoto(){
+  var d=outDims();
+  var c=document.createElement('canvas'); c.width=d.w; c.height=d.h;
+  var x=c.getContext('2d');
+  x.fillStyle=state.bg; x.fillRect(0,0,d.w,d.h);
+  if(state.img){
+    var s=srcSize();
+    x.filter='brightness('+(100+state.br)+'%) contrast('+(100+state.ct)+'%) saturate('+(100+state.st)+'%)';
+    x.translate(d.w/2+state.ox, d.h/2+state.oy);
+    x.rotate(state.rot*Math.PI/180);
+    x.scale(state.flip*state.scale, state.scale);
+    x.drawImage(state.srcCanvas||state.img, -s.w/2, -s.h/2);
+  }
+  return c;
+}
+function saveCanvas(c, name, type, q){
+  c.toBlob(function(blob){
+    if(!blob){ toast('File ban nahi payi — dobara try karo.'); return; }
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob); a.download=name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); },4000);
+    toast('Download shuru — '+name);
+  }, type, q);
+}
+$('dlSingle').addEventListener('click',function(){ saveCanvas(renderPhoto(),'passport-photo-'+state.preset.id+'.jpg','image/jpeg',0.95); });
+$('dlPng').addEventListener('click',function(){ saveCanvas(renderPhoto(),'passport-photo-'+state.preset.id+'.png','image/png'); });
+
+/* ---------- print sheet ---------- */
+Array.prototype.forEach.call($('paperRow').children,function(b){
+  b.addEventListener('click',function(){
+    state.paper=b.dataset.paper;
+    Array.prototype.forEach.call($('paperRow').children,function(o){ o.setAttribute('aria-pressed', o===b?'true':'false'); });
+    buildSheet();
+  });
+});
+var sheetTimer=null;
+function buildSheetSoon(){ clearTimeout(sheetTimer); sheetTimer=setTimeout(buildSheet,350); }
+function sheetLayout(){
+  var paper=PAPERS[state.paper], d=outDims();
+  var pw=mm2px(paper.w), ph=mm2px(paper.h);
+  // keep paper portrait as listed; photos upright
+  var gap=mm2px(3), margin=mm2px(5);
+  var cols=Math.max(1, Math.floor((pw-2*margin+gap)/(d.w+gap)));
+  var rows=Math.max(1, Math.floor((ph-2*margin+gap)/(d.h+gap)));
+  return {paper:paper, pw:pw, ph:ph, gap:gap, margin:margin, cols:cols, rows:rows, count:cols*rows, d:d};
+}
+function buildSheet(){
+  var L=sheetLayout();
+  $('sheetInfo').textContent=L.paper.name+' sheet par is size ki '+L.count+' copies aayengi ('+L.cols+' × '+L.rows+', kaatne ke nishan ke saath).';
+  if(!state.img){ $('sheetPreview').style.display='none'; return; }
+  var photo=renderPhoto();
+  var c=document.createElement('canvas'); c.width=L.pw; c.height=L.ph;
+  var x=c.getContext('2d');
+  x.fillStyle='#ffffff'; x.fillRect(0,0,L.pw,L.ph);
+  var totalW=L.cols*L.d.w+(L.cols-1)*L.gap, totalH=L.rows*L.d.h+(L.rows-1)*L.gap;
+  var sx=(L.pw-totalW)/2, sy=(L.ph-totalH)/2;
+  for(var r=0;r<L.rows;r++) for(var col=0;col<L.cols;col++){
+    var px=sx+col*(L.d.w+L.gap), py=sy+r*(L.d.h+L.gap);
+    x.drawImage(photo,px,py);
+    x.strokeStyle='#c8c8c8'; x.lineWidth=2; x.setLineDash([12,9]);
+    x.strokeRect(px,py,L.d.w,L.d.h);
+    x.setLineDash([]);
+  }
+  c.toBlob(function(blob){
+    if(!blob) return;
+    var img=$('sheetImg');
+    if(img.dataset.url) URL.revokeObjectURL(img.dataset.url);
+    img.dataset.url=URL.createObjectURL(blob);
+    img.src=img.dataset.url;
+    $('sheetPreview').style.display='block';
+  },'image/jpeg',0.85);
+  state._sheetCanvas=c;
+}
+$('dlSheet').addEventListener('click',function(){
+  if(state._sheetCanvas) saveCanvas(state._sheetCanvas,'passport-print-sheet-'+state.paper+'.jpg','image/jpeg',0.95);
+});
+
+/* init */
+setBg('#ffffff', true);
+$('presetNote').textContent=PRESETS[0].note;
+layoutEditor(false);
+buildSheet();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Sun, Moon &amp; Rising Sign Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fdf9ef; --bg2:#f6ecd4; --surface:#ffffff; --surface2:#fffaf0;
+    --ink:#211a12; --muted:#6f6455; --line:#e7dcc3;
+    --kumkum:#8c2b1d; --kumkum2:#a83a28; --gold:#b8860b; --gold-soft:#f3e3b3;
+    --navy:#1c2340; --teal:#1f5c57;
+    --shadow:0 10px 30px rgba(60,40,10,.10);
+    --radius:18px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12101f; --bg2:#18152c; --surface:#1e1b33; --surface2:#252140;
+      --ink:#f2ecdc; --muted:#b8b0a0; --line:#353156;
+      --kumkum:#e07a5f; --kumkum2:#e88a70; --gold:#e3b94e; --gold-soft:#3a341f;
+      --navy:#aeb8e8; --teal:#7fc8bc;
+      --shadow:0 10px 30px rgba(0,0,0,.45);
+    }
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+  button,[role="button"],select,input{font:inherit}
+  button,select,input[type="date"],input[type="time"]{min-height:44px}
+  a{color:var(--kumkum)}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 18px 56px}
+
+  /* ---------- hero ---------- */
+  .hero{padding:34px 0 8px;text-align:center}
+  .stars{font-size:15px;letter-spacing:.55em;color:var(--gold);text-indent:.55em}
+  .hero h1{font-family:"Marcellus",serif;font-weight:400;font-size:clamp(30px,6vw,52px);line-height:1.08;margin:10px 0 10px;color:var(--ink)}
+  .hero h1 em{font-family:"Cormorant Garamond",serif;font-style:italic;font-weight:600;color:var(--kumkum)}
+  .hero p{max-width:620px;margin:0 auto;color:var(--muted);font-size:16.5px}
+  .hero .trio{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px}
+  .trio span{display:inline-flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:13.5px;font-weight:600}
+  .trio .sym{font-size:17px;line-height:1}
+  .sun-c{color:#c47b12}.moon-c{color:#5b6fb5}.rise-c{color:var(--teal)}
+  @media (prefers-color-scheme: dark){.moon-c{color:#9db0e8}}
+
+  /* ---------- layout ---------- */
+  .grid{display:grid;grid-template-columns:400px 1fr;gap:22px;margin-top:26px;align-items:start}
+  @media (max-width:860px){.grid{grid-template-columns:1fr}}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .form-card{padding:22px 20px 20px;position:sticky;top:14px}
+  @media (max-width:860px){.form-card{position:static}}
+  .form-card h2{font-family:"Marcellus",serif;font-weight:400;font-size:21px;margin:0 0 4px}
+  .form-card .sub{font-size:13.5px;color:var(--muted);margin:0 0 16px}
+  label.flabel{display:block;font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:16px 0 6px}
+  label.flabel:first-of-type{margin-top:0}
+  input[type="date"],input[type="time"],input[type="number"],input[type="text"],select{width:100%;border:1.5px solid var(--line);border-radius:11px;padding:10px 12px;background:var(--surface2);color:var(--ink)}
+  input:focus,select:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:var(--gold)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .row3 input{padding:10px 8px;font-size:14px}
+  .seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:5px}
+  .seg button{border:0;background:transparent;border-radius:8px;padding:9px 6px;font-weight:700;font-size:14px;cursor:pointer;color:var(--muted);min-height:42px}
+  .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.12)}
+  .seg3{grid-template-columns:1fr 1fr 1fr}
+  .hint{font-size:12.5px;color:var(--muted);margin-top:6px}
+  details.adv{margin-top:14px;border-top:1px dashed var(--line);padding-top:10px}
+  details.adv summary{cursor:pointer;font-weight:700;font-size:14px;min-height:36px;display:flex;align-items:center;color:var(--kumkum)}
+  .calc-btn{width:100%;margin-top:20px;background:var(--kumkum);color:#fff;border:0;border-radius:13px;padding:15px;font-size:17px;font-weight:800;cursor:pointer;letter-spacing:.01em;min-height:54px}
+  .calc-btn:hover{background:var(--kumkum2)}
+  .calc-btn:active{transform:translateY(1px)}
+  .err{display:none;margin-top:12px;background:#fdeceb;border:1px solid #f0b8ae;color:#7c1d10;border-radius:10px;padding:10px 12px;font-size:14px}
+  @media (prefers-color-scheme: dark){.err{background:#3a1d18;border-color:#7a3a2c;color:#ffb9a6}}
+  .privacy{font-size:12.5px;color:var(--muted);text-align:center;margin-top:12px}
+
+  /* ---------- results ---------- */
+  .empty{padding:34px 26px;text-align:center}
+  .empty .big-sym{font-size:40px;color:var(--gold);letter-spacing:.2em}
+  .empty h2{font-family:"Marcellus",serif;font-weight:400;font-size:24px;margin:12px 0 6px}
+  .empty p{color:var(--muted);max-width:440px;margin:0 auto}
+  .results{display:none}
+  .results.show{display:block}
+  .res-head{padding:22px 22px 4px}
+  .res-head h2{font-family:"Marcellus",serif;font-weight:400;font-size:26px;margin:0}
+  .res-head p{color:var(--muted);margin:4px 0 0;font-size:14.5px}
+  .sign-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:16px}
+  @media (max-width:700px){.sign-cards{grid-template-columns:1fr}}
+  .sign-card{border:1px solid var(--line);border-radius:15px;padding:20px 16px;text-align:center;background:var(--surface2)}
+  .sign-card .glyph{font-size:52px;line-height:1.05}
+  .sign-card .what{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+  .sign-card h3{font-family:"Marcellus",serif;font-weight:400;font-size:27px;margin:2px 0 0}
+  .sign-card .hindi{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:16px;color:var(--kumkum);margin-top:1px}
+  .sign-card .deg{font-weight:700;font-size:14.5px;margin-top:7px}
+  .sign-card .meta{font-size:13px;color:var(--muted)}
+  .sign-card .desc{font-size:14px;text-align:left;margin-top:12px;border-top:1px dashed var(--line);padding-top:11px}
+  .sign-card.sun{border-top:5px solid #e09b1f}
+  .sign-card.moon{border-top:5px solid #6d81c4}
+  .sign-card.rise{border-top:5px solid var(--teal)}
+  .cusp{display:inline-block;margin-top:9px;font-size:12px;font-weight:700;background:var(--gold-soft);border-radius:999px;padding:3px 10px}
+
+  .lower{display:grid;grid-template-columns:290px 1fr;gap:14px;padding:0 16px 16px}
+  @media (max-width:700px){.lower{grid-template-columns:1fr}}
+  .wheel-box{border:1px solid var(--line);border-radius:15px;padding:14px;text-align:center;background:var(--surface2)}
+  .wheel-box h4,.detail-box h4{font-family:"Marcellus",serif;font-weight:400;font-size:17px;margin:0 0 8px}
+  .detail-box{border:1px solid var(--line);border-radius:15px;padding:16px;background:var(--surface2)}
+  table.dt{width:100%;border-collapse:collapse;font-size:14px}
+  table.dt th,table.dt td{padding:7px 4px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  table.dt th{color:var(--muted);font-weight:600;width:44%}
+  table.dt tr:last-child th,table.dt tr:last-child td{border-bottom:0}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;padding:0 16px 20px}
+  .actions button{flex:1;min-width:150px;border-radius:11px;padding:12px;font-weight:700;cursor:pointer;min-height:48px}
+  .btn-copy{background:var(--navy);color:#fff;border:0}
+  @media (prefers-color-scheme: dark){.btn-copy{background:#e8e2cf;color:#1c1a12}}
+  .btn-again{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+  .copied{font-size:13px;color:var(--teal);font-weight:700;align-self:center}
+
+  /* ---------- info sections ---------- */
+  .info{margin-top:26px}
+  .info h2{font-family:"Marcellus",serif;font-weight:400;font-size:27px;margin:0 0 6px;text-align:center}
+  .info .lead{text-align:center;color:var(--muted);max-width:640px;margin:0 auto 18px}
+  .three{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media (max-width:760px){.three{grid-template-columns:1fr}}
+  .three .card{padding:20px}
+  .three .ic{font-size:30px}
+  .three h3{font-family:"Marcellus",serif;font-weight:400;font-size:20px;margin:8px 0 6px}
+  .three p{font-size:14.5px;color:var(--muted);margin:0}
+  .zodiac-table{width:100%;border-collapse:collapse;font-size:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  .zodiac-table th,.zodiac-table td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left}
+  .zodiac-table th{background:var(--bg2);font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+  .zodiac-table tr:last-child td{border-bottom:0}
+  .zt-wrap{border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  @media (max-width:560px){
+    .zodiac-table th:nth-child(4),.zodiac-table td:nth-child(4),
+    .zodiac-table th:nth-child(5),.zodiac-table td:nth-child(5){display:none}
+    .zodiac-table th,.zodiac-table td{padding:9px 10px}
+  }
+  .faq{max-width:760px;margin:0 auto}
+  .faq details{background:var(--surface);border:1px solid var(--line);border-radius:13px;margin-bottom:10px;padding:4px 18px}
+  .faq summary{cursor:pointer;font-weight:700;padding:12px 0;min-height:44px;display:flex;align-items:center}
+  .faq p{color:var(--muted);font-size:14.5px;margin:0 0 14px}
+  footer{text-align:center;color:var(--muted);font-size:13px;margin-top:36px}
+  footer .fstar{color:var(--gold);letter-spacing:.4em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="stars" aria-hidden="true">✦ ✦ ✦</div>
+    <h1>Your Sun, Moon &amp; <em>Rising Sign</em></h1>
+    <p>Enter your birth date, time and place to reveal the three signs that form the core of your birth chart — calculated instantly, right here in your browser.</p>
+    <div class="trio" aria-hidden="true">
+      <span><span class="sym sun-c">☉</span> Sun — who you are</span>
+      <span><span class="sym moon-c">☽</span> Moon — how you feel</span>
+      <span><span class="sym rise-c">↑</span> Rising — how you appear</span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ============ FORM ============ -->
+    <section class="card form-card" aria-label="Birth details">
+      <h2>Your birth details</h2>
+      <p class="sub">The Rising sign changes every ~2 hours, so an accurate birth time and place matter.</p>
+
+      <label class="flabel" for="dob">Date of birth</label>
+      <input type="date" id="dob" min="1920-01-01" max="2030-12-31" value="1995-08-15">
+
+      <label class="flabel">Birth time</label>
+      <div class="seg" role="group" aria-label="Do you know your birth time?">
+        <button type="button" id="timeKnownBtn" aria-pressed="true">I know it</button>
+        <button type="button" id="timeUnknownBtn" aria-pressed="false">Don’t know</button>
+      </div>
+      <div id="timeField">
+        <input type="time" id="tob" value="10:30" style="margin-top:10px">
+      </div>
+      <p class="hint" id="timeHint" style="display:none">No problem — your Sun and Moon signs will still be calculated. The Rising sign needs a birth time, so it will be left out.</p>
+
+      <label class="flabel" for="city">Place of birth</label>
+      <select id="city"></select>
+      <p class="hint">Pick the nearest city — or choose “Custom place…” and enter coordinates below.</p>
+
+      <label class="flabel">System</label>
+      <div class="seg" role="group" aria-label="Zodiac system">
+        <button type="button" id="sysWest" aria-pressed="true">Western</button>
+        <button type="button" id="sysVed" aria-pressed="false">Vedic (Sidereal)</button>
+      </div>
+      <p class="hint" id="sysHint">Western (tropical) zodiac — the system used by most newspaper &amp; app horoscopes.</p>
+
+      <details class="adv">
+        <summary>Location &amp; timezone settings</summary>
+        <label class="flabel" for="lat">Latitude (° N positive, S negative)</label>
+        <input type="number" id="lat" step="0.0001" min="-90" max="90">
+        <label class="flabel" for="lon">Longitude (° E positive, W negative)</label>
+        <input type="number" id="lon" step="0.0001" min="-180" max="180">
+        <label class="flabel" for="tz">Timezone (hours from UTC)</label>
+        <select id="tz">
+          <option value="-8">UTC −8 (US Pacific)</option>
+          <option value="-5">UTC −5 (US Eastern)</option>
+          <option value="0">UTC ±0 (London, winter)</option>
+          <option value="1">UTC +1 (Central Europe)</option>
+          <option value="3">UTC +3 (Moscow / Gulf +1)</option>
+          <option value="4">UTC +4 (Dubai)</option>
+          <option value="5">UTC +5 (Pakistan)</option>
+          <option value="5.5" selected>UTC +5:30 (India / Sri Lanka)</option>
+          <option value="5.75">UTC +5:45 (Nepal)</option>
+          <option value="6">UTC +6 (Bangladesh)</option>
+          <option value="8">UTC +8 (Singapore / Perth)</option>
+          <option value="9">UTC +9 (Japan)</option>
+          <option value="10">UTC +10 (Sydney)</option>
+        </select>
+        <p class="hint">If the birthplace observed daylight saving time on the birth date, pick the offset that was in effect then.</p>
+      </details>
+
+      <button class="calc-btn" id="calcBtn" type="button">✦ &nbsp;Reveal My Signs&nbsp; ✦</button>
+      <div class="err" id="errBox" role="alert"></div>
+      <p class="privacy">100% private — the calculation runs on this page. Your birth details are never sent anywhere or saved.</p>
+    </section>
+
+    <!-- ============ RESULTS ============ -->
+    <section aria-live="polite">
+      <div class="card empty" id="emptyState">
+        <div class="big-sym" aria-hidden="true">☉ &nbsp;☽&nbsp; ↑</div>
+        <h2>Your big three will appear here</h2>
+        <p>Astrologers call the Sun, Moon and Rising signs your “big three” — together they describe your core self, your emotional nature and the face you show the world.</p>
+      </div>
+
+      <div class="card results" id="results">
+        <div class="res-head">
+          <h2 id="resTitle">Your Big Three</h2>
+          <p id="resSub"></p>
+        </div>
+        <div class="sign-cards" id="signCards"></div>
+        <div class="lower">
+          <div class="wheel-box">
+            <h4>Your chart wheel</h4>
+            <div id="wheel"></div>
+            <p class="hint" style="margin-bottom:0">☉ Sun &nbsp;·&nbsp; ☽ Moon &nbsp;·&nbsp; ASC Rising<br>Ring shows the 12 signs in order.</p>
+          </div>
+          <div class="detail-box">
+            <h4>Chart details</h4>
+            <table class="dt"><tbody id="detailBody"></tbody></table>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn-copy" id="copyBtn" type="button">Copy my results</button>
+          <button class="btn-again" id="againBtn" type="button">Calculate for someone else</button>
+          <span class="copied" id="copiedMsg" style="display:none">Copied ✓</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ EXPLAINER ============ -->
+  <section class="info">
+    <h2>What do the three signs mean?</h2>
+    <p class="lead">Your full birth chart has many pieces, but these three do most of the talking.</p>
+    <div class="three">
+      <div class="card">
+        <div class="ic sun-c" aria-hidden="true">☉</div>
+        <h3>Sun sign — your core</h3>
+        <p>The sign the Sun was in on your birthday. It describes your basic identity, ego, vitality and the qualities you are growing into over your lifetime. This is the sign most people know as “my star sign”.</p>
+      </div>
+      <div class="card">
+        <div class="ic moon-c" aria-hidden="true">☽</div>
+        <h3>Moon sign — your feelings</h3>
+        <p>The sign the Moon was passing through when you were born. The Moon changes sign every ~2½ days, so it is personal to your exact birth moment. It rules your emotions, instincts, habits and what makes you feel safe.</p>
+      </div>
+      <div class="card">
+        <div class="ic rise-c" aria-hidden="true">↑</div>
+        <h3>Rising sign — your mask &amp; manner</h3>
+        <p>Also called the Ascendant: the sign rising on the eastern horizon at your birth. It shapes your appearance, first impressions and automatic way of approaching life — and it sets the layout of the whole chart, which is why birth time matters.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="info">
+    <h2>The 12 signs at a glance</h2>
+    <p class="lead">Dates below are for the Western (tropical) Sun sign and shift by about a day from year to year.</p>
+    <div class="zt-wrap">
+      <table class="zodiac-table">
+        <thead><tr><th>Sign</th><th>Sun dates</th><th>Element</th><th>Ruled by</th><th>Known for</th></tr></thead>
+        <tbody id="ztBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="info faq">
+    <h2 style="margin-bottom:16px">Common questions</h2>
+    <details>
+      <summary>Why do I need my birth time?</summary>
+      <p>The Rising sign completes a full circle every 24 hours, changing sign roughly every 2 hours, and the Moon moves about 13° a day. A birth time from your birth certificate or hospital record gives the most reliable result. Without it, the Sun sign is still exact and the Moon sign is right for most of the day — it can only be uncertain if you were born on a day the Moon changed signs.</p>
+    </details>
+    <details>
+      <summary>Western or Vedic — which should I choose?</summary>
+      <p>Western astrology uses the tropical zodiac, fixed to the seasons. Vedic (Jyotish) astrology uses the sidereal zodiac, fixed to the stars, adjusted by the Lahiri ayanamsa (about 24° today). Because of that shift, your Vedic signs are often — but not always — one sign earlier than your Western signs. Neither is “wrong”; they are two different frameworks. If you grew up reading Rashi-based predictions, choose Vedic.</p>
+    </details>
+    <details>
+      <summary>My sign is different on another website. Why?</summary>
+      <p>Usually one of three reasons: the other site used the other zodiac system (Western vs Vedic), your birth time or timezone was entered differently, or your Sun, Moon or Rising falls very close to a sign boundary (a “cusp”). This calculator shows the exact degree, so you can see how close to a boundary you are.</p>
+    </details>
+    <details>
+      <summary>How accurate is this calculator?</summary>
+      <p>Sun and Ascendant positions are accurate to a small fraction of a degree; the Moon position uses a standard astronomical series accurate to roughly 0.1–0.3°. That is more than enough to place each body in the correct sign, except in rare cases where a body sits within a few minutes of arc of a sign boundary.</p>
+    </details>
+  </section>
+
+  <footer>
+    <div class="fstar" aria-hidden="true">✦ ✦ ✦</div>
+    <p>For reflection and entertainment. Made for the Ashvish Creative Studio Play Zone.</p>
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+var DEG=Math.PI/180, RAD=180/Math.PI;
+function norm360(x){x=x%360; return x<0?x+360:x;}
+function fmtDeg(lon){
+  var within=lon%30, d=Math.floor(within), m=Math.floor((within-d)*60);
+  return d+"° "+(m<10?"0":"")+m+"′";
+}
+
+/* ---------------- sign data ---------------- */
+var SIGNS=[
+ {n:"Aries",hi:"मेष",g:"♈",el:"Fire",mode:"Cardinal",ruler:"Mars",dates:"Mar 21 – Apr 19",kw:"Bold, driven, pioneering",
+  sun:"You lead with courage and directness. Aries Sun people are starters — quick to act, honest to a fault, and happiest when chasing a fresh challenge head-on.",
+  moon:"You feel things fast and intensely, then move on just as fast. You recharge through action and independence, and you need emotional honesty — no games, no sulking.",
+  rise:"You come across as energetic, confident and refreshingly straightforward. People notice your spark and decisiveness first; you look like someone who gets things moving."},
+ {n:"Taurus",hi:"वृषभ",g:"♉",el:"Earth",mode:"Fixed",ruler:"Venus",dates:"Apr 20 – May 20",kw:"Steady, sensual, loyal",
+  sun:"You build life patiently and value what lasts. Taurus Sun people are grounded, dependable and deeply appreciative of comfort, good food, music and nature.",
+  moon:"You need calm, routine and physical comfort to feel secure. Affectionate and loyal, you process feelings slowly — but once settled, your emotions run deep and steady.",
+  rise:"You appear calm, composed and quietly attractive, with an unhurried manner. People sense reliability and good taste; you rarely seem flustered."},
+ {n:"Gemini",hi:"मिथुन",g:"♊",el:"Air",mode:"Mutable",ruler:"Mercury",dates:"May 21 – Jun 20",kw:"Curious, quick, versatile",
+  sun:"Your mind is your engine. Gemini Sun people are curious, witty and versatile — always learning, connecting people and ideas, and happiest in lively conversation.",
+  moon:"You process emotions by talking and thinking them through. Variety keeps you emotionally alive; boredom, not sadness, is your real low mood.",
+  rise:"You seem bright, chatty and youthful, with quick expressions and quicker questions. People find you easy to talk to and hard to pin down."},
+ {n:"Cancer",hi:"कर्क",g:"♋",el:"Water",mode:"Cardinal",ruler:"Moon",dates:"Jun 21 – Jul 22",kw:"Protective, intuitive, devoted",
+  sun:"Home, family and emotional roots anchor you. Cancer Sun people are intuitive and protective, with a strong memory and a gift for making others feel cared for.",
+  moon:"The Moon rules Cancer, so feelings are your home territory. You are deeply empathetic and nostalgic, and you need a private space to retreat and refill.",
+  rise:"You give a gentle, approachable first impression — kind eyes, a guarded softness. People feel safe around you, though you open up only when trust is earned."},
+ {n:"Leo",hi:"सिंह",g:"♌",el:"Fire",mode:"Fixed",ruler:"Sun",dates:"Jul 23 – Aug 22",kw:"Warm, proud, expressive",
+  sun:"Ruled by the Sun itself, you are built to shine. Leo Sun people are warm, generous and expressive, with a natural flair for leadership, loyalty and celebration.",
+  moon:"You need appreciation and heartfelt connection to feel emotionally full. Generous with love, you feel wounded when your warmth goes unnoticed.",
+  rise:"You walk in with presence — confident posture, expressive style, a smile that takes the room. People remember you; being overlooked is not your problem."},
+ {n:"Virgo",hi:"कन्या",g:"♍",el:"Earth",mode:"Mutable",ruler:"Mercury",dates:"Aug 23 – Sep 22",kw:"Precise, helpful, thoughtful",
+  sun:"You improve everything you touch. Virgo Sun people are analytical, skilful and quietly devoted to doing things well — health, craft and useful service matter to you.",
+  moon:"You feel safest when life is organised and useful. You show love through practical help, and your mind keeps working on feelings long after others have moved on.",
+  rise:"You appear neat, observant and modest, with a helpful, competent air. People trust your eye for detail — you notice what everyone else missed."},
+ {n:"Libra",hi:"तुला",g:"♎",el:"Air",mode:"Cardinal",ruler:"Venus",dates:"Sep 23 – Oct 22",kw:"Graceful, fair, sociable",
+  sun:"Partnership and harmony are your themes. Libra Sun people are diplomatic, aesthetic and fair-minded, with a real talent for bringing people together beautifully.",
+  moon:"You need peace, beauty and company to feel balanced. Conflict unsettles you deeply; you restore yourself through relationships, art and pleasant surroundings.",
+  rise:"Charming, well-presented and easy to like — Libra Rising gives a graceful first impression and a smile that defuses tension. People seek your company and your counsel."},
+ {n:"Scorpio",hi:"वृश्चिक",g:"♏",el:"Water",mode:"Fixed",ruler:"Mars & Pluto",dates:"Oct 23 – Nov 21",kw:"Intense, private, transformative",
+  sun:"You live at depth. Scorpio Sun people are intense, perceptive and all-or-nothing — drawn to truth, transformation and the things others are afraid to look at.",
+  moon:"Your feelings are powerful, private and total. You bond deeply or not at all, sense hidden motives instantly, and need absolute trust to feel safe.",
+  rise:"You project quiet intensity — a penetrating gaze and an air of mystery. People sense there is far more to you than you show, and they are right."},
+ {n:"Sagittarius",hi:"धनु",g:"♐",el:"Fire",mode:"Mutable",ruler:"Jupiter",dates:"Nov 22 – Dec 21",kw:"Honest, adventurous, philosophical",
+  sun:"You are a seeker — of places, ideas and meaning. Sagittarius Sun people are honest, optimistic and restless, happiest with open horizons and room to roam.",
+  moon:"Freedom is an emotional need, not a luxury. You recover from low moods through travel, learning, laughter and wide-open spaces; routine drains you.",
+  rise:"You come across as cheerful, candid and adventurous, with an easy laugh and big gestures. People feel their world get bigger around you."},
+ {n:"Capricorn",hi:"मकर",g:"♑",el:"Earth",mode:"Cardinal",ruler:"Saturn",dates:"Dec 22 – Jan 19",kw:"Ambitious, patient, self-reliant",
+  sun:"You are a long-game builder. Capricorn Sun people are disciplined, pragmatic and quietly ambitious, earning respect through patience, mastery and results.",
+  moon:"You feel secure when you are in control and providing. Emotions are handled privately and practically; achievement genuinely soothes you.",
+  rise:"You appear serious, capable and composed — older than your years when young, younger than your years later. People instinctively hand you responsibility."},
+ {n:"Aquarius",hi:"कुम्भ",g:"♒",el:"Air",mode:"Fixed",ruler:"Saturn & Uranus",dates:"Jan 20 – Feb 18",kw:"Original, humane, independent",
+  sun:"You think in futures. Aquarius Sun people are original, principled and community-minded — friendly to all, owned by none, and quietly rebellious against stale rules.",
+  moon:"You process feelings through ideas and friendship. You need intellectual kinship and personal space; emotional drama feels like static to you.",
+  rise:"You seem distinctive and unpredictable — an original style, a detached friendliness. People peg you as the interesting one in the room."},
+ {n:"Pisces",hi:"मीन",g:"♓",el:"Water",mode:"Mutable",ruler:"Jupiter & Neptune",dates:"Feb 19 – Mar 20",kw:"Compassionate, dreamy, artistic",
+  sun:"You feel the world rather than just see it. Pisces Sun people are compassionate, imaginative and spiritually inclined, with gifts for art, healing and empathy.",
+  moon:"Your emotional boundaries are porous — you absorb the moods around you. Solitude, music, water and sleep restore you like nothing else.",
+  rise:"You give a soft, dreamy, kind first impression, with a chameleon quality — you subtly become what each person needs. People confide in you quickly."}
+];
+var NAK=["Ashwini","Bharani","Krittika","Rohini","Mrigashira","Ardra","Punarvasu","Pushya","Ashlesha","Magha","Purva Phalguni","Uttara Phalguni","Hasta","Chitra","Swati","Vishakha","Anuradha","Jyeshtha","Mula","Purva Ashadha","Uttara Ashadha","Shravana","Dhanishta","Shatabhisha","Purva Bhadrapada","Uttara Bhadrapada","Revati"];
+
+/* ---------------- cities: [name, lat, lon, tz] ---------------- */
+var CITIES=[
+ ["Delhi, India",28.6139,77.2090,5.5],["Mumbai, India",19.0760,72.8777,5.5],["Kolkata, India",22.5726,88.3639,5.5],
+ ["Chennai, India",13.0827,80.2707,5.5],["Bengaluru, India",12.9716,77.5946,5.5],["Hyderabad, India",17.3850,78.4867,5.5],
+ ["Ahmedabad, India",23.0225,72.5714,5.5],["Pune, India",18.5204,73.8567,5.5],["Jaipur, India",26.9124,75.7873,5.5],
+ ["Lucknow, India",26.8467,80.9462,5.5],["Kanpur, India",26.4499,80.3319,5.5],["Nagpur, India",21.1458,79.0882,5.5],
+ ["Indore, India",22.7196,75.8577,5.5],["Bhopal, India",23.2599,77.4126,5.5],["Patna, India",25.5941,85.1376,5.5],
+ ["Varanasi, India",25.3176,82.9739,5.5],["Agra, India",27.1767,78.0081,5.5],["Surat, India",21.1702,72.8311,5.5],
+ ["Vadodara, India",22.3072,73.1812,5.5],["Ludhiana, India",30.9009,75.8573,5.5],["Jalandhar, India",31.3260,75.5762,5.5],["Amritsar, India",31.6340,74.8723,5.5],
+ ["Chandigarh, India",30.7333,76.7794,5.5],["Dehradun, India",30.3165,78.0322,5.5],["Haridwar, India",29.9457,78.1642,5.5],
+ ["Kangra (Jwala Ji), India",32.1000,76.2667,5.5],["Shimla, India",31.1048,77.1734,5.5],["Jammu, India",34.0837,74.7973,5.5],
+ ["Srinagar, India",34.0837,74.7973,5.5],["Guwahati, India",26.1445,91.7362,5.5],["Bhubaneswar, India",20.2961,85.8245,5.5],
+ ["Ranchi, India",23.3441,85.3096,5.5],["Raipur, India",21.2514,81.6296,5.5],["Kochi, India",9.9312,76.2673,5.5],
+ ["Thiruvananthapuram, India",8.5241,76.9366,5.5],["Coimbatore, India",11.0168,76.9558,5.5],["Madurai, India",9.9252,78.1198,5.5],
+ ["Mysuru, India",12.2958,76.6394,5.5],["Mangaluru, India",12.9141,74.8560,5.5],["Visakhapatnam, India",17.6868,83.2185,5.5],
+ ["Vijayawada, India",16.5062,80.6480,5.5],["Goa (Panaji), India",15.4909,73.8278,5.5],["Udaipur, India",24.5854,73.7125,5.5],
+ ["Jodhpur, India",26.2389,73.0243,5.5],["Allahabad (Prayagraj), India",25.4358,81.8463,5.5],["Gorakhpur, India",26.7606,83.3732,5.5],
+ ["Kathmandu, Nepal",27.7172,85.3240,5.75],["Dhaka, Bangladesh",23.8103,90.4125,6],["Karachi, Pakistan",24.8608,67.0011,5],
+ ["Lahore, Pakistan",31.5497,74.3436,5],["Colombo, Sri Lanka",6.9271,79.8612,5.5],["Dubai, UAE",25.2048,55.2708,4],
+ ["London, UK",51.5074,-0.1278,0],["New York, USA",40.7128,-74.0060,-5],["Los Angeles, USA",34.0522,-118.2437,-8],
+ ["Chicago, USA",41.8781,-87.6298,-6],["Toronto, Canada",43.6532,-79.3832,-5],["Singapore",1.3521,103.8198,8],
+ ["Kuala Lumpur, Malaysia",3.1390,101.6869,8],["Sydney, Australia",-33.8688,151.2093,10],["Auckland, New Zealand",-36.8485,174.7633,12]
+];
+
+/* ---------------- astronomy ---------------- */
+function julianDay(y,mo,d,utHours){
+  if(mo<=2){y-=1;mo+=12;}
+  var A=Math.floor(y/100), B=2-A+Math.floor(A/4);
+  var jd=Math.floor(365.25*(y+4716))+Math.floor(30.6001*(mo+1))+d+B-1524.5;
+  return jd+utHours/24;
+}
+function sunLongitude(T){
+  var L0=norm360(280.46646+T*(36000.76983+0.0003032*T));
+  var M=357.52911+T*(35999.05029-0.0001537*T);
+  var Mr=M*DEG;
+  var C=Math.sin(Mr)*(1.914602-T*(0.004817+0.000014*T))
+        +Math.sin(2*Mr)*(0.019993-0.000101*T)
+        +Math.sin(3*Mr)*0.000289;
+  var trueLon=L0+C;
+  var omega=125.04-1934.136*T;
+  return norm360(trueLon-0.00569-0.00478*Math.sin(omega*DEG));
+}
+/* Moon longitude — Meeus Table 47.A series (largest terms).
+   Each term: [D, M, M', F, coefficient] — argument multipliers in
+   Table 47.A order; the term is coefficient × sin(D·D + M·M + M'·M' + F·F),
+   with the coefficient scaled by E^|M|. */
+var MOON_TERMS=[
+ [0,0,1,0,6288774],[2,0,-1,0,1274027],[2,0,0,0,658314],[0,0,2,0,213618],
+ [0,1,0,0,-185116],[0,0,0,2,-114332],[2,0,-2,0,58793],[2,-1,-1,0,57066],
+ [2,0,1,0,53322],[2,-1,0,0,45758],[0,1,-1,0,-40923],[1,0,0,0,-34720],
+ [0,1,1,0,-30383],[2,0,0,-2,15327],[0,0,1,2,-12528],[0,0,1,-2,10980],
+ [4,0,-1,0,10675],[0,0,3,0,10034],[4,0,-2,0,8548],[2,1,-1,0,-7888],
+ [2,1,0,0,-6766],[1,0,-1,0,-5163],[1,1,0,0,4987],[2,-1,1,0,4036],
+ [2,0,2,0,3994],[4,0,0,0,3861],[2,0,-3,0,3665],[0,1,-2,0,-2689],
+ [2,0,-1,2,-2602],[2,-1,-2,0,2390],[1,0,1,0,-2348],[2,-2,0,0,2236],
+ [0,1,2,0,-2120],[0,2,0,0,-2069],[2,-2,-1,0,2048],[2,0,1,-2,1773],
+ [2,0,0,2,-1773],[4,0,-1,-2,-1495],[0,0,2,2,-1490],[0,0,4,0,-1458],
+ [2,-1,-3,0,-1250]
+];
+function moonLongitude(T){
+  var Lp=norm360(218.3164477+481267.88123421*T-0.0015786*T*T+T*T*T/538841-T*T*T*T/65194000);
+  var D=norm360(297.8501921+445267.1114034*T-0.0018819*T*T+T*T*T/545868-T*T*T*T/113065209);
+  var M=norm360(357.5291092+35999.0502909*T-0.0001536*T*T+T*T*T/24490000);
+  var Mp=norm360(134.9633964+477198.8675055*T+0.0087414*T*T+T*T*T/69699-T*T*T*T/14712000);
+  var F=norm360(93.2720950+483202.0175233*T-0.0036539*T*T-T*T*T/3526000+T*T*T*T/863310000);
+  var E=1-0.002516*T-0.0000074*T*T;
+  var sum=0,i,t;
+  for(i=0;i<MOON_TERMS.length;i++){
+    t=MOON_TERMS[i];
+    var arg=(t[0]*D+t[1]*M+t[2]*Mp+t[3]*F)*DEG;
+    var coef=t[4]*Math.pow(E,Math.abs(t[1]));
+    sum+=coef*Math.sin(arg);
+  }
+  return norm360(Lp+sum/1000000);
+}
+function obliquity(T){
+  return 23.4392911-0.013004167*T-0.000000164*T*T+0.000000504*T*T*T;
+}
+function ascendant(T,jd,lat,lon){
+  /* GMST in degrees */
+  var gmst=norm360(280.46061837+360.98564736629*(jd-2451545)+0.000387933*T*T-T*T*T/38710000);
+  var lst=norm360(gmst+lon);
+  var eps=obliquity(T)*DEG, ramc=lst*DEG, phi=lat*DEG;
+  var y=Math.cos(ramc);
+  var x=-(Math.sin(ramc)*Math.cos(eps)+Math.tan(phi)*Math.sin(eps));
+  var asc=norm360(Math.atan2(y,x)*RAD);
+  return {asc:asc,lst:lst};
+}
+function ayanamsa(jd){
+  /* Lahiri, ~23.853° at J2000, +50.29"/yr */
+  return 23.853+((jd-2451545)/365.25)*0.013958;
+}
+
+/* ---------------- UI wiring ---------------- */
+var $=function(id){return document.getElementById(id);};
+var citySel=$("city"), latIn=$("lat"), lonIn=$("lon"), tzSel=$("tz");
+var opt=document.createElement("option");
+CITIES.forEach(function(c,i){
+  var o=document.createElement("option"); o.value=i; o.textContent=c[0]; citySel.appendChild(o);
+});
+var cust=document.createElement("option"); cust.value="custom"; cust.textContent="Custom place… (enter coordinates below)"; citySel.appendChild(cust);
+citySel.value="0";
+function applyCity(){
+  if(citySel.value==="custom"){return;}
+  var c=CITIES[+citySel.value];
+  latIn.value=c[1]; lonIn.value=c[2];
+  for(var i=0;i<tzSel.options.length;i++){ if(parseFloat(tzSel.options[i].value)===c[3]){tzSel.selectedIndex=i;break;} }
+}
+citySel.addEventListener("change",applyCity);
+applyCity();
+[latIn,lonIn].forEach(function(el){ el.addEventListener("input",function(){citySel.value="custom";}); });
+
+var timeKnown=true;
+function setTimeMode(known){
+  timeKnown=known;
+  $("timeKnownBtn").setAttribute("aria-pressed",known?"true":"false");
+  $("timeUnknownBtn").setAttribute("aria-pressed",known?"false":"true");
+  $("timeField").style.display=known?"block":"none";
+  $("timeHint").style.display=known?"none":"block";
+}
+$("timeKnownBtn").addEventListener("click",function(){setTimeMode(true);});
+$("timeUnknownBtn").addEventListener("click",function(){setTimeMode(false);});
+
+var vedic=false;
+function setSystem(v){
+  vedic=v;
+  $("sysWest").setAttribute("aria-pressed",v?"false":"true");
+  $("sysVed").setAttribute("aria-pressed",v?"true":"false");
+  $("sysHint").textContent=v
+    ?"Vedic (sidereal) zodiac with Lahiri ayanamsa — the system behind Janma Kundli and Rashi predictions. Moon sign = your Rashi."
+    :"Western (tropical) zodiac — the system used by most newspaper & app horoscopes.";
+}
+$("sysWest").addEventListener("click",function(){setSystem(false);});
+$("sysVed").addEventListener("click",function(){setSystem(true);});
+
+/* zodiac table */
+$("ztBody").innerHTML=SIGNS.map(function(s){
+  return "<tr><td><strong>"+s.g+" "+s.n+"</strong></td><td>"+s.dates+"</td><td>"+s.el+"</td><td>"+s.ruler+"</td><td>"+s.kw+"</td></tr>";
+}).join("");
+
+/* ---------------- calculation ---------------- */
+var lastResult=null;
+function signOf(lon){return SIGNS[Math.floor(norm360(lon)/30)];}
+function cuspNote(lon){
+  var w=norm360(lon)%30;
+  if(w<0.75||w>29.25) return "<span class='cusp'>Very close to a sign boundary — birth time accuracy matters here</span>";
+  return "";
+}
+function cardHTML(kind,label,glyphClass,lon,show){
+  if(!show) return "<div class='sign-card "+kind+"'><div class='glyph' style='color:var(--muted)'>?</div><div class='what'>"+label+"</div><h3>Needs birth time</h3><p class='desc'>The Rising sign changes about every 2 hours, so it can’t be found from the date alone. If you can find your birth time — birth certificate, hospital record, family memory — run the calculator again with it.</p></div>";
+  var s=signOf(lon);
+  var key=kind==="sun"?"sun":(kind==="moon"?"moon":"rise");
+  return "<div class='sign-card "+kind+"'>"
+    +"<div class='glyph "+glyphClass+"'>"+s.g+"</div>"
+    +"<div class='what'>"+label+" sign</div>"
+    +"<h3>"+s.n+"</h3>"
+    +"<div class='hindi'>"+s.hi+" Rashi</div>"
+    +"<div class='deg'>"+fmtDeg(lon)+" "+s.n+"</div>"
+    +"<div class='meta'>"+s.el+" · "+s.mode+" · Ruled by "+s.ruler+"</div>"
+    +"<p class='desc'>"+s[key]+"</p>"
+    +cuspNote(lon)
+    +"</div>";
+}
+function drawWheel(sunLon,moonLon,ascLon,hasAsc){
+  var cx=130,cy=130,R=118,r2=88;
+  var svg="<svg viewBox='0 0 260 260' width='100%' style='max-width:260px' role='img' aria-label='Birth chart wheel'>";
+  var ringFill=getComputedStyle(document.documentElement).getPropertyValue('--surface')||'#fff';
+  svg+="<circle cx='"+cx+"' cy='"+cy+"' r='"+R+"' fill='none' stroke='var(--line)' stroke-width='1.5'/>";
+  svg+="<circle cx='"+cx+"' cy='"+cy+"' r='"+r2+"' fill='none' stroke='var(--line)' stroke-width='1'/>";
+  for(var i=0;i<12;i++){
+    var a0=(180-i*30)*DEG, a1=(180-(i+1)*30)*DEG;
+    var x1=cx+R*Math.cos(a0),y1=cy-R*Math.sin(a0);
+    svg+="<line x1='"+x1.toFixed(1)+"' y1='"+y1.toFixed(1)+"' x2='"+(cx+r2*Math.cos(a0)).toFixed(1)+"' y2='"+(cy-r2*Math.sin(a0)).toFixed(1)+"' stroke='var(--line)'/>";
+    var am=(180-(i*30+15))*DEG, rm=(R+r2)/2;
+    svg+="<text x='"+(cx+rm*Math.cos(am)).toFixed(1)+"' y='"+(cy-rm*Math.sin(am)+6).toFixed(1)+"' text-anchor='middle' font-size='17' fill='var(--muted)'>"+SIGNS[i].g+"</text>";
+    void a1;
+  }
+  function marker(lon,sym,color,label){
+    var a=(180-lon)*DEG;
+    var x=cx+(r2-16)*Math.cos(a), y=cy-(r2-16)*Math.sin(a);
+    var lx=cx+(r2-2)*Math.cos(a), ly=cy-(r2-2)*Math.sin(a);
+    var lx2=cx+(r2-30)*Math.cos(a), ly2=cy-(r2-30)*Math.sin(a);
+    return "<line x1='"+lx.toFixed(1)+"' y1='"+ly.toFixed(1)+"' x2='"+lx2.toFixed(1)+"' y2='"+ly2.toFixed(1)+"' stroke='"+color+"' stroke-width='2'/>"
+      +"<text x='"+x.toFixed(1)+"' y='"+(y+6).toFixed(1)+"' text-anchor='middle' font-size='16' font-weight='bold' fill='"+color+"' aria-label='"+label+"'>"+sym+"</text>";
+  }
+  svg+=marker(sunLon,"☉","#d18d0d","Sun");
+  svg+=marker(moonLon,"☽","#5b6fb5","Moon");
+  if(hasAsc) svg+=marker(ascLon,"↑","#1f5c57","Ascendant");
+  svg+="<circle cx='"+cx+"' cy='"+cy+"' r='4' fill='var(--gold)'/></svg>";
+  return svg;
+}
+
+$("calcBtn").addEventListener("click",function(){
+  var err=$("errBox"); err.style.display="none";
+  var dobVal=$("dob").value;
+  if(!dobVal){err.textContent="Please choose your date of birth.";err.style.display="block";return;}
+  var parts=dobVal.split("-"), y=+parts[0], mo=+parts[1], d=+parts[2];
+  var hh=12, mm=0;
+  if(timeKnown){
+    var tVal=$("tob").value;
+    if(!tVal){err.textContent="Please enter your birth time — or tap “Don’t know” above.";err.style.display="block";return;}
+    var tp=tVal.split(":"); hh=+tp[0]; mm=+tp[1];
+  }
+  var lat=parseFloat(latIn.value), lon=parseFloat(lonIn.value), tz=parseFloat(tzSel.value);
+  if(isNaN(lat)||lat<-90||lat>90){err.textContent="Latitude looks off — open “Location & timezone settings” and check it (between −90 and 90).";err.style.display="block";return;}
+  if(isNaN(lon)||lon<-180||lon>180){err.textContent="Longitude looks off — open “Location & timezone settings” and check it (between −180 and 180).";err.style.display="block";return;}
+
+  var ut=hh+mm/60-tz;
+  var jd=julianDay(y,mo,d,ut);
+  var T=(jd-2451545)/36525;
+  var sunT=sunLongitude(T), moonT=moonLongitude(T);
+  var ascObj=ascendant(T,jd,lat,lon);
+  var ay=vedic?ayanamsa(jd):0;
+  var sunL=norm360(sunT-ay), moonL=norm360(moonT-ay), ascL=norm360(ascObj.asc-ay);
+
+  var placeName=citySel.value==="custom"?"Custom place":CITIES[+citySel.value][0];
+  var dateStr=new Date(y,mo-1,d).toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"});
+  $("resTitle").textContent="Your Big Three — "+(vedic?"Vedic":"Western");
+  $("resSub").textContent="Born "+dateStr+(timeKnown?(" at "+$("tob").value):" (time unknown)")+" · "+placeName;
+
+  $("signCards").innerHTML=
+      cardHTML("sun","Sun","sun-c",sunL,true)
+    + cardHTML("moon","Moon","moon-c",moonL,true)
+    + cardHTML("rise","Rising","rise-c",ascL,timeKnown);
+
+  $("wheel").innerHTML=drawWheel(sunL,moonL,ascL,timeKnown);
+
+  var rows="";
+  function row(k,v){return "<tr><th>"+k+"</th><td>"+v+"</td></tr>";}
+  rows+=row("☉ Sun",signOf(sunL).n+" — "+fmtDeg(sunL)+" (longitude "+sunL.toFixed(2)+"°)");
+  rows+=row("☽ Moon",signOf(moonL).n+" — "+fmtDeg(moonL)+" (longitude "+moonL.toFixed(2)+"°)");
+  rows+=row("↑ Rising",timeKnown?(signOf(ascL).n+" — "+fmtDeg(ascL)+" (longitude "+ascL.toFixed(2)+"°)"):"Not calculated — birth time unknown");
+  if(vedic){
+    var nakIdx=Math.floor(moonL/(360/27)), pada=Math.floor((moonL%(360/27))/(360/108))+1;
+    rows+=row("Moon Nakshatra",NAK[nakIdx]+", Pada "+pada);
+    rows+=row("Lahiri Ayanamsa",ay.toFixed(2)+"°");
+  }
+  rows+=row("Birthplace",placeName+" · "+Math.abs(lat).toFixed(2)+"° "+(lat>=0?"N":"S")+", "+Math.abs(lon).toFixed(2)+"° "+(lon>=0?"E":"W"));
+  rows+=row("Elements", "Sun "+signOf(sunL).el+" · Moon "+signOf(moonL).el+(timeKnown?(" · Rising "+signOf(ascL).el):""));
+  $("detailBody").innerHTML=rows;
+
+  lastResult={
+    sun:signOf(sunL), moon:signOf(moonL), rise:timeKnown?signOf(ascL):null,
+    sunL:sunL, moonL:moonL, ascL:ascL, dateStr:dateStr, place:placeName, vedic:vedic
+  };
+  $("emptyState").style.display="none";
+  $("results").classList.add("show");
+  $("copiedMsg").style.display="none";
+  $("results").scrollIntoView({behavior:"smooth",block:"start"});
+});
+
+$("copyBtn").addEventListener("click",function(){
+  if(!lastResult) return;
+  var r=lastResult;
+  var txt="My Big Three ("+(r.vedic?"Vedic":"Western")+") — born "+r.dateStr+", "+r.place+"\n"
+    +"☉ Sun sign: "+r.sun.n+" ("+fmtDeg(r.sunL)+")\n"
+    +"☽ Moon sign: "+r.moon.n+" ("+fmtDeg(r.moonL)+")\n"
+    +"↑ Rising sign: "+(r.rise?(r.rise.n+" ("+fmtDeg(r.ascL)+")"):"unknown (no birth time)");
+  function done(){$("copiedMsg").style.display="inline"; setTimeout(function(){$("copiedMsg").style.display="none";},2500);}
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done).catch(function(){fallback();});
+  } else fallback();
+  function fallback(){
+    var ta=document.createElement("textarea"); ta.value=txt; document.body.appendChild(ta);
+    ta.select(); try{document.execCommand("copy"); done();}catch(e){}
+    document.body.removeChild(ta);
+  }
+});
+$("againBtn").addEventListener("click",function(){
+  $("results").classList.remove("show");
+  $("emptyState").style.display="block";
+  window.scrollTo({top:0,behavior:"smooth"});
+});
+})();
+</script>
+</body>
+</html>

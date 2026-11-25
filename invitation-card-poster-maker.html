@@ -1,0 +1,1587 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Invitation Card Poster Maker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Playfair+Display:wght@600;800&family=Dancing+Script:wght@600;700&family=Jost:wght@400;500;600&family=Baloo+2:wght@600;800&family=Pacifico&family=Nunito:wght@400;600;700;800&family=Oswald:wght@500;600;700&family=Poppins:wght@400;600;700&family=Caveat:wght@600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root{
+        --bg:#faf5ec; --panel:#fffdf7; --panel2:#f4ecdc; --ink:#2b1d16; --muted:#7d6a58;
+        --line:#e6d9c3; --brand:#8c1d2f; --brand-ink:#fff7ea; --gold:#b9862f;
+        --chip:#fffdf7; --chip-on:#8c1d2f; --shadow:0 10px 30px rgba(80,50,20,.12);
+        color-scheme: light dark;
+      }
+      @media (prefers-color-scheme: dark){
+        :root{
+          --bg:#161110; --panel:#221a17; --panel2:#2a201c; --ink:#f3e9da; --muted:#b7a48d;
+          --line:#3d2f28; --brand:#cf4a5e; --brand-ink:#fff5ec; --gold:#d9a94f;
+          --chip:#221a17; --chip-on:#cf4a5e; --shadow:0 10px 30px rgba(0,0,0,.45);
+        }
+      }
+      *{box-sizing:border-box}
+      html,body{margin:0;padding:0}
+      body{background:var(--bg);color:var(--ink);font-family:"Outfit",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+      .wrap{max-width:1180px;margin:0 auto;padding:18px 16px 40px}
+      .intro{font-family:"Cormorant Garamond",serif;font-size:clamp(22px,3.4vw,32px);font-weight:600;line-height:1.15;margin:2px 0 4px}
+      .intro em{color:var(--brand);font-style:italic}
+      .sub{color:var(--muted);font-size:15px;margin:0 0 14px;max-width:60ch}
+      .season-banner{background:var(--panel);border:1px solid var(--gold);border-radius:14px;padding:13px 16px;font-size:14.5px;line-height:1.5;margin:0 0 10px;box-shadow:var(--shadow)}
+      .season-banner b{color:var(--brand)}
+      .fresh-strip{background:var(--panel2);border:1px dashed var(--gold);border-radius:12px;padding:11px 14px;font-size:13.5px;line-height:1.5;color:var(--ink);margin:0 0 18px}
+      .fresh-strip b{color:var(--brand)}
+      .layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,480px);gap:22px;align-items:start}
+      @media (max-width:900px){ .layout{grid-template-columns:1fr} .preview{order:-1} }
+      .group{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:var(--shadow)}
+      .group h2{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--brand);margin:0 0 12px;font-weight:700}
+      .group h2 .hint{color:var(--muted);letter-spacing:0;text-transform:none;font-weight:400;font-size:12.5px;margin-left:6px}
+      /* category tabs */
+      .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+      .tab{border:1px solid var(--line);background:var(--chip);color:var(--ink);border-radius:999px;padding:8px 14px;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;min-height:40px}
+      .tab[aria-pressed="true"]{background:var(--chip-on);color:var(--brand-ink);border-color:transparent}
+      .tplgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px}
+      .tpl{border:2px solid var(--line);background:var(--panel2);border-radius:10px;padding:6px;cursor:pointer;text-align:center;font:inherit;position:relative}
+      .tpl .tpl-badge{display:inline-block;position:absolute;top:10px;left:10px;margin:0;background:var(--brand);color:var(--brand-ink);font-size:10.5px;font-weight:700;letter-spacing:.03em;padding:3px 9px;border-radius:999px;line-height:1.3;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+      .tpl canvas{width:100%;height:auto;display:block;border-radius:6px}
+      .tpl span{display:block;font-size:12px;font-weight:600;margin-top:6px;line-height:1.25}
+      .tpl[aria-pressed="true"]{border-color:var(--brand)}
+      /* fields */
+      .field{margin-bottom:12px}
+      .field label{display:block;font-size:13px;font-weight:600;margin-bottom:5px}
+      .field input[type="text"], .field textarea{
+        width:100%;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);
+        font:inherit;font-size:15px;padding:10px 12px;min-height:44px}
+      .field textarea{resize:vertical;min-height:58px;line-height:1.35}
+      .field input:focus-visible,.field textarea:focus-visible,.tab:focus-visible,.tpl:focus-visible,
+      button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+      /* style controls */
+      .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+      .row + .row{margin-top:14px}
+      .ctl-label{font-size:13px;font-weight:600;min-width:104px}
+      select{font:inherit;font-size:14.5px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);min-height:44px;flex:1;min-width:170px}
+      input[type="range"]{flex:1;min-width:130px;accent-color:var(--brand);height:32px}
+      .val{font-size:13px;color:var(--muted);min-width:42px;text-align:right;font-variant-numeric:tabular-nums}
+      .seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+      .seg button{border:0;background:var(--chip);color:var(--ink);font:inherit;font-size:13.5px;font-weight:600;padding:10px 16px;cursor:pointer;min-height:44px}
+      .seg button[aria-pressed="true"]{background:var(--brand);color:var(--brand-ink)}
+      .swatches{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+      .sw{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);cursor:pointer;padding:0;position:relative}
+      .sw[aria-pressed="true"]{border-color:var(--brand);box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--brand)}
+      .sw.auto{background:conic-gradient(#c0392b,#e67e22,#f1c40f,#27ae60,#2980b9,#8e44ad,#c0392b);display:grid;place-items:center;color:#fff;font-size:10px;font-weight:700}
+      input[type="color"]{width:44px;height:38px;border:1px solid var(--line);border-radius:9px;background:var(--bg);padding:3px;cursor:pointer}
+      /* size chips */
+      .chips{display:flex;flex-wrap:wrap;gap:8px}
+      .chip{border:1px solid var(--line);background:var(--chip);color:var(--ink);border-radius:10px;padding:9px 13px;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;min-height:44px;text-align:left}
+      .chip small{display:block;font-weight:400;color:var(--muted);font-size:11.5px}
+      .chip[aria-pressed="true"]{background:var(--brand);color:var(--brand-ink);border-color:transparent}
+      .chip[aria-pressed="true"] small{color:var(--brand-ink);opacity:.85}
+      .custom-size{display:none;margin-top:12px;gap:10px;align-items:flex-end;flex-wrap:wrap}
+      .custom-size.open{display:flex}
+      .custom-size .field{margin:0}
+      .custom-size input{width:110px}
+      /* buttons */
+      .btn{border:0;border-radius:11px;font:inherit;font-weight:700;cursor:pointer;min-height:48px;padding:12px 20px;font-size:15.5px}
+      .btn-primary{background:var(--brand);color:var(--brand-ink);width:100%}
+      .btn-ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line);font-size:14px;min-height:44px;padding:10px 16px}
+      .btn:active{transform:translateY(1px)}
+      /* photo */
+      .photo-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+      .photo-thumb{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);background:var(--panel2);display:none}
+      .file-label{display:inline-flex;align-items:center;min-height:48px;padding:12px 18px;border-radius:11px;background:var(--brand);color:var(--brand-ink);font-weight:700;cursor:pointer;font-size:15px}
+      input[type="file"]{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+      /* preview */
+      .preview{position:sticky;top:14px}
+      @media (max-width:900px){ .preview{position:static} }
+      .stage-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
+      .stage-wrap{display:grid;place-items:center;background:
+        repeating-conic-gradient(rgba(127,110,90,.10) 0% 25%, transparent 0% 50%) 0 0/22px 22px;border-radius:10px;padding:10px}
+      #stage{max-width:100%;height:auto;display:block;border-radius:4px;box-shadow:0 14px 34px rgba(40,20,10,.28)}
+      .dl-bar{margin-top:14px;display:flex;flex-direction:column;gap:10px}
+      .dl-meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+      .dl-meta b{color:var(--ink)}
+      #status{font-size:13.5px;color:var(--brand);font-weight:600;min-height:20px;margin:2px 0 0}
+      .ghost-row{display:flex;gap:10px;flex-wrap:wrap}
+      .hidden{display:none !important}
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <p class="intro">Design your <em>invitation card</em> or poster in minutes.</p>
+      <p class="sub">Pick a design, type your words, add a photo if you like — then download a print-ready PNG at full size for WhatsApp, Instagram or printing.</p>
+      <div class="season-banner" id="seasonBanner" role="status"></div>
+      <p class="fresh-strip" id="freshStrip"></p>
+
+      <div class="layout">
+        <div class="controls">
+          <section class="group" aria-labelledby="h-tpl">
+            <h2 id="h-tpl">1 · Choose a design</h2>
+            <div class="tabs" id="catTabs" role="group" aria-label="Template category"></div>
+            <div class="tplgrid" id="tplGrid"></div>
+          </section>
+
+          <section class="group" aria-labelledby="h-words">
+            <h2 id="h-words">2 · Your words <span class="hint">the card updates as you type</span></h2>
+            <div id="fields"></div>
+          </section>
+
+          <section class="group" id="photoGroup" aria-labelledby="h-photo">
+            <h2 id="h-photo">3 · Add a photo</h2>
+            <p id="photoNA" style="margin:0;color:var(--muted);font-size:14px">This design has no photo area — the <b>Birthday</b> and <b>Baby Shower</b> designs do. Pick one of those to place a photo inside a golden circle on the card.</p>
+            <div class="photo-row" id="photoControls">
+              <img class="photo-thumb" id="photoThumb" alt="Your uploaded photo preview" />
+              <label class="file-label" for="photoInput">Choose photo</label>
+              <input type="file" id="photoInput" accept="image/*" />
+              <button type="button" class="btn btn-ghost hidden" id="photoRemove">Remove</button>
+            </div>
+          </section>
+
+          <section class="group" aria-labelledby="h-style">
+            <h2 id="h-style">Style</h2>
+            <div class="row">
+              <span class="ctl-label" id="lbl-font">Font style</span>
+              <select id="fontTheme" aria-labelledby="lbl-font"></select>
+            </div>
+            <div class="row">
+              <span class="ctl-label" id="lbl-ts">Heading size</span>
+              <input type="range" id="titleScale" min="70" max="145" value="100" aria-labelledby="lbl-ts" />
+              <span class="val" id="titleScaleVal">100%</span>
+            </div>
+            <div class="row">
+              <span class="ctl-label" id="lbl-bs">Text size</span>
+              <input type="range" id="textScale" min="80" max="130" value="100" aria-labelledby="lbl-bs" />
+              <span class="val" id="textScaleVal">100%</span>
+            </div>
+            <div class="row">
+              <span class="ctl-label" id="lbl-al">Alignment</span>
+              <div class="seg" id="alignSeg" role="group" aria-labelledby="lbl-al">
+                <button type="button" data-align="left">Left</button>
+                <button type="button" data-align="center" aria-pressed="true">Center</button>
+                <button type="button" data-align="right">Right</button>
+              </div>
+            </div>
+            <div class="row">
+              <span class="ctl-label" id="lbl-tc">Text colour</span>
+              <div class="swatches" id="textSwatches"></div>
+              <input type="color" id="textColorPick" value="#f7ead2" aria-label="Custom text colour" />
+            </div>
+            <div class="row">
+              <span class="ctl-label" id="lbl-ac">Accent colour</span>
+              <div class="swatches" id="accentSwatches"></div>
+              <input type="color" id="accentColorPick" value="#c9a24b" aria-label="Custom accent colour" />
+            </div>
+            <div class="row hidden" id="bgRow">
+              <span class="ctl-label" id="lbl-bg">Background</span>
+              <div class="swatches" id="bgSwatches"></div>
+              <input type="color" id="bgColorPick" value="#fdf6ec" aria-label="Custom background colour" />
+            </div>
+          </section>
+
+          <section class="group" aria-labelledby="h-size">
+            <h2 id="h-size">Size</h2>
+            <div class="chips" id="sizeChips"></div>
+            <div class="custom-size" id="customSize">
+              <div class="field"><label for="cw">Width (px)</label><input type="text" inputmode="numeric" id="cw" value="1200" /></div>
+              <div class="field"><label for="ch">Height (px)</label><input type="text" inputmode="numeric" id="ch" value="1600" /></div>
+              <button type="button" class="btn btn-ghost" id="customApply">Apply size</button>
+            </div>
+          </section>
+        </div>
+
+        <aside class="preview">
+          <div class="stage-card">
+            <div class="stage-wrap"><canvas id="stage" width="432" height="540" aria-label="Live preview of your card"></canvas></div>
+            <div class="dl-bar">
+              <div class="dl-meta"><span>Download size: <b id="dlSize">1080 × 1350 px</b></span><span>PNG · print-ready</span></div>
+              <button type="button" class="btn btn-primary" id="downloadBtn">Download PNG</button>
+              <div class="ghost-row">
+                <button type="button" class="btn btn-ghost" id="shuffleBtn">Shuffle decorations</button>
+              </div>
+              <p id="status" role="status" aria-live="polite"></p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+<script>
+"use strict";
+/* ============ Data ============ */
+var FONT_THEMES = {
+  royal:   { label:"Royal — Cinzel & Great Vibes",        head:"Cinzel",            script:"Great Vibes",     body:"Cormorant Garamond" },
+  elegant: { label:"Elegant — Playfair & Dancing Script", head:"Playfair Display",  script:"Dancing Script",  body:"Jost" },
+  playful: { label:"Playful — Baloo & Pacifico",          head:"Baloo 2",           script:"Pacifico",        body:"Nunito" },
+  modern:  { label:"Modern — Oswald & Poppins",           head:"Oswald",            script:"Poppins",         body:"Poppins" },
+  classic: { label:"Classic — Cormorant & Caveat",        head:"Cormorant Garamond",script:"Caveat",          body:"Jost" }
+};
+
+var ROLES = {
+  kicker:  { mult:0.60, font:"body",   weight:600, upper:true,  ls:0.32, gap:0.55 },
+  title:   { mult:1.45, font:"head",   weight:700, upper:false, ls:0.02, gap:0.55 },
+  names:   { mult:2.05, font:"script", weight:400, upper:false, ls:0.0,  gap:0.45 },
+  big:     { mult:1.90, font:"head",   weight:800, upper:true,  ls:0.03, gap:0.45 },
+  subtitle:{ mult:0.98, font:"body",   weight:600, upper:false, ls:0.04, gap:0.55 },
+  date:    { mult:1.00, font:"body",   weight:700, upper:false, ls:0.05, gap:0.30 },
+  time:    { mult:0.92, font:"body",   weight:500, upper:false, ls:0.05, gap:0.55 },
+  venue:   { mult:0.92, font:"body",   weight:500, upper:false, ls:0.02, gap:0.55 },
+  message: { mult:0.88, font:"body",   weight:500, upper:false, ls:0.01, gap:0.55 },
+  host:    { mult:0.80, font:"body",   weight:600, upper:false, ls:0.03, gap:0.0  }
+};
+
+function F(key,label,role,def,ta){ return {key:key,label:label,role:role,def:def||"",ta:!!ta}; }
+
+var TEMPLATES = [
+  { id:"mehndi-ceremony", name:"Mehndi Ceremony", cat:"Wedding", motif:"mehndi", frame:"double", ornament:true,
+    fontTheme:"royal", textTop:0.17,
+    pal:{ bg:["#0d3520","#14532d"], ink:"#fdf3d8", accent:"#d4af5f", sub:"#cfe0b8" },
+    fields:[
+      F("kicker","Top line","kicker","Henna · Music · Masti"),
+      F("title","Title","title","Mehndi Ceremony"),
+      F("invite","Invitation line","subtitle","Join us for the mehndi of"),
+      F("names","Bride / family name","names","Aisha Khan"),
+      F("date","Date","date","12 December 2026"),
+      F("time","Time","time","4:00 PM onwards"),
+      F("venue","Venue","venue","Rosewood Gardens, MG Road, Jaipur"),
+      F("message","Message","message","An evening of henna, dholki and dancing — wear your brightest greens and yellows!", true),
+      F("host","Host line","host","With love — The Khan Family"),
+      F("contact","Phone / RSVP line (optional)","host","")
+    ]},
+  { id:"winter-sale", name:"Winter Year-End Sale", cat:"Shop Offer", motif:"wintersale", frame:"single",
+    fontTheme:"modern", textTop:0.30,
+    pal:{ bg:["#0b1e3f","#173a63"], ink:"#eaf4ff", accent:"#e3b341", sub:"#a9c6e8" },
+    fields:[
+      F("kicker","Top line","kicker","Winter Special"),
+      F("title","Title","title","Year-End Sale"),
+      F("names","Big offer line","big","Up to 60% OFF"),
+      F("subtitle","Offer details","subtitle","On winter wear, gifts & festive picks"),
+      F("date","Sale dates","date","20 – 31 December 2026"),
+      F("venue","Shop name / address","venue","Your Shop · MG Road · @yourshop"),
+      F("message","Message","message","Wrap up the year with our biggest savings — once it's gone, it's gone!", true),
+      F("host","Host line (optional)","host",""),
+      F("contact","Phone / website line (optional)","host","")
+    ]},
+  { id:"first-birthday", name:"Baby's First Birthday", cat:"Birthday", motif:"firstbday", frame:"single", photo:true, photoY:0.245, photoR:0.15,
+    fontTheme:"playful", textTop:0.45,
+    pal:{ bg:["#fff3e6","#fdeef2"], ink:"#6d3b4e", accent:"#d9a441", sub:"#a0715f" },
+    fields:[
+      F("kicker","Top line","kicker","A Little Milestone"),
+      F("title","Title","title","Happy Birthday"),
+      F("names","Baby's name","names","Aarav"),
+      F("subtitle","Age / tagline","subtitle","turns one!"),
+      F("date","Date","date","20 December 2026"),
+      F("time","Time","time","4:00 PM onwards"),
+      F("venue","Venue","venue","At Home, Green Park Colony"),
+      F("message","Message","message","One whole year of giggles — come celebrate our little star's very first birthday!", true),
+      F("host","Host line","host","With love — Mummy & Papa"),
+      F("contact","Phone / RSVP line (optional)","host","")
+    ]},
+  { id:"wedding-royal", name:"Royal Wedding", cat:"Wedding", motif:"rings", frame:"double", ornament:true,
+    fontTheme:"royal", textTop:0.17,
+    pal:{ bg:["#5d0f1d","#7d1626"], ink:"#f7ead2", accent:"#d4af5f", sub:"#e8cf9f" },
+    fields:[
+      F("kicker","Top line","kicker","|| Shree Ganeshaya Namah ||"),
+      F("invite","Invitation line","subtitle","You are cordially invited to the wedding of"),
+      F("names","Couple names","names","Aarav Sharma\n& Priya Verma", true),
+      F("date","Date","date","14 December 2026"),
+      F("time","Time","time","7:00 PM onwards"),
+      F("venue","Venue","venue","Rosewood Gardens, MG Road, Jaipur"),
+      F("message","Message","message","Your presence and blessings will make our day truly complete.", true),
+      F("host","Host line","host","With love — The Sharma & Verma Families"),
+      F("contact","Phone / RSVP line (optional)","host","")
+    ]},
+  { id:"wedding-blush", name:"Blush Floral", cat:"Wedding", motif:"floral", frame:"single", ornament:true,
+    fontTheme:"elegant", textTop:0.13,
+    pal:{ bg:["#fdf3e7","#fbe9dd"], ink:"#5b2a35", accent:"#c96f7f", sub:"#a05a68" },
+    fields:[
+      F("kicker","Top line","kicker","Together with their families"),
+      F("names","Couple names","names","Kabir\n& Ananya", true),
+      F("invite","Invitation line","subtitle","invite you to celebrate their wedding day"),
+      F("date","Date","date","8 February 2027"),
+      F("time","Time","time","11:00 AM onwards"),
+      F("venue","Venue","venue","The Palm Courtyard, Udaipur"),
+      F("message","Message","message","Dinner, music and dancing to follow. Dress code: festive pastels.", true),
+      F("host","Host line","host","With love — The Mehta & Rao Families"),
+      F("contact","Phone / RSVP line (optional)","host","")
+    ]},
+  { id:"birthday-confetti", name:"Confetti Party", cat:"Birthday", motif:"party", frame:"none", photo:true, photoY:0.235, photoR:0.155,
+    fontTheme:"playful", textTop:0.44,
+    pal:{ bg:["#1d2350","#2c1e56"], ink:"#ffffff", accent:"#ffc93c", sub:"#cfd4ff" },
+    fields:[
+      F("kicker","Top line","kicker","You're Invited!"),
+      F("title","Title","title","Happy Birthday"),
+      F("names","Birthday star's name","names","Aarav"),
+      F("subtitle","Age / tagline","subtitle","is turning 7!"),
+      F("date","Date","date","22 November 2026"),
+      F("time","Time","time","4:00 PM onwards"),
+      F("venue","Venue","venue","FunZone Party Hall, Sector 12"),
+      F("message","Message","message","Cake, games, music and lots of fun — don't miss it!", true),
+      F("host","Host line","host","Hosted by the Sharma Family"),
+      F("contact","Phone / RSVP line (optional)","host","")
+    ]},
+  { id:"birthday-pastel", name:"Pastel Cake", cat:"Birthday", motif:"bunting", frame:"single", photo:true, photoY:0.25, photoR:0.15,
+    fontTheme:"playful", textTop:0.45,
+    pal:{ bg:["#fff6f0","#fdeef4"], ink:"#6d3455", accent:"#e2739a", sub:"#a05b7d" },
+    fields:[
+      F("kicker","Top line","kicker","A Sweet Celebration"),
+      F("title","Title","title","Happy Birthday"),
+      F("names","Birthday star's name","names","Myra"),
+      F("subtitle","Age / tagline","subtitle","turns five today!"),
+      F("date","Date","date","10 January 2027"),
+      F("time","Time","time","5:00 PM onwards"),
+      F("venue","Venue","venue","At Home, Green Park Colony"),
+      F("message","Message","message","Join us for cake, balloons and giggles.", true),
+      F("host","Host line","host","With love — Mummy & Papa"),
+      F("contact","Phone / RSVP line (optional)","host","")
+    ]},
+  { id:"baby-shower", name:"Sweet Arrival", cat:"Baby Shower", motif:"clouds", frame:"single", photo:true, photoY:0.245, photoR:0.145,
+    fontTheme:"elegant", textTop:0.44,
+    pal:{ bg:["#eef6fd","#fdeef6"], ink:"#3d4e6b", accent:"#7ba7d9", sub:"#7d87a0" },
+    fields:[
+      F("kicker","Top line","kicker","It's a Baby Shower!"),
+      F("title","Title","title","Welcome, Little One"),
+      F("names","Mum-to-be's name","names","Priya Sharma"),
+      F("subtitle","Tagline","subtitle","A little star is on the way"),
+      F("date","Date","date","17 January 2027"),
+      F("time","Time","time","3:00 PM onwards"),
+      F("venue","Venue","venue","The Sharma Residence, Lakeview Apartments"),
+      F("message","Message","message","Shower Priya with love, blessings and sweet wishes.", true),
+      F("host","Host line","host","Hosted by Neha & Ritu"),
+      F("contact","Phone / RSVP line (optional)","host","")
+    ]},
+  { id:"diwali", name:"Diwali Lights", cat:"Festival", motif:"diya", frame:"double", ornament:true,
+    fontTheme:"royal", textTop:0.13,
+    pal:{ bg:["#3d0a24","#5c1030"], ink:"#ffeec4", accent:"#f0a832", sub:"#f3cd8d" },
+    fields:[
+      F("kicker","Top line","kicker","Shubh Deepavali"),
+      F("title","Title","title","Diwali Celebration"),
+      F("subtitle","Tagline","subtitle","Lakshmi Puja & Family Dinner"),
+      F("date","Date","date","8 November 2026"),
+      F("time","Time","time","6:30 PM onwards"),
+      F("venue","Venue","venue","At our home, Green Park"),
+      F("message","Message","message","Join us for an evening of lights, sweets and togetherness.", true),
+      F("host","Host line","host","— The Kashyap Family"),
+      F("contact","Phone / RSVP line (optional)","host","")
+    ]},
+  { id:"christmas", name:"Christmas Cheer", cat:"Festival", motif:"snow", frame:"single",
+    fontTheme:"elegant", textTop:0.13,
+    pal:{ bg:["#123524","#1b4a30"], ink:"#fdf6e3", accent:"#d9a441", sub:"#cfe3cf" },
+    fields:[
+      F("kicker","Top line","kicker","You are invited to a"),
+      F("title","Title","title","Merry Christmas"),
+      F("subtitle","Tagline","subtitle","Christmas Party & Dinner"),
+      F("date","Date","date","25 December 2026"),
+      F("time","Time","time","7:00 PM onwards"),
+      F("venue","Venue","venue","The D'Souza Residence, Bandra West"),
+      F("message","Message","message","Carols, cake and secret santa — bring your festive cheer!", true),
+      F("host","Host line","host","— The D'Souza Family"),
+      F("contact","Phone / RSVP line (optional)","host","")
+    ]},
+  { id:"shop-sale", name:"Mega Sale Poster", cat:"Shop Offer", motif:"burst", frame:"dash",
+    fontTheme:"modern", textTop:0.30,
+    pal:{ bg:["#ffd21f","#ffc400"], ink:"#33230a", accent:"#d21f3c", sub:"#6b4e12" },
+    fields:[
+      F("kicker","Top line","kicker","Limited Time Offer"),
+      F("title","Title","title","Mega Sale"),
+      F("names","Big offer line","big","Flat 50% OFF"),
+      F("subtitle","Offer details","subtitle","On all colouring books & gifts"),
+      F("date","Date / validity","date","Valid till 30 November 2026"),
+      F("venue","Shop name / address","venue","Your Shop · @yourshop"),
+      F("message","Message","message","Hurry — offer ends soon. Order today!", true),
+      F("host","Host line (optional)","host",""),
+      F("contact","Phone / website line (optional)","host","")
+    ]},
+  { id:"music-night", name:"Music Night", cat:"Event", motif:"spotlight", frame:"none",
+    fontTheme:"modern", textTop:0.16,
+    pal:{ bg:["#0c0d14","#161826"], ink:"#f4f4ff", accent:"#37e0c8", sub:"#a7abcc" },
+    fields:[
+      F("kicker","Top line","kicker","Live in Concert"),
+      F("title","Title","title","Music Night"),
+      F("names","Artist / headline","names","DJ Aarav — Live"),
+      F("subtitle","Tagline","subtitle","One night. All your favourite hits."),
+      F("date","Date","date","19 December 2026"),
+      F("time","Time","time","Gates open 6:00 PM"),
+      F("venue","Venue","venue","City Arena, Sector 29"),
+      F("message","Message","message","Entry free for members. Carry a valid ID.", true),
+      F("host","Host line","host","Presented by City Beats Club"),
+      F("contact","Phone / booking line (optional)","host","")
+    ]},
+  { id:"holi", name:"Holi Colours", cat:"Festival", motif:"splash", frame:"single",
+    fontTheme:"playful", textTop:0.14,
+    pal:{ bg:["#fff8ec","#ffeef6"], ink:"#4a154b", accent:"#e91e63", sub:"#7d3c98" },
+    fields:[
+      F("kicker","Top line","kicker","Bura Na Mano, Holi Hai!"),
+      F("title","Title","title","Holi Celebration"),
+      F("subtitle","Tagline","subtitle","Colours, gujiya, thandai & dhol"),
+      F("date","Date","date","22 March 2027"),
+      F("time","Time","time","10:00 AM onwards"),
+      F("venue","Venue","venue","At our home, Green Park"),
+      F("message","Message","message","Come dressed in white — leave in every colour of the rainbow!", true),
+      F("host","Host line","host","— The Kashyap Family"),
+      F("contact","Phone / RSVP line (optional)","host","")
+    ]},
+  { id:"eid", name:"Eid Mubarak", cat:"Festival", motif:"crescent", frame:"double", ornament:true,
+    fontTheme:"royal", textTop:0.16,
+    pal:{ bg:["#0b3d2e","#0f5132"], ink:"#f7ead2", accent:"#d4af5f", sub:"#cfe3cf" },
+    fields:[
+      F("kicker","Top line","kicker","Chand Mubarak"),
+      F("title","Title","title","Eid Mubarak"),
+      F("subtitle","Tagline","subtitle","Eid Feast & Get-Together"),
+      F("date","Date","date","10 March 2027"),
+      F("time","Time","time","7:00 PM onwards"),
+      F("venue","Venue","venue","At our home, Green Park"),
+      F("message","Message","message","Join us for biryani, sheer khurma and heartfelt duas.", true),
+      F("host","Host line","host","— The Khan Family"),
+      F("contact","Phone / RSVP line (optional)","host","")
+    ]},
+  { id:"rakhi", name:"Raksha Bandhan", cat:"Festival", motif:"rakhi", frame:"single",
+    fontTheme:"elegant", textTop:0.18,
+    pal:{ bg:["#fff6ec","#ffe9f0"], ink:"#7b1e2b", accent:"#c0392b", sub:"#a05a68" },
+    fields:[
+      F("kicker","Top line","kicker","A Thread of Love"),
+      F("title","Title","title","Raksha Bandhan"),
+      F("subtitle","Tagline","subtitle","Celebrating the brother–sister bond"),
+      F("date","Date","date","16 August 2027"),
+      F("time","Time","time","11:00 AM onwards"),
+      F("venue","Venue","venue","At our home, Green Park"),
+      F("message","Message","message","Rakhi tying, sweets and a family lunch. Brothers — gifts are compulsory!", true),
+      F("host","Host line","host","— With love, Didi"),
+      F("contact","Phone / RSVP line (optional)","host","")
+    ]},
+  { id:"navratri", name:"Navratri Nights", cat:"Festival", motif:"garba", frame:"double", ornament:true,
+    fontTheme:"royal", textTop:0.13,
+    pal:{ bg:["#3b0f4f","#5e1a6e"], ink:"#ffeec4", accent:"#f0a832", sub:"#e3c8f3" },
+    fields:[
+      F("kicker","Top line","kicker","Jai Mata Di"),
+      F("title","Title","title","Navratri Garba"),
+      F("subtitle","Tagline","subtitle","Dandiya Night & Aarti"),
+      F("date","Date","date","2 October 2027"),
+      F("time","Time","time","7:00 PM onwards"),
+      F("venue","Venue","venue","Community Hall, Sector 12"),
+      F("message","Message","message","Bring your dandiya sticks and your best ghagra — prizes for best dancers!", true),
+      F("host","Host line","host","— Green Park Society"),
+      F("contact","Phone / RSVP line (optional)","host","")
+    ]},
+  { id:"new-year", name:"New Year Bash", cat:"Festival", motif:"fireworks", frame:"single",
+    fontTheme:"modern", textTop:0.14,
+    pal:{ bg:["#0a0a23","#171740"], ink:"#ffffff", accent:"#f3c96b", sub:"#c9cdf5" },
+    fields:[
+      F("kicker","Top line","kicker","Countdown Begins"),
+      F("title","Title","title","Happy New Year"),
+      F("names","Big line","big","Welcome 2027"),
+      F("subtitle","Tagline","subtitle","New Year's Eve Party & Dinner"),
+      F("date","Date","date","31 December 2026"),
+      F("time","Time","time","8:00 PM onwards"),
+      F("venue","Venue","venue","Rooftop Lounge, City Centre"),
+      F("message","Message","message","Music, fireworks and a midnight toast — let's welcome the new year together!", true),
+      F("host","Host line","host","— Hosted by Aarav & Friends"),
+      F("contact","Phone / RSVP line (optional)","host","")
+    ]},
+  { id:"valentine", name:"Valentine's Day", cat:"Event", motif:"hearts", frame:"single",
+    fontTheme:"elegant", textTop:0.14,
+    pal:{ bg:["#5d0f2a","#7d1638"], ink:"#ffe4ec", accent:"#ff8fab", sub:"#f3b8c8" },
+    fields:[
+      F("kicker","Top line","kicker","You Are Invited"),
+      F("title","Title","title","Valentine's Day"),
+      F("subtitle","Tagline","subtitle","An evening of love, music & candlelight dinner"),
+      F("date","Date","date","14 February 2027"),
+      F("time","Time","time","7:00 PM onwards"),
+      F("venue","Venue","venue","The Rose Café, MG Road"),
+      F("message","Message","message","Bring your favourite person — or find one here. Roses on the house!", true),
+      F("host","Host line","host","— The Rose Café"),
+      F("contact","Phone / booking line (optional)","host","")
+    ]},
+  { id:"anniversary", name:"Golden Anniversary", cat:"Wedding", motif:"rings", frame:"double", ornament:true,
+    fontTheme:"royal", textTop:0.17,
+    pal:{ bg:["#fdf3e7","#f7e3c8"], ink:"#5d2f0f", accent:"#b9862f", sub:"#8a6a3b" },
+    fields:[
+      F("kicker","Top line","kicker","50 Years of Togetherness"),
+      F("invite","Invitation line","subtitle","Please join us to celebrate the golden anniversary of"),
+      F("names","Couple names","names","Ramesh Gupta\n& Kamla Gupta", true),
+      F("date","Date","date","18 January 2027"),
+      F("time","Time","time","6:00 PM onwards"),
+      F("venue","Venue","venue","Rosewood Gardens, MG Road, Jaipur"),
+      F("message","Message","message","Your blessings are the only gift they wish for.", true),
+      F("host","Host line","host","With love — The Gupta Family"),
+      F("contact","Phone / RSVP line (optional)","host","")
+    ]},
+  { id:"housewarming", name:"Griha Pravesh", cat:"Event", motif:"diya", frame:"double", ornament:true,
+    fontTheme:"royal", textTop:0.13,
+    pal:{ bg:["#3d0a24","#5c1030"], ink:"#ffeec4", accent:"#f0a832", sub:"#f3cd8d" },
+    fields:[
+      F("kicker","Top line","kicker","Shubh Griha Pravesh"),
+      F("title","Title","title","Housewarming"),
+      F("subtitle","Tagline","subtitle","Griha Pravesh Puja & Lunch"),
+      F("date","Date","date","5 February 2027"),
+      F("time","Time","time","Puja 9:00 AM · Lunch 12:30 PM"),
+      F("venue","Venue","venue","Our new home — Flat 402, Lakeview Apartments"),
+      F("message","Message","message","Bless our new home with your presence and good wishes.", true),
+      F("host","Host line","host","— The Kashyap Family"),
+      F("contact","Phone / RSVP line (optional)","host","")
+    ]},
+  { id:"christmas-celebration", name:"Christmas Celebration", cat:"Festival", motif:"christmastree", frame:"double", ornament:true,
+    fontTheme:"elegant", textTop:0.17,
+    pal:{ bg:["#7d1420","#9e1b30"], ink:"#fff8e7", accent:"#e8b84b", sub:"#f3d5a0" },
+    fields:[
+      F("kicker","Top line","kicker","You are warmly invited to a"),
+      F("title","Title","title","Christmas Celebration"),
+      F("subtitle","Tagline","subtitle","Tree Lighting, Carols & Festive Dinner"),
+      F("date","Date","date","25 December 2026"),
+      F("time","Time","time","6:30 PM onwards"),
+      F("venue","Venue","venue","St. Mary's Community Hall, MG Road"),
+      F("message","Message","message","Join us for an evening of carols, twinkling lights, plum cake and joyful cheer with family and friends.", true),
+      F("host","Host line","host","— Hosted with love by the Fernandes Family"),
+      F("contact","Phone / RSVP line (optional)","host","")
+    ]},
+  { id:"gurpurab", name:"Guru Nanak Jayanti", cat:"Festival", motif:"gurpurab", frame:"double", ornament:true,
+    fontTheme:"royal", textTop:0.17,
+    pal:{ bg:["#fff7e6","#fdeec9"], ink:"#6b3406", accent:"#d98e1a", sub:"#96682e" },
+    fields:[
+      F("kicker","Top line","kicker","Satnam Waheguru"),
+      F("title","Title","title","Guru Nanak Jayanti"),
+      F("subtitle","Tagline","subtitle","Gurpurab Celebration & Langar"),
+      F("date","Date","date","24 November 2026"),
+      F("time","Time","time","Kirtan 9:00 AM · Langar 12:30 PM"),
+      F("venue","Venue","venue","Gurdwara Sahib, Model Town"),
+      F("message","Message","message","Join us for kirtan, ardas and guru ka langar as we celebrate the Prakash Purab of Guru Nanak Dev Ji.", true),
+      F("host","Host line","host","— With humility, the Sangat"),
+      F("contact","Phone / RSVP line (optional)","host","")
+    ]},
+  { id:"engagement", name:"Engagement Ceremony", cat:"Wedding", motif:"engagement", frame:"double", ornament:true,
+    fontTheme:"elegant", textTop:0.17,
+    pal:{ bg:["#fdf0ec","#fbe4dd"], ink:"#6d2f3a", accent:"#b76e79", sub:"#9c5f6d" },
+    fields:[
+      F("kicker","Top line","kicker","With the blessings of our families"),
+      F("invite","Invitation line","subtitle","You are cordially invited to the engagement ceremony of"),
+      F("names","Couple names","names","Aisha Khan\n& Rohan Mehta", true),
+      F("date","Date","date","6 December 2026"),
+      F("time","Time","time","7:00 PM onwards"),
+      F("venue","Venue","venue","The Rosewood Banquet, MG Road, Jaipur"),
+      F("message","Message","message","Join us as two hearts and two families begin a beautiful journey together. Dinner and music to follow.", true),
+      F("host","Host line","host","With love — The Khan & Mehta Families"),
+      F("contact","Phone / RSVP line (optional)","host","")
+    ]},
+  { id:"blank", name:"Blank Canvas", cat:"Blank", motif:"none", frame:"single",
+    fontTheme:"classic", textTop:0.12, blank:true,
+    pal:{ bg:["#fdf6ec","#fdf6ec"], ink:"#3a2a1c", accent:"#b9862f", sub:"#8a715a" },
+    fields:[
+      F("kicker","Top line","kicker",""),
+      F("title","Title","title","Your Title Here"),
+      F("names","Big line (optional)","names",""),
+      F("subtitle","Subtitle","subtitle","A short line about your event"),
+      F("date","Date","date",""),
+      F("time","Time","time",""),
+      F("venue","Venue","venue",""),
+      F("message","Message","message","Write your message here — an invitation, an announcement, a festival wish, anything at all.", true),
+      F("host","Host / signature line","host",""),
+      F("contact","Phone / contact line (optional)","host","")
+    ]}
+];
+
+var CATEGORIES = ["All","Fresh","Wedding","Birthday","Baby Shower","Festival","Shop Offer","Event","Blank"];
+
+/* ============ Festival auto-design calendar ============
+   The tool reads today's date and picks the matching festival design on its
+   own. Windows are [month, day] inclusive; a window may wrap over New Year. */
+var FESTIVALS = [
+  { name:"Eid",           tpl:"eid",       start:[3,18],  end:[3,24]  },
+  { name:"Holi",          tpl:"holi",      start:[3,1],   end:[3,25]  },
+  { name:"Valentine's Day", tpl:"valentine", start:[2,8], end:[2,14]  },
+  { name:"Raksha Bandhan", tpl:"rakhi",    start:[8,12],  end:[9,2]   },
+  { name:"Navratri",      tpl:"navratri",  start:[10,6],  end:[10,22] },
+  { name:"Diwali",        tpl:"diwali",    start:[10,23], end:[11,12] },
+  { name:"Guru Nanak Jayanti", tpl:"gurpurab", start:[11,20], end:[11,27] },
+  { name:"Christmas",     tpl:"christmas", start:[12,10], end:[12,27] },
+  { name:"New Year",      tpl:"new-year",  start:[12,28], end:[1,3]   }
+];
+function mdVal(mo,da){ return mo*100+da; }
+function inWindow(now, s, e){
+  var v=mdVal(now.getMonth()+1, now.getDate()), sv=mdVal(s[0],s[1]), ev=mdVal(e[0],e[1]);
+  return sv<=ev ? (v>=sv && v<=ev) : (v>=sv || v<=ev);
+}
+function currentFestival(){
+  var now=new Date();
+  for (var i=0;i<FESTIVALS.length;i++) if (inWindow(now, FESTIVALS[i].start, FESTIVALS[i].end)) return FESTIVALS[i];
+  return null;
+}
+function nextFestival(){
+  var now=new Date(); var today=new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  var best=null, bestDays=1e9;
+  FESTIVALS.forEach(function(f){
+    var d=new Date(today.getFullYear(), f.start[0]-1, f.start[1]);
+    if (d < today) d=new Date(today.getFullYear()+1, f.start[0]-1, f.start[1]);
+    var days=Math.round((d-today)/86400000);
+    if (days<bestDays){ bestDays=days; best={ fest:f, date:d, days:days }; }
+  });
+  return best;
+}
+
+/* ============ Weekly fresh designs ============
+   Designs added in the latest drop, plus a spotlight of 3 designs that
+   rotates by itself every Monday — so the tool always shows something new
+   without anyone having to touch it. New drops are added by appending one
+   entry to TEMPLATES (and its id here); they appear everywhere on their own. */
+var NEW_ARRIVALS = ["mehndi-ceremony","winter-sale","first-birthday","holi","eid","rakhi","navratri","new-year","valentine","anniversary","housewarming","christmas-celebration","gurpurab","engagement"];
+var SPOTLIGHT = ["mehndi-ceremony","winter-sale","first-birthday"];
+function isSpotlight(id){ return SPOTLIGHT.indexOf(id)>=0; }
+function isFresh(id){ return isSpotlight(id) || NEW_ARRIVALS.indexOf(id)>=0; }
+function mondayOf(d){ var x=new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate()-((x.getDay()+6)%7)); return x; }
+function nextDropDate(){ var m=mondayOf(new Date()); m.setDate(m.getDate()+7); return m; }
+function fmtDay(d){ return d.toLocaleDateString("en-IN",{ weekday:"long", day:"numeric", month:"long" }); }
+function tplName(id){ for (var i=0;i<TEMPLATES.length;i++) if (TEMPLATES[i].id===id) return TEMPLATES[i].name; return id; }
+
+var SIZES = [
+  { id:"ig-portrait", label:"Instagram Portrait", sub:"1080 × 1350", w:1080, h:1350 },
+  { id:"ig-post",     label:"Instagram Post",     sub:"1080 × 1080", w:1080, h:1080 },
+  { id:"wa-status",   label:"WhatsApp Status",    sub:"1080 × 1920", w:1080, h:1920 },
+  { id:"a4",          label:"A4 Print",           sub:"2480 × 3508", w:2480, h:3508 },
+  { id:"custom",      label:"Custom Size",        sub:"your own px", w:0, h:0 }
+];
+
+var TEXT_SWATCHES = ["#ffffff","#f7ead2","#f3c96b","#7b1e2b","#2b2118","#e88bb0","#1f4d3a","#274b73"];
+var ACCENT_SWATCHES = ["#d4af5f","#c0392b","#e2739a","#37e0c8","#7ba7d9","#f0a832","#8c1d2f","#3f7d4e"];
+var BG_SWATCHES = ["#fdf6ec","#ffffff","#fdeef4","#eef6fd","#123524","#5d0f1d","#ffd21f","#1d2350"];
+
+/* ============ State ============ */
+var state = {
+  cat:"All",
+  tplId:"wedding-royal",
+  values:{},              // tplId -> {key: value}
+  fontTheme:"royal",
+  titleScale:1, textScale:1,
+  align:"center",
+  textColor:null, accentColor:null, bgColor:null,
+  size:{ w:1080, h:1350, id:"ig-portrait" },
+  seed:11,
+  photo:null              // HTMLImageElement or null
+};
+TEMPLATES.forEach(function(t){
+  var v={}; t.fields.forEach(function(f){ v[f.key]=f.def; }); state.values[t.id]=v;
+});
+function tpl(){ for (var i=0;i<TEMPLATES.length;i++) if (TEMPLATES[i].id===state.tplId) return TEMPLATES[i]; return TEMPLATES[0]; }
+function vals(){ return state.values[state.tplId]; }
+</script>
+
+<script>
+"use strict";
+/* ============ Drawing engine ============ */
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; var t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function hashStr(s){ var h=2166136261; for (var i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+function rr(ctx,x,y,w,h,r){ r=Math.min(r,w/2,h/2); ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+function hexA(hex,a){ var n=parseInt(hex.slice(1),16); return "rgba("+((n>>16)&255)+","+((n>>8)&255)+","+(n&255)+","+a+")"; }
+
+function fontFor(roleKey, theme, size){
+  var r = ROLES[roleKey];
+  var fam = theme[r.font];
+  var w = r.weight;
+  if (roleKey==="big" && theme.head==="Oswald") w=700;
+  return w+" "+size+"px \""+fam+"\", serif";
+}
+
+function wrapLines(ctx, text, maxW){
+  var out=[];
+  var paras = String(text).split("\n");
+  for (var p=0;p<paras.length;p++){
+    var words = paras[p].split(/\s+/).filter(Boolean);
+    if (!words.length){ continue; }
+    var line = words[0];
+    for (var i=1;i<words.length;i++){
+      var test = line+" "+words[i];
+      if (ctx.measureText(test).width <= maxW) line = test;
+      else { out.push(line); line = words[i]; }
+    }
+    out.push(line);
+  }
+  return out;
+}
+
+/* --- decorations --- */
+function drawFrame(ctx,W,H,t,accent){
+  var m = Math.min(W,H);
+  ctx.strokeStyle = accent; ctx.lineCap="round";
+  if (t.frame==="double"){
+    ctx.lineWidth = Math.max(2, W*0.0045);
+    rr(ctx, m*0.045, m*0.045, W-m*0.09, H-m*0.09, m*0.02); ctx.stroke();
+    ctx.lineWidth = Math.max(1, W*0.0016);
+    rr(ctx, m*0.068, m*0.068, W-m*0.136, H-m*0.136, m*0.016); ctx.stroke();
+  } else if (t.frame==="single"){
+    ctx.lineWidth = Math.max(1.5, W*0.0028);
+    rr(ctx, m*0.05, m*0.05, W-m*0.10, H-m*0.10, m*0.03); ctx.stroke();
+  } else if (t.frame==="dash"){
+    ctx.lineWidth = Math.max(2, W*0.004);
+    ctx.setLineDash([W*0.018, W*0.012]);
+    rr(ctx, m*0.05, m*0.05, W-m*0.10, H-m*0.10, m*0.02); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+}
+function star(ctx,x,y,r,color){ ctx.fillStyle=color; ctx.beginPath(); for(var i=0;i<8;i++){ var ang=Math.PI/4*i - Math.PI/2; var rad=i%2? r*0.38:r; var px=x+Math.cos(ang)*rad, py=y+Math.sin(ang)*rad; i?ctx.lineTo(px,py):ctx.moveTo(px,py);} ctx.closePath(); ctx.fill(); }
+function petalFlower(ctx,x,y,r,petal,center){
+  ctx.fillStyle=petal;
+  for (var i=0;i<5;i++){ var a=i/5*Math.PI*2 - Math.PI/2; ctx.beginPath(); ctx.ellipse(x+Math.cos(a)*r*0.62, y+Math.sin(a)*r*0.62, r*0.52, r*0.30, a, 0, Math.PI*2); ctx.fill(); }
+  ctx.fillStyle=center; ctx.beginPath(); ctx.arc(x,y,r*0.34,0,Math.PI*2); ctx.fill();
+}
+function leaf(ctx,x,y,len,ang,color){ ctx.save(); ctx.translate(x,y); ctx.rotate(ang); ctx.fillStyle=color; ctx.beginPath(); ctx.ellipse(len/2,0,len/2,len*0.20,0,0,Math.PI*2); ctx.fill(); ctx.restore(); }
+
+function drawDecor(ctx,W,H,t,pal,accent,seed){
+  var rnd = mulberry32(seed + hashStr(t.id));
+  var m = Math.min(W,H), i, x, y;
+  switch(t.motif){
+    case "rings": {
+      ctx.strokeStyle=accent; ctx.globalAlpha=0.10; ctx.lineWidth=W*0.010;
+      for (i=0;i<3;i++){ ctx.beginPath(); ctx.arc(W*0.5, -H*0.04, m*(0.24+i*0.075), 0, Math.PI*2); ctx.stroke(); }
+      ctx.globalAlpha=1;
+      var cy=H*0.085, r=m*0.036, cx=W*0.5;
+      ctx.lineWidth=Math.max(2,W*0.004); ctx.strokeStyle=accent;
+      ctx.beginPath(); ctx.arc(cx-r*0.55, cy, r, 0, Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx+r*0.55, cy, r, 0, Math.PI*2); ctx.stroke();
+      star(ctx, cx, cy-r*1.5, m*0.016, accent);
+      break;
+    }
+    case "floral": {
+      var cols=["#e8a0ae","#d97f92","#f2c4ac","#c96f7f"];
+      var corners=[[0,0],[W,0],[0,H],[W,H]];
+      for (var c=0;c<4;c++){
+        var bx=corners[c][0], by=corners[c][1], sx=bx===0?1:-1, sy=by===0?1:-1;
+        for (i=0;i<7;i++){
+          x = bx + sx*(rnd()*m*0.20 + m*0.03); y = by + sy*(rnd()*m*0.15 + m*0.025);
+          petalFlower(ctx, x, y, m*(0.020+rnd()*0.016), cols[i%4], "#e9b949");
+          leaf(ctx, bx+sx*m*0.05, by+sy*(rnd()*m*0.16+m*0.03), m*0.055, (sy>0?0.5:2.6)+(sx<0?Math.PI*0.85:0), "rgba(110,150,90,0.65)");
+        }
+      }
+      ctx.fillStyle=hexA(pal.accent,0.5);
+      for (i=0;i<26;i++){ ctx.beginPath(); ctx.arc(rnd()*W, rnd()*H, m*0.004, 0, Math.PI*2); ctx.fill(); }
+      break;
+    }
+    case "party": {
+      var cols=["#ffc93c","#ff5d8f","#37e0c8","#7b8cff","#ff8a5c","#b388ff"];
+      for (i=0;i<110;i++){
+        x=rnd()*W; y=rnd()*H; var s=m*(0.008+rnd()*0.012);
+        ctx.save(); ctx.translate(x,y); ctx.rotate(rnd()*Math.PI);
+        ctx.fillStyle=cols[i%cols.length]; ctx.globalAlpha=0.55+rnd()*0.45;
+        if (i%3===0){ ctx.beginPath(); ctx.arc(0,0,s*0.6,0,Math.PI*2); ctx.fill(); }
+        else ctx.fillRect(-s,-s*0.45,s*2,s*0.9);
+        ctx.restore();
+      }
+      ctx.globalAlpha=1;
+      // balloons top corners
+      var bcols=["#ff5d8f","#ffc93c","#37e0c8"];
+      var spots=[[0.10,0.10],[0.90,0.09],[0.82,0.20]];
+      for (i=0;i<3;i++){
+        var bx2=W*spots[i][0], by2=H*spots[i][1], br=m*0.052;
+        ctx.strokeStyle="rgba(255,255,255,0.55)"; ctx.lineWidth=Math.max(1,W*0.0016);
+        ctx.beginPath(); ctx.moveTo(bx2, by2+br*1.25);
+        ctx.bezierCurveTo(bx2-br*0.4, by2+br*2.0, bx2+br*0.4, by2+br*2.4, bx2-br*0.15, by2+br*3.1); ctx.stroke();
+        ctx.fillStyle=bcols[i]; ctx.beginPath(); ctx.ellipse(bx2,by2,br*0.82,br,0,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle="rgba(255,255,255,0.35)"; ctx.beginPath(); ctx.ellipse(bx2-br*0.3,by2-br*0.35,br*0.20,br*0.32,-0.5,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle=bcols[i]; ctx.beginPath(); ctx.moveTo(bx2-4,by2+br*1.18); ctx.lineTo(bx2+4,by2+br*1.18); ctx.lineTo(bx2,by2+br*1.42); ctx.closePath(); ctx.fill();
+      }
+      break;
+    }
+    case "bunting": {
+      var cols=["#e2739a","#f2b950","#7fc8a9","#7ba7d9","#c39bd3"];
+      for (var row=0; row<2; row++){
+        var yBase = H*(0.045+row*0.045), sag = H*0.055;
+        ctx.strokeStyle="rgba(109,52,85,0.45)"; ctx.lineWidth=Math.max(1.2,W*0.002);
+        ctx.beginPath(); ctx.moveTo(-W*0.02, yBase);
+        ctx.quadraticCurveTo(W*0.5, yBase+sag*2, W*1.02, yBase); ctx.stroke();
+        var n=9;
+        for (i=0;i<n;i++){
+          var tt=(i+0.5)/n, px=(1-tt)*(1-tt)*(-W*0.02)+2*(1-tt)*tt*(W*0.5)+tt*tt*(W*1.02);
+          var py=(1-tt)*(1-tt)*yBase+2*(1-tt)*tt*(yBase+sag*2)+tt*tt*yBase;
+          var tw=W*0.055, th=H*0.045;
+          ctx.fillStyle=cols[(i+row*2)%cols.length];
+          ctx.beginPath(); ctx.moveTo(px-tw/2,py); ctx.lineTo(px+tw/2,py); ctx.lineTo(px,py+th); ctx.closePath(); ctx.fill();
+        }
+      }
+      ctx.fillStyle=hexA(pal.accent,0.35);
+      for (i=0;i<20;i++){ ctx.beginPath(); ctx.arc(rnd()*W, H*0.55+rnd()*H*0.42, m*0.005, 0, Math.PI*2); ctx.fill(); }
+      break;
+    }
+    case "clouds": {
+      function cloud(cx,cy,s,a){
+        ctx.fillStyle="rgba(255,255,255,"+a+")"; ctx.beginPath();
+        ctx.arc(cx,cy,s*0.5,Math.PI*0.5,Math.PI*1.5); ctx.arc(cx+s*0.45,cy-s*0.28,s*0.42,Math.PI*0.95,Math.PI*1.95);
+        ctx.arc(cx+s*0.95,cy,s*0.45,Math.PI*1.5,Math.PI*0.5); ctx.closePath(); ctx.fill();
+      }
+      cloud(W*0.06,H*0.06,m*0.16,0.85); cloud(W*0.68,H*0.035,m*0.13,0.7); cloud(W*0.10,H*0.90,m*0.15,0.6); cloud(W*0.72,H*0.93,m*0.17,0.8);
+      for (i=0;i<14;i++){ star(ctx, W*(0.08+rnd()*0.84), H*(0.06+rnd()*0.85), m*(0.008+rnd()*0.008), i%2? "#f2b950":"#e88bb0"); }
+      ctx.strokeStyle=hexA(pal.accent,0.6); ctx.lineWidth=Math.max(1.5,W*0.003);
+      ctx.beginPath(); ctx.arc(W*0.86,H*0.16,m*0.045,Math.PI*0.15,Math.PI*1.85); ctx.stroke();
+      break;
+    }
+    case "diya": {
+      ctx.fillStyle=accent;
+      for (i=0;i<40;i++){ star(ctx, rnd()*W, rnd()*H*0.5, m*(0.005+rnd()*0.007), accent); ctx.globalAlpha=0.5; }
+      ctx.globalAlpha=1;
+      function diya(cx, baseY, s){
+        var g=ctx.createRadialGradient(cx,baseY-s*0.9,0,cx,baseY-s*0.9,s*1.5);
+        g.addColorStop(0,"rgba(255,170,40,0.5)"); g.addColorStop(1,"rgba(255,170,40,0)");
+        ctx.fillStyle=g; ctx.beginPath(); ctx.arc(cx,baseY-s*0.9,s*1.5,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle="#ffdf6b"; ctx.beginPath();
+        ctx.moveTo(cx, baseY-s*1.45);
+        ctx.bezierCurveTo(cx+s*0.30, baseY-s*0.85, cx+s*0.20, baseY-s*0.55, cx, baseY-s*0.5);
+        ctx.bezierCurveTo(cx-s*0.20, baseY-s*0.55, cx-s*0.30, baseY-s*0.85, cx, baseY-s*1.45); ctx.fill();
+        ctx.fillStyle="#ff9d2e"; ctx.beginPath(); ctx.ellipse(cx, baseY-s*0.62, s*0.13, s*0.20, 0, 0, Math.PI*2); ctx.fill();
+        var bg2=ctx.createLinearGradient(cx-s,baseY-s*0.5,cx+s,baseY-s*0.5);
+        bg2.addColorStop(0,"#8a3b12"); bg2.addColorStop(0.5,"#c65a1d"); bg2.addColorStop(1,"#8a3b12");
+        ctx.fillStyle=bg2; ctx.beginPath();
+        ctx.moveTo(cx-s, baseY-s*0.5); ctx.quadraticCurveTo(cx, baseY+s*0.35, cx+s, baseY-s*0.5);
+        ctx.quadraticCurveTo(cx, baseY-s*0.18, cx-s, baseY-s*0.5); ctx.closePath(); ctx.fill();
+        ctx.fillStyle="#e07f2e"; ctx.beginPath(); ctx.ellipse(cx, baseY-s*0.5, s, s*0.16, 0, 0, Math.PI*2); ctx.fill();
+      }
+      var nD = W>H ? 5 : 3;
+      for (i=0;i<nD;i++){ diya(W*(0.14+ (0.72)*(nD===1?0.5:i/(nD-1))), H*0.955, m*0.075); }
+      // hanging light strings
+      ctx.strokeStyle="rgba(240,168,50,0.5)"; ctx.lineWidth=Math.max(1,W*0.0016);
+      for (var srow=0;srow<2;srow++){
+        ctx.beginPath(); ctx.moveTo(0,H*(0.02+srow*0.035)); ctx.quadraticCurveTo(W*0.5,H*(0.075+srow*0.035),W,H*(0.02+srow*0.035)); ctx.stroke();
+        for (i=0;i<=10;i++){ var tt2=i/10; var lx=(1-tt2)*(1-tt2)*0+2*(1-tt2)*tt2*(W*0.5)+tt2*tt2*W; var ly=(1-tt2)*(1-tt2)*(H*(0.02+srow*0.035))+2*(1-tt2)*tt2*(H*(0.075+srow*0.035))+tt2*tt2*(H*(0.02+srow*0.035));
+          ctx.fillStyle="#ffd76b"; ctx.beginPath(); ctx.arc(lx,ly+H*0.012,m*0.007,0,Math.PI*2); ctx.fill(); }
+      }
+      break;
+    }
+    case "snow": {
+      ctx.fillStyle="#ffffff";
+      for (i=0;i<130;i++){ ctx.globalAlpha=0.25+rnd()*0.65; ctx.beginPath(); ctx.arc(rnd()*W, rnd()*H, m*(0.004+rnd()*0.008), 0, Math.PI*2); ctx.fill(); }
+      ctx.globalAlpha=1;
+      function flake(cx,cy,r){ ctx.strokeStyle="rgba(255,255,255,0.85)"; ctx.lineWidth=Math.max(1.2,r*0.14); for(var k=0;k<6;k++){ var a=k*Math.PI/3; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(a)*r, cy+Math.sin(a)*r); ctx.stroke(); ctx.beginPath(); ctx.moveTo(cx+Math.cos(a)*r*0.6, cy+Math.sin(a)*r*0.6); ctx.lineTo(cx+Math.cos(a+0.6)*r*0.85, cy+Math.sin(a+0.6)*r*0.85); ctx.stroke(); ctx.beginPath(); ctx.moveTo(cx+Math.cos(a)*r*0.6, cy+Math.sin(a)*r*0.6); ctx.lineTo(cx+Math.cos(a-0.6)*r*0.85, cy+Math.sin(a-0.6)*r*0.85); ctx.stroke(); } }
+      flake(W*0.13,H*0.12,m*0.035); flake(W*0.88,H*0.20,m*0.028); flake(W*0.80,H*0.86,m*0.04); flake(W*0.10,H*0.78,m*0.024);
+      // simple pine branches in bottom corners
+      ctx.strokeStyle="rgba(46,110,64,0.9)"; ctx.lineCap="round";
+      [[0.02,1,1],[0.98,1,-1]].forEach(function(cn){
+        for (var b=0;b<4;b++){ ctx.lineWidth=m*0.012-b*m*0.002; ctx.beginPath(); ctx.moveTo(W*cn[0], H*0.99-b*H*0.035); ctx.quadraticCurveTo(W*(cn[0]+cn[2]*0.10), H*0.965-b*H*0.035, W*(cn[0]+cn[2]*(0.17-b*0.025)), H*0.99-b*H*0.035-H*0.012); ctx.stroke(); }
+      });
+      break;
+    }
+    case "burst": {
+      ctx.save(); ctx.translate(W*0.5, H*0.335); ctx.rotate(-0.06);
+      ctx.fillStyle=accent; ctx.beginPath();
+      var spikes=18, R1=m*0.335, R2=m*0.265;
+      for (i=0;i<spikes*2;i++){ var a2=i/(spikes*2)*Math.PI*2; var rad=i%2?R2:R1; var px=Math.cos(a2)*rad, py=Math.sin(a2)*rad*0.92; i?ctx.lineTo(px,py):ctx.moveTo(px,py); }
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle="rgba(255,255,255,0.65)"; ctx.lineWidth=Math.max(1.5,W*0.003); ctx.setLineDash([W*0.012,W*0.010]);
+      ctx.beginPath(); ctx.arc(0,0,R2*0.88,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
+      ctx.restore();
+      ctx.fillStyle=hexA(accent,0.85);
+      star(ctx, W*0.10, H*0.08, m*0.02, accent); star(ctx, W*0.90, H*0.10, m*0.016, accent);
+      star(ctx, W*0.88, H*0.90, m*0.02, accent); star(ctx, W*0.09, H*0.88, m*0.015, accent);
+      break;
+    }
+    case "fireworks": {
+      var centers=[[0.16,0.16],[0.84,0.13],[0.74,0.82],[0.13,0.84],[0.5,0.07]];
+      var fcols=["#f3c96b","#ff5d8f","#37e0c8","#7b8cff","#ffc93c"];
+      centers.forEach(function(c,ci){
+        var cx2=W*c[0], cy2=H*c[1], R=m*(0.048+(ci%3)*0.012);
+        ctx.strokeStyle=fcols[ci%fcols.length]; ctx.lineWidth=Math.max(1.2,W*0.002);
+        for (var k=0;k<12;k++){
+          var a2=k/12*Math.PI*2 + ci*0.4;
+          ctx.beginPath(); ctx.moveTo(cx2+Math.cos(a2)*R*0.25, cy2+Math.sin(a2)*R*0.25); ctx.lineTo(cx2+Math.cos(a2)*R, cy2+Math.sin(a2)*R); ctx.stroke();
+          ctx.fillStyle=fcols[(ci+2)%fcols.length]; ctx.beginPath(); ctx.arc(cx2+Math.cos(a2)*R*1.14, cy2+Math.sin(a2)*R*1.14, m*0.005, 0, Math.PI*2); ctx.fill();
+        }
+      });
+      ctx.fillStyle="#ffffff";
+      for (i=0;i<60;i++){ ctx.globalAlpha=0.2+rnd()*0.5; ctx.beginPath(); ctx.arc(rnd()*W, rnd()*H, m*0.004, 0, Math.PI*2); ctx.fill(); }
+      ctx.globalAlpha=1;
+      break;
+    }
+    case "splash": {
+      var scols=["#e91e63","#ff9800","#9c27b0","#2196f3","#4caf50","#f9a825"];
+      for (i=0;i<44;i++){
+        x=rnd()*W; y=rnd()*H; var r0=m*(0.008+rnd()*0.028);
+        ctx.fillStyle=scols[i%scols.length]; ctx.globalAlpha=0.22+rnd()*0.42;
+        ctx.beginPath(); ctx.arc(x,y,r0,0,Math.PI*2); ctx.fill();
+        for (var d=0;d<4;d++){ ctx.beginPath(); ctx.arc(x+(rnd()-0.5)*r0*3.6, y+(rnd()-0.5)*r0*3.6, r0*0.32, 0, Math.PI*2); ctx.fill(); }
+      }
+      ctx.globalAlpha=1;
+      break;
+    }
+    case "crescent": {
+      var mx=W*0.84, my=H*0.105, mr=m*0.055;
+      ctx.fillStyle=accent; ctx.beginPath(); ctx.arc(mx,my,mr,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle=pal.bg[1]; ctx.beginPath(); ctx.arc(mx+mr*0.45, my-mr*0.22, mr*0.86, 0, Math.PI*2); ctx.fill();
+      star(ctx, W*0.70, H*0.07, m*0.014, accent);
+      ctx.fillStyle="#ffffff";
+      for (i=0;i<46;i++){ ctx.globalAlpha=0.25+rnd()*0.6; ctx.beginPath(); ctx.arc(rnd()*W, rnd()*H*0.62, m*0.004, 0, Math.PI*2); ctx.fill(); }
+      ctx.globalAlpha=1;
+      ctx.strokeStyle=hexA(accent,0.55); ctx.lineWidth=Math.max(1,W*0.0016);
+      for (i=0;i<5;i++){
+        var lx=W*(0.13+i*0.17);
+        ctx.beginPath(); ctx.moveTo(lx,0); ctx.lineTo(lx,H*0.052); ctx.stroke();
+        ctx.fillStyle=i%2? accent:"#37e0c8";
+        ctx.beginPath(); ctx.ellipse(lx, H*0.072, m*0.012, m*0.018, 0, 0, Math.PI*2); ctx.fill();
+      }
+      break;
+    }
+    case "rakhi": {
+      var rcx=W*0.5, rcy=H*0.085, rcr=m*0.042;
+      ctx.lineCap="round";
+      ctx.strokeStyle="#c0392b"; ctx.lineWidth=Math.max(1.5,W*0.003);
+      ctx.beginPath(); ctx.moveTo(rcx-rcr*3.4, rcy+rcr*0.4); ctx.quadraticCurveTo(rcx, rcy+rcr*1.6, rcx+rcr*3.4, rcy+rcr*0.4); ctx.stroke();
+      ctx.strokeStyle=accent; ctx.lineWidth=Math.max(1.2,W*0.0022);
+      ctx.beginPath(); ctx.moveTo(rcx-rcr*3.4, rcy+rcr*0.8); ctx.quadraticCurveTo(rcx, rcy+rcr*2.0, rcx+rcr*3.4, rcy+rcr*0.8); ctx.stroke();
+      ctx.fillStyle="#c0392b"; ctx.beginPath(); ctx.arc(rcx,rcy,rcr,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle=accent; ctx.beginPath(); ctx.arc(rcx,rcy,rcr*0.72,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle="#ffffff"; ctx.beginPath(); ctx.arc(rcx,rcy,rcr*0.30,0,Math.PI*2); ctx.fill();
+      star(ctx, rcx, rcy, rcr*0.20, "#c0392b");
+      var rfcols=["#e2739a","#f2b950","#e88bb0","#c96f7f"];
+      [[0.08,0.10],[0.92,0.10],[0.08,0.90],[0.92,0.90]].forEach(function(cn,ci){
+        petalFlower(ctx, W*cn[0], H*cn[1], m*0.026, rfcols[ci%4], "#e9b949");
+      });
+      break;
+    }
+    case "garba": {
+      var gcols=["#f0a832","#ff5d8f","#37e0c8","#ffc93c"];
+      for (i=0;i<26;i++){ star(ctx, rnd()*W, rnd()*H, m*(0.005+rnd()*0.006), gcols[i%4]); }
+      [0.16,0.5,0.84].forEach(function(fx,fi){
+        for (var ring=1; ring<=3; ring++){
+          var gr=m*0.030*ring;
+          ctx.fillStyle=gcols[(fi+ring)%4];
+          var cnt=10*ring;
+          for (var k2=0;k2<cnt;k2++){
+            var a3=k2/cnt*Math.PI*2;
+            ctx.beginPath(); ctx.arc(W*fx+Math.cos(a3)*gr, H*0.935+Math.sin(a3)*gr*0.55, m*0.005, 0, Math.PI*2); ctx.fill();
+          }
+        }
+      });
+      break;
+    }
+    case "hearts": {
+      function heart(cx3,cy3,s,col,a){
+        ctx.save(); ctx.globalAlpha=a; ctx.fillStyle=col; ctx.beginPath();
+        ctx.moveTo(cx3, cy3+s*0.9);
+        ctx.bezierCurveTo(cx3-s*1.3, cy3+s*0.1, cx3-s*1.05, cy3-s*0.9, cx3, cy3-s*0.25);
+        ctx.bezierCurveTo(cx3+s*1.05, cy3-s*0.9, cx3+s*1.3, cy3+s*0.1, cx3, cy3+s*0.9);
+        ctx.fill(); ctx.restore();
+      }
+      var hcols=["#ff8fab","#ff5d8f","#ffc2d1","#e2739a"];
+      for (i=0;i<15;i++){ heart(rnd()*W, rnd()*H, m*(0.012+rnd()*0.02), hcols[i%4], 0.30+rnd()*0.40); }
+      heart(W*0.5, H*0.072, m*0.026, accent, 0.95);
+      break;
+    }
+    case "spotlight": {
+      var grd=ctx.createRadialGradient(W*0.5,H*0.42,0,W*0.5,H*0.42,m*0.75);
+      grd.addColorStop(0,"rgba(90,100,220,0.35)"); grd.addColorStop(1,"rgba(90,100,220,0)");
+      ctx.fillStyle=grd; ctx.fillRect(0,0,W,H);
+      function beam(x0,ang,col){ ctx.save(); ctx.translate(x0,0); ctx.rotate(ang); var bg3=ctx.createLinearGradient(0,0,0,H*0.75); bg3.addColorStop(0,hexA(col,0.30)); bg3.addColorStop(1,hexA(col,0)); ctx.fillStyle=bg3; ctx.beginPath(); ctx.moveTo(-W*0.02,0); ctx.lineTo(W*0.02,0); ctx.lineTo(W*0.16,H*0.75); ctx.lineTo(-W*0.16,H*0.75); ctx.closePath(); ctx.fill(); ctx.restore(); }
+      beam(W*0.14, 0.28, "#37e0c8"); beam(W*0.86, -0.28, "#ff5d8f"); beam(W*0.5, 0.05, "#7b8cff");
+      ctx.fillStyle="#ffffff";
+      for (i=0;i<70;i++){ ctx.globalAlpha=0.15+rnd()*0.5; ctx.beginPath(); ctx.arc(rnd()*W, rnd()*H, m*(0.003+rnd()*0.005), 0, Math.PI*2); ctx.fill(); }
+      ctx.globalAlpha=1;
+      // equalizer bars along bottom
+      var bars=16, bw=W*0.75/bars;
+      for (i=0;i<bars;i++){ var bh=(0.25+Math.abs(Math.sin(i*1.7+seed))*0.75)*H*0.045; ctx.fillStyle=i%2? hexA(accent,0.75):"rgba(255,93,143,0.75)"; ctx.fillRect(W*0.125+i*bw+bw*0.18, H*0.965-bh, bw*0.64, bh); }
+      break;
+    }
+    case "christmastree": {
+      // falling snow
+      ctx.fillStyle="#ffffff";
+      for (i=0;i<110;i++){ ctx.globalAlpha=0.20+rnd()*0.60; ctx.beginPath(); ctx.arc(rnd()*W, rnd()*H, m*(0.004+rnd()*0.007), 0, Math.PI*2); ctx.fill(); }
+      ctx.globalAlpha=1;
+      function cflake(cx,cy,r){ ctx.strokeStyle="rgba(255,255,255,0.9)"; ctx.lineWidth=Math.max(1.2,r*0.14); for(var k=0;k<6;k++){ var a=k*Math.PI/3; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(a)*r, cy+Math.sin(a)*r); ctx.stroke(); ctx.beginPath(); ctx.moveTo(cx+Math.cos(a)*r*0.6, cy+Math.sin(a)*r*0.6); ctx.lineTo(cx+Math.cos(a+0.6)*r*0.85, cy+Math.sin(a+0.6)*r*0.85); ctx.stroke(); ctx.beginPath(); ctx.moveTo(cx+Math.cos(a)*r*0.6, cy+Math.sin(a)*r*0.6); ctx.lineTo(cx+Math.cos(a-0.6)*r*0.85, cy+Math.sin(a-0.6)*r*0.85); ctx.stroke(); } }
+      cflake(W*0.11,H*0.13,m*0.032); cflake(W*0.89,H*0.16,m*0.026); cflake(W*0.84,H*0.84,m*0.036); cflake(W*0.12,H*0.82,m*0.022);
+      star(ctx, W*0.20, H*0.07, m*0.013, accent); star(ctx, W*0.80, H*0.06, m*0.011, accent); star(ctx, W*0.92, H*0.55, m*0.010, accent);
+      // Christmas tree at top centre
+      var tx=W*0.5, tTop=H*0.018, tH=H*0.115, tW=m*0.20;
+      star(ctx, tx, tTop+m*0.014, m*0.020, accent);
+      ctx.fillStyle="#2e7d46";
+      for (var tier=0; tier<3; tier++){
+        var ty = tTop + tH*0.18 + tier*tH*0.26;
+        var tw2 = tW*(0.45 + tier*0.28);
+        ctx.beginPath(); ctx.moveTo(tx, ty - tH*0.16); ctx.lineTo(tx+tw2/2, ty + tH*0.30); ctx.lineTo(tx-tw2/2, ty + tH*0.30); ctx.closePath(); ctx.fill();
+      }
+      ctx.fillStyle="#7a4a21"; ctx.fillRect(tx-m*0.014, tTop+tH*0.92, m*0.028, tH*0.20);
+      var ornCols=["#e8b84b","#ffffff","#ffd76b","#ff8a5c"];
+      var ornPts=[[0,0.42],[-0.22,0.60],[0.20,0.62],[-0.12,0.80],[0.14,0.84],[0,0.68]];
+      for (i=0;i<ornPts.length;i++){ ctx.fillStyle=ornCols[i%ornCols.length]; ctx.beginPath(); ctx.arc(tx+ornPts[i][0]*tW, tTop+tH*ornPts[i][1], m*0.009, 0, Math.PI*2); ctx.fill(); }
+      // garland swag along the bottom
+      ctx.strokeStyle=hexA(accent,0.75); ctx.lineWidth=Math.max(1.2,W*0.0022);
+      ctx.beginPath(); ctx.moveTo(W*0.06,H*0.955); ctx.quadraticCurveTo(W*0.5,H*0.895,W*0.94,H*0.955); ctx.stroke();
+      for (i=0;i<=8;i++){ var gt=i/8; var gx=(1-gt)*(1-gt)*(W*0.06)+2*(1-gt)*gt*(W*0.5)+gt*gt*(W*0.94); var gy=(1-gt)*(1-gt)*(H*0.955)+2*(1-gt)*gt*(H*0.895)+gt*gt*(H*0.955); star(ctx, gx, gy+H*0.012, m*0.009, i%2? accent:"#2e7d46"); }
+      break;
+    }
+    case "gurpurab": {
+      // calm glow and tiny stars in the upper sky
+      var gg=ctx.createRadialGradient(W*0.5,H*0.10,0,W*0.5,H*0.10,m*0.55);
+      gg.addColorStop(0,"rgba(217,142,26,0.20)"); gg.addColorStop(1,"rgba(217,142,26,0)");
+      ctx.fillStyle=gg; ctx.fillRect(0,0,W,H*0.5);
+      for (i=0;i<28;i++){ ctx.globalAlpha=0.25+rnd()*0.45; star(ctx, rnd()*W, rnd()*H*0.30, m*(0.005+rnd()*0.005), accent); }
+      ctx.globalAlpha=1;
+      // gurdwara dome at top centre
+      var gx2=W*0.5, gBase=H*0.135, gW=m*0.30;
+      ctx.fillStyle=hexA(accent,0.16); ctx.fillRect(gx2-gW/2, gBase-m*0.012, gW, m*0.020);
+      ctx.fillStyle="#ffffff"; ctx.strokeStyle=accent; ctx.lineWidth=Math.max(1.4,W*0.0026);
+      // side mini domes
+      [-1,1].forEach(function(sd){
+        var sx2=gx2+sd*gW*0.36, sr=m*0.030;
+        ctx.beginPath(); ctx.arc(sx2, gBase-m*0.006, sr, Math.PI, 0); ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(sx2, gBase-m*0.006-sr); ctx.lineTo(sx2, gBase-m*0.006-sr-m*0.022); ctx.stroke();
+        ctx.fillStyle=accent; ctx.beginPath(); ctx.arc(sx2, gBase-m*0.006-sr-m*0.026, m*0.006, 0, Math.PI*2); ctx.fill(); ctx.fillStyle="#ffffff";
+      });
+      // main dome
+      ctx.beginPath();
+      ctx.moveTo(gx2-gW*0.30, gBase);
+      ctx.bezierCurveTo(gx2-gW*0.30, gBase-m*0.085, gx2-gW*0.12, gBase-m*0.125, gx2, gBase-m*0.135);
+      ctx.bezierCurveTo(gx2+gW*0.12, gBase-m*0.125, gx2+gW*0.30, gBase-m*0.085, gx2+gW*0.30, gBase);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      // finial
+      ctx.strokeStyle=accent; ctx.lineWidth=Math.max(1.4,W*0.0026);
+      ctx.beginPath(); ctx.moveTo(gx2, gBase-m*0.135); ctx.lineTo(gx2, gBase-m*0.175); ctx.stroke();
+      ctx.fillStyle=accent; ctx.beginPath(); ctx.arc(gx2, gBase-m*0.183, m*0.009, 0, Math.PI*2); ctx.fill();
+      star(ctx, gx2, gBase-m*0.205, m*0.011, accent);
+      // arched doorway hint
+      ctx.strokeStyle=hexA(accent,0.8); ctx.lineWidth=Math.max(1.2,W*0.0022);
+      ctx.beginPath(); ctx.arc(gx2, gBase, m*0.020, Math.PI, 0); ctx.stroke();
+      // diyas along the bottom
+      function gdiya(cx, baseY, s){
+        var gr2=ctx.createRadialGradient(cx,baseY-s*0.9,0,cx,baseY-s*0.9,s*1.5);
+        gr2.addColorStop(0,"rgba(255,170,40,0.45)"); gr2.addColorStop(1,"rgba(255,170,40,0)");
+        ctx.fillStyle=gr2; ctx.beginPath(); ctx.arc(cx,baseY-s*0.9,s*1.5,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle="#ffdf6b"; ctx.beginPath();
+        ctx.moveTo(cx, baseY-s*1.45);
+        ctx.bezierCurveTo(cx+s*0.30, baseY-s*0.85, cx+s*0.20, baseY-s*0.55, cx, baseY-s*0.5);
+        ctx.bezierCurveTo(cx-s*0.20, baseY-s*0.55, cx-s*0.30, baseY-s*0.85, cx, baseY-s*1.45); ctx.fill();
+        ctx.fillStyle="#ff9d2e"; ctx.beginPath(); ctx.ellipse(cx, baseY-s*0.62, s*0.13, s*0.20, 0, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle="#c65a1d"; ctx.beginPath();
+        ctx.moveTo(cx-s, baseY-s*0.5); ctx.quadraticCurveTo(cx, baseY+s*0.35, cx+s, baseY-s*0.5);
+        ctx.quadraticCurveTo(cx, baseY-s*0.18, cx-s, baseY-s*0.5); ctx.closePath(); ctx.fill();
+        ctx.fillStyle="#e07f2e"; ctx.beginPath(); ctx.ellipse(cx, baseY-s*0.5, s, s*0.16, 0, 0, Math.PI*2); ctx.fill();
+      }
+      var nG = W>H ? 5 : 3;
+      for (i=0;i<nG;i++){ gdiya(W*(0.14+(0.72)*(nG===1?0.5:i/(nG-1))), H*0.955, m*0.068); }
+      break;
+    }
+    case "engagement": {
+      // interlocked rings at top centre
+      var ecx=W*0.5, ecy=H*0.082, er=m*0.040;
+      ctx.lineWidth=Math.max(2.2,W*0.005);
+      ctx.strokeStyle="#c9a24b"; ctx.beginPath(); ctx.arc(ecx-er*0.58, ecy, er, 0, Math.PI*2); ctx.stroke();
+      ctx.strokeStyle=accent; ctx.beginPath(); ctx.arc(ecx+er*0.58, ecy, er, 0, Math.PI*2); ctx.stroke();
+      // diamond sparkle on the rose-gold ring
+      ctx.save(); ctx.translate(ecx+er*0.58, ecy-er*1.12); ctx.rotate(Math.PI/4);
+      ctx.fillStyle="#ffffff"; ctx.strokeStyle=accent; ctx.lineWidth=Math.max(1.2,W*0.0022);
+      var ed=m*0.011; ctx.fillRect(-ed,-ed,ed*2,ed*2); ctx.strokeRect(-ed,-ed,ed*2,ed*2); ctx.restore();
+      star(ctx, ecx+er*0.58, ecy-er*1.55, m*0.013, accent);
+      star(ctx, ecx-er*1.55, ecy-er*0.55, m*0.009, "#c9a24b");
+      star(ctx, ecx+er*1.60, ecy+er*0.35, m*0.009, accent);
+      // roses and leaves in the corners
+      var ecols=["#e8a0ae","#d97f92","#f2c4ac","#c96f7f"];
+      var ecorners=[[0,0],[W,0],[0,H],[W,H]];
+      for (var c2=0;c2<4;c2++){
+        var ebx=ecorners[c2][0], eby=ecorners[c2][1], esx=ebx===0?1:-1, esy=eby===0?1:-1;
+        for (i=0;i<6;i++){
+          var ex = ebx + esx*(rnd()*m*0.17 + m*0.035); var ey = eby + esy*(rnd()*m*0.13 + m*0.03);
+          petalFlower(ctx, ex, ey, m*(0.018+rnd()*0.014), ecols[i%4], "#e9b949");
+          leaf(ctx, ebx+esx*m*0.05, eby+esy*(rnd()*m*0.14+m*0.03), m*0.05, (esy>0?0.5:2.6)+(esx<0?Math.PI*0.85:0), "rgba(140,160,110,0.55)");
+        }
+      }
+      // faint floating hearts
+      function eheart(hx,hy,s,col,a){
+        ctx.save(); ctx.globalAlpha=a; ctx.fillStyle=col; ctx.beginPath();
+        ctx.moveTo(hx, hy+s*0.9);
+        ctx.bezierCurveTo(hx-s*1.3, hy+s*0.1, hx-s*1.05, hy-s*0.9, hx, hy-s*0.25);
+        ctx.bezierCurveTo(hx+s*1.05, hy-s*0.9, hx+s*1.3, hy+s*0.1, hx, hy+s*0.9);
+        ctx.fill(); ctx.restore();
+      }
+      for (i=0;i<9;i++){ eheart(rnd()*W, H*0.25+rnd()*H*0.65, m*(0.010+rnd()*0.012), i%2? accent:"#e8a0ae", 0.20+rnd()*0.25); }
+      ctx.fillStyle=hexA(accent,0.45);
+      for (i=0;i<20;i++){ ctx.beginPath(); ctx.arc(rnd()*W, rnd()*H, m*0.004, 0, Math.PI*2); ctx.fill(); }
+      break;
+    }
+    case "mehndi": {
+      function marigold(mx,my,mr,c1,c2){
+        ctx.fillStyle=c1;
+        for (var p=0;p<8;p++){ var pa=p/8*Math.PI*2; ctx.beginPath(); ctx.arc(mx+Math.cos(pa)*mr*0.55, my+Math.sin(pa)*mr*0.55, mr*0.52, 0, Math.PI*2); ctx.fill(); }
+        ctx.fillStyle=c2; ctx.beginPath(); ctx.arc(mx,my,mr*0.55,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle="#f7c948"; ctx.beginPath(); ctx.arc(mx,my,mr*0.26,0,Math.PI*2); ctx.fill();
+      }
+      var mcols=[["#e8862e","#c65a1d"],["#f0a832","#e8862e"],["#b03a2e","#8c1d2f"]];
+      // hanging marigold strings along the top
+      for (var st=0; st<7; st++){
+        var sx3 = W*(0.10+st*0.133), slen = H*(0.028+(st%3)*0.014);
+        ctx.strokeStyle="rgba(212,175,95,0.6)"; ctx.lineWidth=Math.max(1,W*0.0016);
+        ctx.beginPath(); ctx.moveTo(sx3,0); ctx.lineTo(sx3,slen); ctx.stroke();
+        var mc=mcols[st%3]; marigold(sx3, slen+m*0.016, m*0.016, mc[0], mc[1]);
+      }
+      // peacock feathers in the corners
+      function feather(fx,fy,flen,fang){
+        ctx.save(); ctx.translate(fx,fy); ctx.rotate(fang);
+        ctx.strokeStyle="rgba(212,175,95,0.9)"; ctx.lineWidth=Math.max(1.2,W*0.0022);
+        ctx.beginPath(); ctx.moveTo(0,0); ctx.quadraticCurveTo(flen*0.06,-flen*0.5,0,-flen); ctx.stroke();
+        ctx.strokeStyle="rgba(84,178,124,0.55)"; ctx.lineWidth=Math.max(1,W*0.0016);
+        for (var b2=0;b2<8;b2++){
+          var bt2=0.30+b2*0.075, by3=-flen*bt2;
+          ctx.beginPath(); ctx.moveTo(0,by3); ctx.quadraticCurveTo(-flen*0.17,by3-flen*0.05,-flen*0.21,by3+flen*0.05); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(0,by3); ctx.quadraticCurveTo(flen*0.17,by3-flen*0.05,flen*0.21,by3+flen*0.05); ctx.stroke();
+        }
+        var ey2=-flen*0.80;
+        ctx.fillStyle="#1e7a4f"; ctx.beginPath(); ctx.ellipse(0,ey2,flen*0.155,flen*0.235,0,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle="#17a398"; ctx.beginPath(); ctx.ellipse(0,ey2,flen*0.105,flen*0.165,0,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle="#1d4e89"; ctx.beginPath(); ctx.ellipse(0,ey2+flen*0.01,flen*0.062,flen*0.105,0,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle="#d4af5f"; ctx.beginPath(); ctx.ellipse(0,ey2+flen*0.015,flen*0.026,flen*0.048,0,0,Math.PI*2); ctx.fill();
+        ctx.restore();
+      }
+      feather(W*0.075, H*0.30, m*0.24, 0.5);
+      feather(W*0.925, H*0.30, m*0.24, -0.5);
+      feather(W*0.06, H*0.97, m*0.17, 0.9);
+      feather(W*0.94, H*0.97, m*0.17, -0.9);
+      // henna paisley motifs along the sides
+      function paisley(px2,py2,ps,pang,alpha){
+        ctx.save(); ctx.translate(px2,py2); ctx.rotate(pang); ctx.globalAlpha=alpha;
+        ctx.strokeStyle=accent; ctx.lineWidth=Math.max(1.2,W*0.0024);
+        ctx.beginPath();
+        ctx.moveTo(0,-ps);
+        ctx.bezierCurveTo(ps*0.85,-ps*0.35, ps*0.62, ps*0.72, 0, ps*0.82);
+        ctx.bezierCurveTo(-ps*0.72, ps*0.72, -ps*0.78, -ps*0.05, -ps*0.30, -ps*0.28);
+        ctx.bezierCurveTo(-ps*0.08, -ps*0.40, ps*0.02, -ps*0.62, 0, -ps);
+        ctx.stroke();
+        ctx.beginPath(); ctx.arc(0, ps*0.18, ps*0.20, 0, Math.PI*2); ctx.stroke();
+        ctx.fillStyle=accent; ctx.beginPath(); ctx.arc(0, ps*0.18, ps*0.06, 0, Math.PI*2); ctx.fill();
+        ctx.restore();
+      }
+      paisley(W*0.065, H*0.55, m*0.045, 0.4, 0.75);
+      paisley(W*0.935, H*0.55, m*0.045, -0.4, 0.75);
+      paisley(W*0.075, H*0.78, m*0.034, 0.9, 0.55);
+      paisley(W*0.925, H*0.78, m*0.034, -0.9, 0.55);
+      // marigold clusters along the bottom
+      [[0.07,0.94],[0.15,0.965],[0.93,0.94],[0.85,0.965],[0.5,0.972]].forEach(function(mp,mi){
+        var mc2=mcols[mi%3]; marigold(W*mp[0], H*mp[1], m*(0.020+(mi%2)*0.006), mc2[0], mc2[1]);
+      });
+      ctx.fillStyle=hexA(accent,0.5);
+      for (i=0;i<22;i++){ ctx.beginPath(); ctx.arc(rnd()*W, rnd()*H, m*0.004, 0, Math.PI*2); ctx.fill(); }
+      break;
+    }
+    case "wintersale": {
+      ctx.fillStyle="#ffffff";
+      for (i=0;i<120;i++){ ctx.globalAlpha=0.20+rnd()*0.60; ctx.beginPath(); ctx.arc(rnd()*W, rnd()*H, m*(0.004+rnd()*0.007), 0, Math.PI*2); ctx.fill(); }
+      ctx.globalAlpha=1;
+      function wflake(cx,cy,r){ ctx.strokeStyle="rgba(190,225,255,0.9)"; ctx.lineWidth=Math.max(1.2,r*0.14); for(var k=0;k<6;k++){ var a=k*Math.PI/3; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(a)*r, cy+Math.sin(a)*r); ctx.stroke(); ctx.beginPath(); ctx.moveTo(cx+Math.cos(a)*r*0.6, cy+Math.sin(a)*r*0.6); ctx.lineTo(cx+Math.cos(a+0.6)*r*0.85, cy+Math.sin(a+0.6)*r*0.85); ctx.stroke(); ctx.beginPath(); ctx.moveTo(cx+Math.cos(a)*r*0.6, cy+Math.sin(a)*r*0.6); ctx.lineTo(cx+Math.cos(a-0.6)*r*0.85, cy+Math.sin(a-0.6)*r*0.85); ctx.stroke(); } }
+      wflake(W*0.12,H*0.11,m*0.034); wflake(W*0.89,H*0.13,m*0.027); wflake(W*0.85,H*0.80,m*0.030); wflake(W*0.09,H*0.72,m*0.022);
+      // golden sale burst behind the offer line
+      ctx.save(); ctx.translate(W*0.5, H*0.335); ctx.rotate(-0.05);
+      ctx.fillStyle=accent; ctx.beginPath();
+      var wsp=18, WR1=m*0.335, WR2=m*0.262;
+      for (i=0;i<wsp*2;i++){ var wa=i/(wsp*2)*Math.PI*2; var wrad=i%2?WR2:WR1; var wpx=Math.cos(wa)*wrad, wpy=Math.sin(wa)*wrad*0.92; i?ctx.lineTo(wpx,wpy):ctx.moveTo(wpx,wpy); }
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle="rgba(255,255,255,0.7)"; ctx.lineWidth=Math.max(1.5,W*0.003); ctx.setLineDash([W*0.012,W*0.010]);
+      ctx.beginPath(); ctx.arc(0,0,WR2*0.88,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
+      ctx.restore();
+      // gift boxes in the bottom corners
+      function gift(gx,gy,gs,box,rib){
+        ctx.fillStyle=box; rr(ctx, gx-gs, gy-gs*0.72, gs*2, gs*1.44, gs*0.10); ctx.fill();
+        ctx.fillStyle=rib; ctx.fillRect(gx-gs*0.14, gy-gs*0.72, gs*0.28, gs*1.44);
+        ctx.fillStyle=box; rr(ctx, gx-gs*1.12, gy-gs*0.98, gs*2.24, gs*0.34, gs*0.08); ctx.fill();
+        ctx.fillStyle=rib; ctx.fillRect(gx-gs*0.14, gy-gs*0.98, gs*0.28, gs*0.34);
+        ctx.strokeStyle=rib; ctx.lineWidth=Math.max(1.4,gs*0.10);
+        ctx.beginPath(); ctx.ellipse(gx-gs*0.30, gy-gs*1.14, gs*0.30, gs*0.16, -0.5, 0, Math.PI*2); ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(gx+gs*0.30, gy-gs*1.14, gs*0.30, gs*0.16, 0.5, 0, Math.PI*2); ctx.stroke();
+      }
+      gift(W*0.115, H*0.925, m*0.052, "#2c5f8a", "#cfd8e3");
+      gift(W*0.885, H*0.925, m*0.052, "#7d1420", "#e3b341");
+      gift(W*0.205, H*0.955, m*0.036, "#2c5f8a", "#e3b341");
+      star(ctx, W*0.5, H*0.045, m*0.014, accent);
+      break;
+    }
+    case "firstbday": {
+      // bunting across the top
+      var fcols2=["#f6a97c","#8fd0b2","#f2a7bb","#e9c46a","#a8c8ec"];
+      for (var frow=0; frow<2; frow++){
+        var fyBase = H*(0.045+frow*0.045), fsag = H*0.055;
+        ctx.strokeStyle="rgba(109,59,78,0.4)"; ctx.lineWidth=Math.max(1.2,W*0.002);
+        ctx.beginPath(); ctx.moveTo(-W*0.02, fyBase);
+        ctx.quadraticCurveTo(W*0.5, fyBase+fsag*2, W*1.02, fyBase); ctx.stroke();
+        var fn=9;
+        for (i=0;i<fn;i++){
+          var ft=(i+0.5)/fn, fpx=(1-ft)*(1-ft)*(-W*0.02)+2*(1-ft)*ft*(W*0.5)+ft*ft*(W*1.02);
+          var fpy=(1-ft)*(1-ft)*fyBase+2*(1-ft)*ft*(fyBase+fsag*2)+ft*ft*fyBase;
+          var ftw=W*0.055, fth=H*0.045;
+          ctx.fillStyle=fcols2[(i+frow*2)%fcols2.length];
+          ctx.beginPath(); ctx.moveTo(fpx-ftw/2,fpy); ctx.lineTo(fpx+ftw/2,fpy); ctx.lineTo(fpx,fpy+fth); ctx.closePath(); ctx.fill();
+        }
+      }
+      // balloons in the top corners
+      var fbcols=["#f6a97c","#8fd0b2","#f2a7bb"];
+      var fspots=[[0.09,0.20],[0.915,0.185],[0.155,0.30]];
+      for (i=0;i<3;i++){
+        var fbx=W*fspots[i][0], fby=H*fspots[i][1], fbr=m*0.046;
+        ctx.strokeStyle="rgba(109,59,78,0.4)"; ctx.lineWidth=Math.max(1,W*0.0016);
+        ctx.beginPath(); ctx.moveTo(fbx, fby+fbr*1.25);
+        ctx.bezierCurveTo(fbx-fbr*0.4, fby+fbr*2.0, fbx+fbr*0.4, fby+fbr*2.4, fbx-fbr*0.15, fby+fbr*3.0); ctx.stroke();
+        ctx.fillStyle=fbcols[i]; ctx.beginPath(); ctx.ellipse(fbx,fby,fbr*0.82,fbr,0,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle="rgba(255,255,255,0.4)"; ctx.beginPath(); ctx.ellipse(fbx-fbr*0.3,fby-fbr*0.35,fbr*0.20,fbr*0.32,-0.5,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle=fbcols[i]; ctx.beginPath(); ctx.moveTo(fbx-4,fby+fbr*1.18); ctx.lineTo(fbx+4,fby+fbr*1.18); ctx.lineTo(fbx,fby+fbr*1.42); ctx.closePath(); ctx.fill();
+      }
+      // one-candle cake at the bottom centre
+      var ckx=W*0.5, ckBase=H*0.968, ckW=m*0.30, ckH=H*0.052;
+      ctx.fillStyle=hexA(accent,0.85); ctx.beginPath(); ctx.ellipse(ckx, ckBase, ckW*0.62, m*0.012, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle="#f2a7bb"; rr(ctx, ckx-ckW/2, ckBase-ckH, ckW, ckH, m*0.008); ctx.fill();
+      ctx.fillStyle="#fff6ec"; rr(ctx, ckx-ckW*0.32, ckBase-ckH*1.72, ckW*0.64, ckH*0.78, m*0.008); ctx.fill();
+      ctx.fillStyle="#fff6ec";
+      for (i=0;i<6;i++){ ctx.beginPath(); ctx.arc(ckx-ckW/2+ckW*(i+0.5)/6, ckBase-ckH, m*0.011, 0, Math.PI); ctx.fill(); }
+      var scols2=["#e2739a","#7fc8a9","#e9c46a","#7ba7d9"];
+      for (i=0;i<10;i++){ ctx.fillStyle=scols2[i%4]; ctx.fillRect(ckx-ckW*0.44+rnd()*ckW*0.88, ckBase-ckH*0.75+rnd()*ckH*0.5, m*0.010, m*0.004); }
+      ctx.fillStyle=accent; rr(ctx, ckx-m*0.008, ckBase-ckH*1.72-H*0.030, m*0.016, H*0.030, m*0.006); ctx.fill();
+      var flY=ckBase-ckH*1.72-H*0.030;
+      var fg=ctx.createRadialGradient(ckx,flY-H*0.008,0,ckx,flY-H*0.008,m*0.045);
+      fg.addColorStop(0,"rgba(255,170,40,0.55)"); fg.addColorStop(1,"rgba(255,170,40,0)");
+      ctx.fillStyle=fg; ctx.beginPath(); ctx.arc(ckx,flY-H*0.008,m*0.045,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle="#ffdf6b"; ctx.beginPath();
+      ctx.moveTo(ckx, flY-H*0.026);
+      ctx.bezierCurveTo(ckx+m*0.010, flY-H*0.010, ckx+m*0.007, flY-H*0.002, ckx, flY);
+      ctx.bezierCurveTo(ckx-m*0.007, flY-H*0.002, ckx-m*0.010, flY-H*0.010, ckx, flY-H*0.026); ctx.fill();
+      ctx.fillStyle=hexA(accent,0.4);
+      for (i=0;i<18;i++){ ctx.beginPath(); ctx.arc(rnd()*W, H*0.55+rnd()*H*0.35, m*0.005, 0, Math.PI*2); ctx.fill(); }
+      break;
+    }
+  }
+}
+
+function drawPhoto(ctx,W,H,t,valsNow,accent,theme,base){
+  var cx=W*0.5, cy=H*t.photoY, r=Math.min(W,H)*t.photoR;
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.closePath();
+  if (state.photo){
+    ctx.clip();
+    var iw=state.photo.naturalWidth, ih=state.photo.naturalHeight, sc=Math.max(r*2/iw, r*2/ih);
+    ctx.drawImage(state.photo, cx-iw*sc/2, cy-ih*sc/2, iw*sc, ih*sc);
+  } else {
+    ctx.fillStyle="rgba(255,255,255,0.14)"; ctx.fill();
+    ctx.strokeStyle=hexA(accent,0.8); ctx.lineWidth=Math.max(1.5,W*0.003); ctx.setLineDash([W*0.014,W*0.010]); ctx.stroke(); ctx.setLineDash([]);
+    var name=(valsNow.names||valsNow.title||"").trim();
+    var ch=(name.charAt(0)||"★").toUpperCase();
+    ctx.fillStyle=accent; ctx.font="400 "+(r*1.05)+"px \""+theme.script+"\", serif";
+    ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText(ch, cx, cy+r*0.06);
+  }
+  ctx.restore();
+  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+  ctx.strokeStyle=accent; ctx.lineWidth=Math.max(2.5,W*0.006); ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx,cy,r+W*0.012,0,Math.PI*2);
+  ctx.strokeStyle=hexA(accent,0.45); ctx.lineWidth=Math.max(1,W*0.002); ctx.stroke();
+  // sparkles around photo
+  star(ctx, cx-r*1.12, cy-r*0.55, r*0.14, accent); star(ctx, cx+r*1.15, cy+r*0.3, r*0.11, accent);
+  return r;
+}
+
+function renderCard(ctx, W, H, t, valsNow, style){
+  var pal = t.pal;
+  var ink = style.textColor || pal.ink;
+  var accent = style.accentColor || pal.accent;
+  var theme = FONT_THEMES[style.fontTheme] || FONT_THEMES.royal;
+  var m = Math.min(W,H);
+
+  // background
+  if (t.blank && style.bgColor){
+    ctx.fillStyle = style.bgColor; ctx.fillRect(0,0,W,H);
+  } else {
+    var g = ctx.createLinearGradient(0,0,W*0.25,H);
+    g.addColorStop(0, pal.bg[0]); g.addColorStop(1, pal.bg[1]);
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+  }
+  drawDecor(ctx, W, H, t, pal, accent, style.seed);
+  drawFrame(ctx, W, H, t, accent);
+
+  // photo
+  var regionTop = H * t.textTop;
+  if (t.photo){
+    var pr = drawPhoto(ctx, W, H, t, valsNow, accent, theme, m);
+    regionTop = Math.max(regionTop, H*t.photoY + pr + H*0.045);
+  }
+  var regionBottom = H*0.945;
+
+  // build text entries
+  var base = m * 0.040 * style.textScale;
+  var maxW = W*0.82;
+  var entries = [];
+  t.fields.forEach(function(f){
+    var raw = (valsNow[f.key]||"").replace(/\s+$/,"");
+    if (!raw.trim()) return;
+    var role = ROLES[f.role];
+    var size = base * role.mult * (f.role==="title"||f.role==="names"||f.role==="big" ? style.titleScale : 1);
+    var txt = role.upper ? raw.toUpperCase() : raw;
+    ctx.font = fontFor(f.role, theme, size);
+    var lines = wrapLines(ctx, txt, maxW);
+    entries.push({ field:f, role:role, size:size, lines:lines, h: lines.length*size*1.26 });
+    if (t.ornament && f.key==="names"){
+      entries.push({ ornament:true, h: base*0.95 });
+    }
+  });
+  var total = 0;
+  entries.forEach(function(e){ total += e.h + (e.ornament?0: base*e.role.gap); });
+  var y = regionTop + Math.max(0,(regionBottom-regionTop-total)/2);
+
+  var x = style.align==="left" ? W*0.10 : (style.align==="right" ? W*0.90 : W*0.5);
+  ctx.textAlign = style.align; ctx.textBaseline="alphabetic";
+
+  entries.forEach(function(e){
+    if (e.ornament){
+      var oy = y + base*0.48, hw = m*0.16;
+      ctx.strokeStyle = accent; ctx.lineWidth = Math.max(1, W*0.0022);
+      ctx.beginPath(); ctx.moveTo(W*0.5-hw, oy); ctx.lineTo(W*0.5-m*0.035, oy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(W*0.5+m*0.035, oy); ctx.lineTo(W*0.5+hw, oy); ctx.stroke();
+      ctx.save(); ctx.translate(W*0.5, oy); ctx.rotate(Math.PI/4);
+      ctx.fillStyle = accent; var d=m*0.011; ctx.fillRect(-d,-d,d*2,d*2); ctx.restore();
+      star(ctx, W*0.5-hw-m*0.022, oy, m*0.009, accent); star(ctx, W*0.5+hw+m*0.022, oy, m*0.009, accent);
+      y += e.h; return;
+    }
+    var role = e.role;
+    var col = ink;
+    if (e.field.role==="kicker") col = accent;
+    if (e.field.role==="subtitle" || e.field.role==="message" || e.field.role==="time" || e.field.role==="venue") col = style.textColor || pal.sub || ink;
+    if (e.field.role==="names" || e.field.role==="big") col = (t.motif==="burst" || t.motif==="wintersale") ? "#ffffff" : (style.textColor || ink);
+    if ((t.motif==="burst" || t.motif==="wintersale") && (e.field.role==="title" || e.field.role==="kicker")) col = "#ffffff";
+    if (t.motif==="wintersale" && e.field.role==="subtitle" && !style.textColor) col = "#ffffff";
+    ctx.fillStyle = col;
+    ctx.font = fontFor(e.field.role, theme, e.size);
+    try { ctx.letterSpacing = (e.size*role.ls)+"px"; } catch(err){}
+    var ly = y + e.size;
+    e.lines.forEach(function(line){ ctx.fillText(line, x, ly); ly += e.size*1.26; });
+    try { ctx.letterSpacing = "0px"; } catch(err){}
+    y += e.h + base*role.gap;
+  });
+}
+
+/* ============ UI ============ */
+var stage = document.getElementById("stage");
+var sctx = stage.getContext("2d");
+var statusEl = document.getElementById("status");
+
+function currentStyle(){
+  return { fontTheme: state.fontTheme, titleScale: state.titleScale, textScale: state.textScale,
+           align: state.align, textColor: state.textColor, accentColor: state.accentColor,
+           bgColor: state.bgColor, seed: state.seed };
+}
+function renderPreview(){
+  var t = tpl(), v = vals();
+  var pw = 460, ph = Math.round(pw * state.size.h / state.size.w);
+  if (ph > 600){ ph = 600; pw = Math.round(ph * state.size.w / state.size.h); }
+  var dpr = Math.min(2, window.devicePixelRatio||1);
+  stage.width = pw*dpr; stage.height = ph*dpr;
+  stage.style.width = pw+"px"; stage.style.height = ph+"px";
+  sctx.setTransform(dpr,0,0,dpr,0,0);
+  renderCard(sctx, pw, ph, t, v, currentStyle());
+  document.getElementById("dlSize").textContent = state.size.w+" × "+state.size.h+" px";
+}
+
+/* thumbnails */
+function buildTabs(){
+  var wrap = document.getElementById("catTabs"); wrap.innerHTML="";
+  CATEGORIES.forEach(function(c){
+    var b=document.createElement("button"); b.type="button"; b.className="tab"; b.textContent=c;
+    b.setAttribute("aria-pressed", state.cat===c ? "true":"false");
+    b.addEventListener("click", function(){ state.cat=c; buildTabs(); buildGrid(); });
+    wrap.appendChild(b);
+  });
+}
+function buildGrid(){
+  var grid = document.getElementById("tplGrid"); grid.innerHTML="";
+  var list = TEMPLATES.filter(function(t){
+    if (state.cat==="All") return true;
+    if (state.cat==="Fresh") return isFresh(t.id);
+    return t.cat===state.cat;
+  });
+  if (state.cat==="All" || state.cat==="Fresh"){
+    list = list.slice().sort(function(a,b){
+      var ra = isSpotlight(a.id)?0 : (NEW_ARRIVALS.indexOf(a.id)>=0?1:2);
+      var rb = isSpotlight(b.id)?0 : (NEW_ARRIVALS.indexOf(b.id)>=0?1:2);
+      return ra-rb;
+    });
+  }
+  list.forEach(function(t){
+    var b=document.createElement("button"); b.type="button"; b.className="tpl";
+    b.setAttribute("aria-pressed", state.tplId===t.id ? "true":"false");
+    var cv=document.createElement("canvas"); cv.width=216; cv.height=270;
+    var cx=cv.getContext("2d");
+    var v={}; t.fields.forEach(function(f){ v[f.key]=f.def; });
+    var keepPhoto = state.photo; if (t.id!==state.tplId) { /* thumb uses monogram */ }
+    renderCard(cx, 216, 270, t, v, { fontTheme:t.fontTheme, titleScale:1, textScale:1, align:"center",
+      textColor:null, accentColor:null, bgColor: t.blank ? "#fdf6ec" : null, seed: state.seed });
+    b.appendChild(cv);
+    if (isFresh(t.id)){
+      var bd=document.createElement("span"); bd.className="tpl-badge";
+      bd.textContent = isSpotlight(t.id) ? "New this week" : "New";
+      b.appendChild(bd);
+    }
+    var s=document.createElement("span"); s.textContent=t.name; b.appendChild(s);
+    b.addEventListener("click", function(){ selectTemplate(t.id); });
+    grid.appendChild(b);
+  });
+}
+function updatePhotoGroup(){
+  var has = !!tpl().photo;
+  document.getElementById("photoControls").classList.toggle("hidden", !has);
+  document.getElementById("photoNA").classList.toggle("hidden", has);
+}
+function selectTemplate(id){
+  state.tplId = id;
+  var t = tpl();
+  state.fontTheme = t.fontTheme;
+  document.getElementById("fontTheme").value = t.fontTheme;
+  updatePhotoGroup();
+  document.getElementById("bgRow").classList.toggle("hidden", !t.blank);
+  buildFields(); buildGrid(); renderPreview();
+}
+
+function buildFields(){
+  var wrap = document.getElementById("fields"); wrap.innerHTML="";
+  var t = tpl(), v = vals();
+  t.fields.forEach(function(f){
+    var div=document.createElement("div"); div.className="field";
+    var lab=document.createElement("label"); lab.textContent=f.label; lab.setAttribute("for","fld-"+f.key);
+    var inp;
+    if (f.ta){ inp=document.createElement("textarea"); inp.rows=2; }
+    else { inp=document.createElement("input"); inp.type="text"; }
+    inp.id="fld-"+f.key; inp.value=v[f.key]||"";
+    inp.setAttribute("autocomplete","off");
+    inp.addEventListener("input", function(){ v[f.key]=inp.value; renderPreview(); });
+    div.appendChild(lab); div.appendChild(inp); wrap.appendChild(div);
+  });
+}
+
+/* swatches */
+function buildSwatches(elId, colors, get, set){
+  var wrap=document.getElementById(elId); wrap.innerHTML="";
+  var auto=document.createElement("button"); auto.type="button"; auto.className="sw auto"; auto.textContent="Auto";
+  auto.setAttribute("aria-pressed", get()===null ? "true":"false");
+  auto.setAttribute("aria-label","Automatic colour");
+  auto.addEventListener("click", function(){ set(null); refreshSwatches(); renderPreview(); });
+  wrap.appendChild(auto);
+  colors.forEach(function(c){
+    var b=document.createElement("button"); b.type="button"; b.className="sw"; b.style.background=c;
+    b.setAttribute("aria-pressed", get()===c ? "true":"false");
+    b.setAttribute("aria-label","Colour "+c);
+    b.addEventListener("click", function(){ set(c); refreshSwatches(); renderPreview(); });
+    wrap.appendChild(b);
+  });
+}
+function refreshSwatches(){
+  buildSwatches("textSwatches", TEXT_SWATCHES, function(){return state.textColor;}, function(c){ state.textColor=c; if(c) document.getElementById("textColorPick").value=c; });
+  buildSwatches("accentSwatches", ACCENT_SWATCHES, function(){return state.accentColor;}, function(c){ state.accentColor=c; if(c) document.getElementById("accentColorPick").value=c; });
+  buildSwatches("bgSwatches", BG_SWATCHES, function(){return state.bgColor;}, function(c){ state.bgColor=c; if(c) document.getElementById("bgColorPick").value=c; });
+}
+
+/* sizes */
+function buildSizes(){
+  var wrap=document.getElementById("sizeChips"); wrap.innerHTML="";
+  SIZES.forEach(function(s){
+    var b=document.createElement("button"); b.type="button"; b.className="chip";
+    b.setAttribute("aria-pressed", state.size.id===s.id ? "true":"false");
+    b.innerHTML = s.label+"<small>"+(s.id==="custom" && state.size.id==="custom" ? state.size.w+" × "+state.size.h : s.sub)+"</small>";
+    b.addEventListener("click", function(){
+      if (s.id==="custom"){ document.getElementById("customSize").classList.add("open"); state.size.id="custom"; if(!state.size.w||state.size.id==="custom"&&state.size.w===0){} buildSizes(); renderPreview(); return; }
+      state.size = { w:s.w, h:s.h, id:s.id };
+      document.getElementById("customSize").classList.remove("open");
+      buildSizes(); renderPreview();
+    });
+    wrap.appendChild(b);
+  });
+}
+function clampDim(n){ n=Math.round(Math.abs(n)||0); return Math.max(200, Math.min(4000, n)); }
+document.getElementById("customApply").addEventListener("click", function(){
+  var w=clampDim(parseInt(document.getElementById("cw").value,10));
+  var h=clampDim(parseInt(document.getElementById("ch").value,10));
+  document.getElementById("cw").value=w; document.getElementById("ch").value=h;
+  state.size={ w:w, h:h, id:"custom" };
+  buildSizes(); renderPreview();
+  statusEl.textContent="Custom size set: "+w+" × "+h+" px.";
+});
+
+/* controls wiring */
+(function(){
+  var sel=document.getElementById("fontTheme");
+  Object.keys(FONT_THEMES).forEach(function(k){
+    var o=document.createElement("option"); o.value=k; o.textContent=FONT_THEMES[k].label; sel.appendChild(o);
+  });
+  sel.value=state.fontTheme;
+  sel.addEventListener("change", function(){ state.fontTheme=sel.value; renderPreview(); });
+
+  var ts=document.getElementById("titleScale"), bs=document.getElementById("textScale");
+  ts.addEventListener("input", function(){ state.titleScale=ts.value/100; document.getElementById("titleScaleVal").textContent=ts.value+"%"; renderPreview(); });
+  bs.addEventListener("input", function(){ state.textScale=bs.value/100; document.getElementById("textScaleVal").textContent=bs.value+"%"; renderPreview(); });
+
+  var seg=document.getElementById("alignSeg");
+  seg.querySelectorAll("button").forEach(function(b){
+    b.addEventListener("click", function(){
+      state.align=b.getAttribute("data-align");
+      seg.querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-pressed", x===b?"true":"false"); });
+      renderPreview();
+    });
+  });
+
+  document.getElementById("textColorPick").addEventListener("input", function(e){ state.textColor=e.target.value; refreshSwatches(); renderPreview(); });
+  document.getElementById("accentColorPick").addEventListener("input", function(e){ state.accentColor=e.target.value; refreshSwatches(); renderPreview(); });
+  document.getElementById("bgColorPick").addEventListener("input", function(e){ state.bgColor=e.target.value; refreshSwatches(); renderPreview(); });
+
+  document.getElementById("shuffleBtn").addEventListener("click", function(){
+    state.seed = (state.seed*9301 + 49297) % 233280;
+    buildGrid(); renderPreview();
+    statusEl.textContent="Decorations shuffled.";
+  });
+
+  var photoInput=document.getElementById("photoInput");
+  photoInput.addEventListener("change", function(){
+    var file=photoInput.files && photoInput.files[0]; if(!file) return;
+    var url=URL.createObjectURL(file);
+    var img=new Image();
+    img.onload=function(){
+      state.photo=img;
+      var th=document.getElementById("photoThumb"); th.src=url; th.style.display="block";
+      document.getElementById("photoRemove").classList.remove("hidden");
+      renderPreview(); statusEl.textContent="Photo added — it appears inside the circle on the card.";
+    };
+    img.onerror=function(){ statusEl.textContent="That image could not be loaded. Try a JPG or PNG."; };
+    img.src=url;
+  });
+  document.getElementById("photoRemove").addEventListener("click", function(){
+    state.photo=null; photoInput.value="";
+    document.getElementById("photoThumb").style.display="none";
+    document.getElementById("photoRemove").classList.add("hidden");
+    renderPreview();
+  });
+
+  document.getElementById("downloadBtn").addEventListener("click", function(){
+    var t=tpl(), v=vals();
+    var off=document.createElement("canvas"); off.width=state.size.w; off.height=state.size.h;
+    var octx=off.getContext("2d");
+    renderCard(octx, state.size.w, state.size.h, t, v, currentStyle());
+    var titleSlug=(v.title||v.names||t.name).toString().split("\n")[0].toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"")||"invitation-card";
+    off.toBlob(function(blob){
+      if(!blob){ statusEl.textContent="Download failed in this browser — try again."; return; }
+      var a=document.createElement("a");
+      a.href=URL.createObjectURL(blob);
+      a.download=titleSlug+"-"+state.size.w+"x"+state.size.h+".png";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+      statusEl.textContent="Downloaded "+a.download+" ("+Math.max(1,Math.round(blob.size/1024))+" KB). Ready to share or print!";
+    }, "image/png");
+  });
+})();
+
+/* ============ Auto season + fresh drops ============ */
+function applyAutoSeason(){
+  var sb = document.getElementById("seasonBanner");
+  var fs = document.getElementById("freshStrip");
+  var fest = currentFestival();
+  if (fest){
+    selectTemplate(fest.tpl);
+    sb.innerHTML = "✦ <b>"+fest.name+" season is here</b> — going by today's date, the tool picked the <b>"+tplName(fest.tpl)+"</b> design for you on its own. You can switch to any other design below, any time.";
+  } else {
+    selectTemplate(SPOTLIGHT[0]);
+    var nf = nextFestival();
+    sb.innerHTML = "✦ No festival today, so the tool opened with one of <b>this week's fresh designs</b>. Next up: <b>"+nf.fest.name+"</b> from <b>"+fmtDay(nf.date)+"</b> — when its season starts, its design will be picked automatically.";
+  }
+  var names = SPOTLIGHT.map(tplName).join(" · ");
+  fs.innerHTML = "<b>Fresh this week:</b> "+names+" &nbsp;|&nbsp; New designs arrive <b>every Monday</b> — next drop <b>"+fmtDay(nextDropDate())+"</b>. They appear here on their own; there is nothing you need to do.";
+}
+
+/* init */
+buildTabs(); buildGrid(); buildFields(); buildSizes(); refreshSwatches();
+updatePhotoGroup();
+applyAutoSeason();
+renderPreview();
+if (document.fonts && document.fonts.ready){
+  document.fonts.ready.then(function(){ buildGrid(); renderPreview(); });
+}
+</script>
+</body>
+</html>

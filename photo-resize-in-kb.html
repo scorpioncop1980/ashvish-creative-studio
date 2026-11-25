@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Photo Resize in KB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f7; --surface:#ffffff; --surface2:#edf1f2; --ink:#14201f; --ink2:#4c5b59;
+    --line:#d7dede; --accent:#0e6b5c; --accent-ink:#ffffff; --accent-soft:#e2f1ed;
+    --warn:#b45309; --warn-soft:#fdf0dd; --danger:#b3261e; --shadow:0 10px 30px rgba(16,40,36,.10);
+    --chip:#eef3f2;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#101615; --surface:#182120; --surface2:#1f2a29; --ink:#e8efed; --ink2:#a9bab6;
+      --line:#2c3a38; --accent:#2ea88f; --accent-ink:#06231d; --accent-soft:#173b34;
+      --warn:#f0b269; --warn-soft:#3a2b16; --danger:#ff9d94; --shadow:0 10px 30px rgba(0,0,0,.45);
+      --chip:#22302e;
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.5}
+  h1,h2,h3{font-family:"Archivo",sans-serif;margin:0;line-height:1.15}
+  button{font:inherit;cursor:pointer}
+  input,select{font:inherit}
+  .wrap{max-width:1180px;margin:0 auto;padding:20px 16px 56px}
+
+  .intro{max-width:780px;margin:6px 0 18px}
+  .intro h1{font-size:clamp(26px,4.5vw,36px);font-weight:800;letter-spacing:-.01em}
+  .intro p{color:var(--ink2);margin:8px 0 0;font-size:16px}
+  .steps{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .steps span{background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600}
+  .steps b{color:var(--accent)}
+
+  .layout{display:grid;grid-template-columns:400px minmax(0,1fr);gap:16px;align-items:start}
+  @media (max-width:900px){.layout{grid-template-columns:1fr}}
+
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow);margin-bottom:16px}
+  .panel h2{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);margin-bottom:12px}
+  .panel h2 .n{color:var(--accent)}
+  .group{margin-bottom:18px}
+  .group:last-child{margin-bottom:0}
+  label.lbl{display:block;font-size:13px;font-weight:600;margin:0 0 6px}
+  .hint{font-size:12.5px;color:var(--ink2);margin-top:5px}
+  .hint.warn{color:var(--warn)}
+
+  .drop{border:2px dashed var(--line);border-radius:12px;padding:20px 12px;text-align:center;background:var(--surface2);transition:border-color .15s, background .15s}
+  .drop.over{border-color:var(--accent);background:var(--accent-soft)}
+  .drop svg{width:34px;height:34px;stroke:var(--accent)}
+  .drop p{margin:6px 0 12px;font-size:13.5px;color:var(--ink2)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:9px 14px;font-weight:600;font-size:14px;transition:transform .08s, background .15s;text-decoration:none}
+  .btn:active{transform:scale(.98)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .btn.block{width:100%}
+  .btn.big{padding:13px 18px;font-size:16px;border-radius:11px}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.small{padding:6px 10px;font-size:13px;border-radius:7px}
+  .linkbtn{background:none;border:none;color:var(--accent);font-weight:600;padding:4px 0;text-decoration:underline;text-underline-offset:3px}
+  .toolrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+
+  .fileinfo{display:none;margin-top:12px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13.5px}
+  .fileinfo.show{display:block}
+  .fileinfo .name{font-weight:700;word-break:break-all}
+  .fileinfo dl{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;margin:6px 0 0}
+  .fileinfo dt{color:var(--ink2)} .fileinfo dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums}
+
+  .preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .preset{border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 10px;text-align:left;color:var(--ink)}
+  .preset .t{font-weight:700;font-size:13.5px;display:block}
+  .preset .s{font-size:12px;color:var(--ink2);display:block}
+  .preset[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+
+  .kbrow{display:flex;gap:8px;align-items:stretch}
+  .kbrow .numin{flex:1}
+  .numin{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font-variant-numeric:tabular-nums}
+  .numin:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .chipbtn{border:1px solid var(--line);background:var(--chip);color:var(--ink);border-radius:999px;padding:4px 11px;font-size:12.5px;font-weight:600}
+  .chipbtn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .row2{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:end}
+  .row2 .x{align-self:center;color:var(--ink2);font-weight:700;padding-bottom:9px}
+  .switchrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}
+  .switchrow .lab{font-size:13.5px;font-weight:600}
+  .tgl{display:inline-flex;flex:none}
+  .tgl input{appearance:none;-webkit-appearance:none;width:46px;height:26px;border-radius:999px;background:var(--line);margin:0;cursor:pointer;position:relative;transition:background .15s;flex:none}
+  .tgl input::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .15s}
+  .tgl input:checked{background:var(--accent)}
+  .tgl input:checked::after{left:23px}
+  .tgl input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  select.numin{appearance:auto}
+
+  .stage-panel{padding:16px}
+  .stage-head{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .stage-head h2{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2)}
+  .spec-chip{background:var(--accent-soft);color:var(--ink);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:700}
+  .stage{background:repeating-conic-gradient(var(--surface2) 0% 25%, var(--surface) 0% 50%) 0 0/22px 22px;border:1px solid var(--line);border-radius:12px;display:flex;align-items:center;justify-content:center;padding:22px;min-height:300px}
+  .stage img{max-width:100%;max-height:52vh;width:auto;height:auto;box-shadow:0 14px 34px rgba(0,0,0,.25);background:#fff}
+  .empty-msg{text-align:center;color:var(--ink2);max-width:360px;line-height:1.55}
+  .empty-msg svg{width:44px;height:44px;stroke:var(--line);margin-bottom:6px}
+
+  .ba{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch;margin-top:14px}
+  @media (max-width:520px){.ba{grid-template-columns:1fr}.ba .arrow{justify-self:center;transform:rotate(90deg)}}
+  .ba .card{background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .ba .card.after{border-color:var(--accent);background:var(--accent-soft)}
+  .ba .k{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink2)}
+  .ba .v{font-size:21px;font-weight:800;font-family:"Archivo",sans-serif;font-variant-numeric:tabular-nums}
+  .ba .d{font-size:12.5px;color:var(--ink2);font-variant-numeric:tabular-nums}
+  .ba .arrow{align-self:center;font-size:20px;color:var(--accent);font-weight:800}
+  .bar{height:8px;background:var(--surface2);border:1px solid var(--line);border-radius:99px;overflow:hidden;margin-top:12px}
+  .bar i{display:block;height:100%;background:var(--accent);width:0%;transition:width .4s ease}
+  .savings{font-size:13.5px;font-weight:700;color:var(--accent);margin-top:8px}
+  .status{font-size:13.5px;margin-top:10px;min-height:20px}
+  .status.ok{color:var(--accent);font-weight:600}
+  .status.warn{color:var(--warn);font-weight:600}
+  .status.err{color:var(--danger);font-weight:600}
+  .busy{opacity:.55;pointer-events:none}
+  @media (prefers-reduced-motion: reduce){.bar i{transition:none}.btn{transition:none}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="intro">
+    <h1>Resize a photo or signature to an exact KB size</h1>
+    <p>Online forms ask for a photo under 50 KB, a signature under 20 KB, a picture of exactly 200×230 pixels. Set the numbers here — the resized file is made on your device and downloaded, ready to upload. Nothing is sent anywhere.</p>
+    <div class="steps">
+      <span><b>1</b>&nbsp; Add photo</span>
+      <span><b>2</b>&nbsp; Set KB &amp; pixels</span>
+      <span><b>3</b>&nbsp; Download</span>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="col-left">
+      <section class="panel" aria-labelledby="h-photo">
+        <h2 id="h-photo"><span class="n">1</span> · Your photo</h2>
+        <div class="drop" id="drop">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <p>Drag &amp; drop a photo here, paste it (Ctrl+V), or</p>
+          <button class="btn primary" id="browseBtn" type="button">Choose photo</button>
+          <input type="file" id="fileInput" accept="image/*" hidden>
+          <div class="toolrow" style="justify-content:center">
+            <button class="linkbtn" id="sampleBtn" type="button">No photo handy? Try a sample image</button>
+          </div>
+        </div>
+        <div class="fileinfo" id="fileInfo">
+          <div class="name" id="fiName">—</div>
+          <dl>
+            <dt>Dimensions</dt><dd id="fiDims">—</dd>
+            <dt>File size</dt><dd id="fiSize">—</dd>
+            <dt>Type</dt><dd id="fiType">—</dd>
+          </dl>
+          <div class="toolrow">
+            <button class="btn small" id="changeBtn" type="button">Change photo</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="h-size">
+        <h2 id="h-size"><span class="n">2</span> · Size settings</h2>
+
+        <div class="group">
+          <label class="lbl">Form presets</label>
+          <div class="preset-grid" id="presetGrid">
+            <button class="preset" type="button" data-preset="exam-photo"><span class="t">Exam Photo</span><span class="s">200 × 230 px · max 50 KB</span></button>
+            <button class="preset" type="button" data-preset="signature"><span class="t">Signature</span><span class="s">140 × 60 px · max 20 KB</span></button>
+            <button class="preset" type="button" data-preset="upsc"><span class="t">UPSC Photo</span><span class="s">Any size · max 300 KB</span></button>
+            <button class="preset" type="button" data-preset="small"><span class="t">Small Photo</span><span class="s">Any size · max 100 KB</span></button>
+          </div>
+          <p class="hint">Common limits used by SSC, banking and other online forms. Pick one, or set your own numbers below.</p>
+        </div>
+
+        <div class="group">
+          <div class="switchrow" style="margin-top:0">
+            <span class="lab">Limit file size</span>
+            <label class="tgl"><input type="checkbox" id="kbToggle" checked aria-label="Limit file size"></label>
+          </div>
+          <div id="kbControls" style="margin-top:10px">
+            <label class="lbl" for="kbInput">Maximum size (KB)</label>
+            <div class="kbrow">
+              <input class="numin" type="number" id="kbInput" min="5" max="10240" step="1" value="50" inputmode="numeric">
+            </div>
+            <div class="chips" id="kbChips">
+              <button class="chipbtn" type="button" data-kb="20">20 KB</button>
+              <button class="chipbtn" type="button" data-kb="50">50 KB</button>
+              <button class="chipbtn" type="button" data-kb="100">100 KB</button>
+              <button class="chipbtn" type="button" data-kb="200">200 KB</button>
+              <button class="chipbtn" type="button" data-kb="500">500 KB</button>
+            </div>
+            <p class="hint">The file is compressed to fit under this size, as close to it as possible without crossing it.</p>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="switchrow" style="margin-top:0">
+            <span class="lab">Set dimensions (pixels)</span>
+            <label class="tgl"><input type="checkbox" id="dimToggle" aria-label="Set dimensions"></label>
+          </div>
+          <div id="dimControls" style="margin-top:10px;display:none">
+            <div class="row2">
+              <div>
+                <label class="lbl" for="wInput">Width (px)</label>
+                <input class="numin" type="number" id="wInput" min="10" max="8000" step="1" inputmode="numeric">
+              </div>
+              <div class="x">×</div>
+              <div>
+                <label class="lbl" for="hInput">Height (px)</label>
+                <input class="numin" type="number" id="hInput" min="10" max="8000" step="1" inputmode="numeric">
+              </div>
+            </div>
+            <div class="switchrow">
+              <span class="lab">Keep photo proportions</span>
+              <label class="tgl"><input type="checkbox" id="lockAspect" checked aria-label="Keep photo proportions"></label>
+            </div>
+            <p class="hint" id="dimHint">With proportions kept, changing one side adjusts the other. Turn it off to force the exact width × height a form asks for.</p>
+          </div>
+        </div>
+
+        <div class="group">
+          <label class="lbl" for="fmtSelect">Output format</label>
+          <select class="numin" id="fmtSelect">
+            <option value="image/jpeg" selected>JPG — best for forms &amp; small sizes</option>
+            <option value="image/png">PNG — sharp, but files stay large</option>
+            <option value="image/webp">WebP — smallest, not accepted by all forms</option>
+          </select>
+          <p class="hint warn" id="pngHint" style="display:none">PNG cannot shrink much. If the result is still over your KB limit, switch to JPG or reduce the dimensions.</p>
+        </div>
+      </section>
+    </div>
+
+    <div class="col-right">
+      <section class="panel stage-panel" aria-labelledby="h-result">
+        <div class="stage-head">
+          <h2 id="h-result"><span style="color:var(--accent)">3</span> · Result</h2>
+          <span class="spec-chip" id="specChip" style="display:none">—</span>
+        </div>
+        <div class="stage" id="stage">
+          <div class="empty-msg" id="emptyMsg">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <div>Your resized photo will appear here.<br>Add a photo on the left to begin.</div>
+          </div>
+          <img id="resultImg" alt="Resized photo preview" style="display:none">
+        </div>
+
+        <div class="ba" id="baBox" style="display:none">
+          <div class="card">
+            <div class="k">Before</div>
+            <div class="v" id="baBeforeSize">—</div>
+            <div class="d" id="baBeforeDims">—</div>
+          </div>
+          <div class="arrow" aria-hidden="true">→</div>
+          <div class="card after">
+            <div class="k">After</div>
+            <div class="v" id="baAfterSize">—</div>
+            <div class="d" id="baAfterDims">—</div>
+          </div>
+        </div>
+        <div class="bar" id="barBox" style="display:none"><i id="barFill"></i></div>
+        <div class="savings" id="savings"></div>
+        <div class="status" id="status" role="status" aria-live="polite"></div>
+
+        <div style="margin-top:14px">
+          <button class="btn primary big block" id="downloadBtn" type="button" disabled>
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download resized photo
+          </button>
+          <p class="hint" style="text-align:center">Processed entirely on your device — your photo never leaves it.</p>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+
+  var drop = $("drop"), fileInput = $("fileInput"), browseBtn = $("browseBtn"),
+      changeBtn = $("changeBtn"), sampleBtn = $("sampleBtn"),
+      fileInfo = $("fileInfo"), fiName = $("fiName"), fiDims = $("fiDims"),
+      fiSize = $("fiSize"), fiType = $("fiType"),
+      kbToggle = $("kbToggle"), kbControls = $("kbControls"), kbInput = $("kbInput"),
+      dimToggle = $("dimToggle"), dimControls = $("dimControls"),
+      wInput = $("wInput"), hInput = $("hInput"), lockAspect = $("lockAspect"),
+      fmtSelect = $("fmtSelect"), pngHint = $("pngHint"),
+      specChip = $("specChip"), emptyMsg = $("emptyMsg"), resultImg = $("resultImg"),
+      baBox = $("baBox"), baBeforeSize = $("baBeforeSize"), baBeforeDims = $("baBeforeDims"),
+      baAfterSize = $("baAfterSize"), baAfterDims = $("baAfterDims"),
+      barBox = $("barBox"), barFill = $("barFill"), savings = $("savings"),
+      statusEl = $("status"), downloadBtn = $("downloadBtn"),
+      stage = $("stage");
+
+  var state = {
+    img: null,          // HTMLImageElement of source
+    srcW: 0, srcH: 0,
+    srcBytes: 0, srcName: "", srcType: "",
+    resultBlob: null, resultURL: null, resultW: 0, resultH: 0,
+    runId: 0
+  };
+
+  function fmtBytes(b){
+    if (b == null || isNaN(b)) return "—";
+    if (b < 1024) return b + " B";
+    var kb = b / 1024;
+    if (kb < 1024) return (kb >= 100 ? Math.round(kb) : kb.toFixed(1)) + " KB";
+    return (kb / 1024).toFixed(2) + " MB";
+  }
+  function extFor(type){
+    if (type === "image/png") return "png";
+    if (type === "image/webp") return "webp";
+    return "jpg";
+  }
+  function setStatus(msg, cls){
+    statusEl.textContent = msg || "";
+    statusEl.className = "status" + (cls ? " " + cls : "");
+  }
+
+  /* ---------- loading a source image ---------- */
+  function loadBlob(blob, name){
+    if (!blob || blob.type.indexOf("image/") !== 0){
+      setStatus("That file is not an image. Please choose a JPG, PNG or WebP photo.", "err");
+      return;
+    }
+    var url = URL.createObjectURL(blob);
+    var img = new Image();
+    img.onload = function(){
+      state.img = img;
+      state.srcW = img.naturalWidth; state.srcH = img.naturalHeight;
+      state.srcBytes = blob.size; state.srcName = name || "photo";
+      state.srcType = blob.type || "image/jpeg";
+      fiName.textContent = state.srcName;
+      fiDims.textContent = state.srcW + " × " + state.srcH + " px";
+      fiSize.textContent = fmtBytes(state.srcBytes);
+      fiType.textContent = state.srcType.replace("image/", "").toUpperCase();
+      fileInfo.classList.add("show");
+      if (!wInput.value){ wInput.value = state.srcW; hInput.value = state.srcH; }
+      setStatus("");
+      process();
+    };
+    img.onerror = function(){
+      URL.revokeObjectURL(url);
+      setStatus("Could not read that image. Try a different file.", "err");
+    };
+    img.src = url;
+  }
+
+  browseBtn.addEventListener("click", function(){ fileInput.click(); });
+  changeBtn.addEventListener("click", function(){ fileInput.click(); });
+  fileInput.addEventListener("change", function(){
+    if (fileInput.files && fileInput.files[0]) loadBlob(fileInput.files[0], fileInput.files[0].name);
+    fileInput.value = "";
+  });
+  ["dragenter","dragover"].forEach(function(ev){
+    drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.add("over"); });
+  });
+  ["dragleave","drop"].forEach(function(ev){
+    drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.remove("over"); });
+  });
+  drop.addEventListener("drop", function(e){
+    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) loadBlob(f, f.name);
+  });
+  window.addEventListener("paste", function(e){
+    var items = e.clipboardData && e.clipboardData.items;
+    if (!items) return;
+    for (var i = 0; i < items.length; i++){
+      if (items[i].type.indexOf("image/") === 0){
+        var b = items[i].getAsFile();
+        if (b){ loadBlob(b, "pasted-photo." + extFor(b.type)); e.preventDefault(); }
+        break;
+      }
+    }
+  });
+
+  /* ---------- sample image (drawn in-browser) ---------- */
+  sampleBtn.addEventListener("click", function(){
+    var w = 1200, h = 900;
+    var c = document.createElement("canvas"); c.width = w; c.height = h;
+    var x = c.getContext("2d");
+    var sky = x.createLinearGradient(0, 0, 0, h * 0.7);
+    sky.addColorStop(0, "#7db3e8"); sky.addColorStop(0.6, "#cfe6f7"); sky.addColorStop(1, "#fdf3d8");
+    x.fillStyle = sky; x.fillRect(0, 0, w, h);
+    x.fillStyle = "#f7c948";
+    x.beginPath(); x.arc(w * 0.78, h * 0.22, 62, 0, Math.PI * 2); x.fill();
+    x.fillStyle = "rgba(247,201,72,.35)";
+    x.beginPath(); x.arc(w * 0.78, h * 0.22, 96, 0, Math.PI * 2); x.fill();
+    function ridge(base, amp, color){
+      x.fillStyle = color; x.beginPath(); x.moveTo(0, h);
+      var seed = base * 7.13;
+      for (var px = 0; px <= w; px += 24){
+        var y = base + Math.sin(px * 0.006 + seed) * amp + Math.sin(px * 0.021 + seed * 2) * amp * 0.35;
+        x.lineTo(px, y);
+      }
+      x.lineTo(w, h); x.closePath(); x.fill();
+    }
+    ridge(h * 0.52, 46, "#8aa8c8");
+    ridge(h * 0.62, 38, "#5d8a68");
+    ridge(h * 0.74, 30, "#3e7048");
+    x.fillStyle = "#2f5d3a"; x.fillRect(0, h * 0.82, w, h * 0.18);
+    for (var i = 0; i < 46; i++){
+      var tx = Math.random() * w, ty = h * 0.66 + Math.random() * h * 0.2, r = 12 + Math.random() * 26;
+      x.fillStyle = "rgba(28,74,40,.85)";
+      x.beginPath(); x.arc(tx, ty, r, 0, Math.PI * 2); x.fill();
+      x.fillStyle = "#5a4030"; x.fillRect(tx - 2, ty + r * 0.5, 4, r * 0.9);
+    }
+    // fine noise so the JPEG has realistic photo-like weight
+    var id = x.getImageData(0, 0, w, h), d = id.data;
+    for (var p = 0; p < d.length; p += 4){
+      var n = (Math.random() - 0.5) * 14;
+      d[p] += n; d[p + 1] += n; d[p + 2] += n;
+    }
+    x.putImageData(id, 0, 0);
+    x.fillStyle = "rgba(255,255,255,.9)";
+    x.font = "700 44px Archivo, sans-serif";
+    x.fillText("SAMPLE PHOTO", 36, h - 36);
+    c.toBlob(function(b){ if (b) loadBlob(b, "sample-photo.jpg"); }, "image/jpeg", 0.95);
+  });
+
+  /* ---------- presets & chips ---------- */
+  var presets = {
+    "exam-photo": { w: 200, h: 230, kb: 50 },
+    "signature":  { w: 140, h: 60,  kb: 20 },
+    "upsc":       { w: null, h: null, kb: 300 },
+    "small":      { w: null, h: null, kb: 100 }
+  };
+  var presetBtns = document.querySelectorAll("#presetGrid .preset");
+  function clearPresets(){
+    presetBtns.forEach(function(b){ b.setAttribute("aria-pressed", "false"); });
+  }
+  presetBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var p = presets[btn.getAttribute("data-preset")];
+      clearPresets();
+      btn.setAttribute("aria-pressed", "true");
+      kbToggle.checked = true; kbControls.style.display = "";
+      kbInput.value = p.kb;
+      if (p.w){
+        dimToggle.checked = true; dimControls.style.display = "";
+        lockAspect.checked = false;
+        wInput.value = p.w; hInput.value = p.h;
+      } else {
+        dimToggle.checked = false; dimControls.style.display = "none";
+      }
+      syncChips(); process();
+    });
+  });
+  var chipBtns = document.querySelectorAll("#kbChips .chipbtn");
+  function syncChips(){
+    chipBtns.forEach(function(b){
+      b.setAttribute("aria-pressed", String(parseInt(b.getAttribute("data-kb"), 10) === parseInt(kbInput.value, 10)));
+    });
+  }
+  chipBtns.forEach(function(b){
+    b.addEventListener("click", function(){
+      kbInput.value = b.getAttribute("data-kb");
+      clearPresets(); syncChips(); process();
+    });
+  });
+
+  /* ---------- control wiring ---------- */
+  var debounce = null;
+  function queue(){ clearTimeout(debounce); debounce = setTimeout(process, 220); }
+
+  kbToggle.addEventListener("change", function(){
+    kbControls.style.display = kbToggle.checked ? "" : "none";
+    process();
+  });
+  kbInput.addEventListener("input", function(){ clearPresets(); syncChips(); queue(); });
+  dimToggle.addEventListener("change", function(){
+    dimControls.style.display = dimToggle.checked ? "" : "none";
+    if (dimToggle.checked && state.img && !wInput.value){
+      wInput.value = state.srcW; hInput.value = state.srcH;
+    }
+    process();
+  });
+  wInput.addEventListener("input", function(){
+    clearPresets();
+    if (lockAspect.checked && state.img && state.srcH){
+      var w = parseInt(wInput.value, 10);
+      if (w > 0) hInput.value = Math.max(1, Math.round(w * state.srcH / state.srcW));
+    }
+    queue();
+  });
+  hInput.addEventListener("input", function(){
+    clearPresets();
+    if (lockAspect.checked && state.img && state.srcW){
+      var h = parseInt(hInput.value, 10);
+      if (h > 0) wInput.value = Math.max(1, Math.round(h * state.srcW / state.srcH));
+    }
+    queue();
+  });
+  lockAspect.addEventListener("change", function(){
+    if (lockAspect.checked && state.img){
+      var w = parseInt(wInput.value, 10);
+      if (w > 0) hInput.value = Math.max(1, Math.round(w * state.srcH / state.srcW));
+    }
+    process();
+  });
+  fmtSelect.addEventListener("change", function(){
+    pngHint.style.display = fmtSelect.value === "image/png" ? "" : "none";
+    process();
+  });
+
+  /* ---------- the resize engine ---------- */
+  function targetDims(){
+    var w = state.srcW, h = state.srcH;
+    // keep phone memory sane when no explicit size is requested
+    var maxSide = 4000;
+    if (Math.max(w, h) > maxSide){
+      var s = maxSide / Math.max(w, h);
+      w = Math.round(w * s); h = Math.round(h * s);
+    }
+    if (dimToggle.checked){
+      var iw = parseInt(wInput.value, 10), ih = parseInt(hInput.value, 10);
+      if (iw > 0) w = Math.min(iw, 8000);
+      if (ih > 0) h = Math.min(ih, 8000);
+    }
+    return { w: Math.max(1, w), h: Math.max(1, h) };
+  }
+
+  function renderCanvas(w, h, type){
+    var c = document.createElement("canvas");
+    c.width = w; c.height = h;
+    var x = c.getContext("2d");
+    if (type === "image/jpeg"){
+      x.fillStyle = "#ffffff"; x.fillRect(0, 0, w, h); // signatures flatten onto white
+    }
+    x.imageSmoothingEnabled = true; x.imageSmoothingQuality = "high";
+    x.drawImage(state.img, 0, 0, w, h);
+    return c;
+  }
+  function encode(canvas, type, q){
+    return new Promise(function(res){ canvas.toBlob(function(b){ res(b); }, type, q); });
+  }
+
+  async function fitToTarget(dims, type, targetBytes, runId){
+    var scale = 1;
+    var work = renderCanvas(dims.w, dims.h, type);
+    for (var attempt = 0; attempt < 7; attempt++){
+      if (runId !== state.runId) return null;
+      if (type === "image/png"){
+        var pb = await encode(work, type);
+        if (!pb) return null;
+        if (pb.size <= targetBytes || attempt === 6) return { blob: pb, canvas: work, hit: pb.size <= targetBytes };
+      } else {
+        var top = await encode(work, type, 0.98);
+        if (!top) return null;
+        if (top.size <= targetBytes) return { blob: top, canvas: work, hit: true };
+        var lo = 0.03, hi = 0.98, best = null;
+        for (var i = 0; i < 14; i++){
+          if (runId !== state.runId) return null;
+          var mid = (lo + hi) / 2;
+          var b = await encode(work, type, mid);
+          if (!b){ hi = mid; continue; }
+          if (b.size <= targetBytes){ best = b; lo = mid; } else { hi = mid; }
+        }
+        if (best) return { blob: best, canvas: work, hit: true };
+      }
+      // even the lowest quality is too big — shrink the picture and retry
+      scale *= 0.82;
+      var nw = Math.round(dims.w * scale), nh = Math.round(dims.h * scale);
+      if (nw < 16 || nh < 16) break;
+      work = renderCanvas(nw, nh, type);
+    }
+    var fb = await encode(work, type, type === "image/png" ? undefined : 0.5);
+    return fb ? { blob: fb, canvas: work, hit: false } : null;
+  }
+
+  async function process(){
+    if (!state.img) return;
+    var runId = ++state.runId;
+    var type = fmtSelect.value;
+    var dims = targetDims();
+    var useKB = kbToggle.checked;
+    var kbVal = parseFloat(kbInput.value);
+    var targetBytes = (useKB && kbVal > 0) ? Math.round(kbVal * 1024) : null;
+
+    document.body.classList.add("busy");
+    downloadBtn.disabled = true;
+    setStatus("Resizing…");
+
+    var out = null;
+    try {
+      if (targetBytes){
+        out = await fitToTarget(dims, type, targetBytes, runId);
+      } else {
+        var c = renderCanvas(dims.w, dims.h, type);
+        var b = await encode(c, type, type === "image/png" ? undefined : 0.92);
+        if (b) out = { blob: b, canvas: c, hit: true };
+      }
+    } catch (err){ out = null; }
+    document.body.classList.remove("busy");
+    if (runId !== state.runId) return;
+    if (!out || !out.blob){
+      setStatus("Something went wrong while resizing. Try a smaller photo.", "err");
+      return;
+    }
+
+    if (state.resultURL) URL.revokeObjectURL(state.resultURL);
+    state.resultBlob = out.blob;
+    state.resultW = out.canvas.width; state.resultH = out.canvas.height;
+    state.resultURL = URL.createObjectURL(out.blob);
+    resultImg.src = state.resultURL;
+    resultImg.style.display = "";
+    emptyMsg.style.display = "none";
+
+    specChip.style.display = "";
+    specChip.textContent = state.resultW + " × " + state.resultH + " px · " + fmtBytes(out.blob.size);
+
+    baBox.style.display = "";
+    barBox.style.display = "";
+    baBeforeSize.textContent = fmtBytes(state.srcBytes);
+    baBeforeDims.textContent = state.srcW + " × " + state.srcH + " px";
+    baAfterSize.textContent = fmtBytes(out.blob.size);
+    baAfterDims.textContent = state.resultW + " × " + state.resultH + " px · " + extFor(type).toUpperCase();
+    var pct = state.srcBytes > 0 ? Math.max(2, Math.round(out.blob.size / state.srcBytes * 100)) : 100;
+    barFill.style.width = Math.min(100, pct) + "%";
+    if (out.blob.size < state.srcBytes){
+      savings.textContent = "Size reduced by " + Math.round((1 - out.blob.size / state.srcBytes) * 100) + "%";
+    } else if (out.blob.size > state.srcBytes){
+      savings.textContent = "New file is slightly larger than the original (dimensions were increased).";
+    } else {
+      savings.textContent = "";
+    }
+
+    if (targetBytes && !out.hit){
+      setStatus("This is the smallest this photo goes at these settings — still above " + fmtBytes(targetBytes) + ". Try JPG, or smaller dimensions.", "warn");
+    } else if (targetBytes){
+      var extra = "";
+      if (state.resultW !== dims.w || state.resultH !== dims.h){
+        extra = " Dimensions were reduced to " + state.resultW + " × " + state.resultH + " px to fit the KB limit.";
+      }
+      setStatus("Done — " + fmtBytes(out.blob.size) + ", within your " + fmtBytes(targetBytes) + " limit." + extra, "ok");
+    } else {
+      setStatus("Done — resized to " + state.resultW + " × " + state.resultH + " px, " + fmtBytes(out.blob.size) + ".", "ok");
+    }
+    downloadBtn.disabled = false;
+  }
+
+  downloadBtn.addEventListener("click", function(){
+    if (!state.resultBlob) return;
+    var base = (state.srcName || "photo").replace(/\.[^.]+$/, "").replace(/[^\w\- ]+/g, "").trim() || "photo";
+    var a = document.createElement("a");
+    a.href = state.resultURL;
+    a.download = base + "-" + state.resultW + "x" + state.resultH + "." + extFor(fmtSelect.value);
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  });
+
+  syncChips();
+})();
+</script>
+</body>
+</html>
