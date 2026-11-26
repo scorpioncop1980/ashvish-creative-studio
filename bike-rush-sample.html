@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="color-scheme" content="light dark"/>
+<link rel="icon" href="data:,"/>
+<title>Bike Rush Sample</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFF3C4; --bg2:#FFE89A; --panel:#FFFDF2; --ink:#1A1405; --muted:#6B5E2E;
+  --red:#E11D2E; --red-d:#B80F1F; --orange:#FF7A00; --road:#3A3F4A; --gold:#FFC400;
+  --line:#E8D48A; --btn:#111827;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#14100A; --bg2:#1E180C; --panel:#1F1A10; --ink:#FFF6D6; --muted:#C9B87A; --line:#3A3320; --btn:#FFC400; }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:"Barlow",system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+body{background: radial-gradient(700px 400px at 20% -5%, #FFE066 0, transparent 60%), linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%); min-height:100vh}
+.wrap{max-width:520px;margin:0 auto;padding:14px 14px 22px}
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+h1{font-family:"Barlow Condensed",sans-serif;font-size:42px;line-height:.9;letter-spacing:.02em;margin:0;text-transform:uppercase}
+h1 span{color:var(--red)}
+.sub{font-weight:700;font-size:14px;line-height:1.3;color:var(--muted);margin-top:5px}
+.badge{background:var(--ink);color:#FFD93D;font-weight:800;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:8px 10px;border-radius:999px;white-space:nowrap;margin-top:4px}
+.hud{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.hud div{background:var(--panel);border:2px solid var(--ink);border-radius:14px;padding:8px 10px;box-shadow:3px 3px 0 var(--ink)}
+.hud label{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--muted)}
+.hud b{font-family:"Barlow Condensed",sans-serif;font-size:24px;line-height:1}
+.hud b.red{color:var(--red)}
+.stage{position:relative;background:#F6C453;border:3px solid var(--ink);border-radius:20px;overflow:hidden;box-shadow:6px 6px 0 var(--ink);aspect-ratio: 420 / 620}
+canvas{width:100%;height:100%;display:block;touch-action:none}
+.overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;background:linear-gradient(180deg, rgba(255,244,180,.96), rgba(255,220,90,.97))}
+.overlay.hidden{display:none}
+.overlay h2{font-family:"Barlow Condensed",sans-serif;font-size:44px;line-height:.9;margin:6px 0 4px;text-transform:uppercase}
+.overlay h2 span{color:var(--red)}
+.overlay p{font-weight:600;font-size:15px;line-height:1.45;margin:6px 0;max-width:340px}
+.rider-chip{background:#111827;color:#fff;border-radius:999px;padding:7px 12px;font-weight:800;font-size:13px;letter-spacing:.04em}
+.rider-chip i{color:#FFD93D;font-style:normal}
+.big-btn{background:var(--red);color:#fff;border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);border-radius:999px;padding:14px 26px;font-weight:900;font-size:18px;letter-spacing:.02em;cursor:pointer;min-height:54px;margin-top:10px}
+.big-btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.small-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.pill{border:2px solid var(--ink);background:#fff;color:#111;border-radius:999px;padding:8px 12px;font-weight:800;font-size:13px}
+.controls{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-top:14px}
+.ctrl{height:72px;border-radius:18px;border:3px solid var(--ink);background:var(--panel);box-shadow:4px 4px 0 var(--ink);font-size:28px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;user-select:none}
+.ctrl:active{background:var(--gold);transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.center-btns{display:flex;flex-direction:column;gap:8px}
+.center-btns button{height:34px;padding:0 16px;border-radius:999px;border:2px solid var(--ink);background:var(--btn);color:var(--bg);font-weight:800;cursor:pointer;min-width:110px}
+.center-btns button:last-child{background:#fff;color:#111}
+.how{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
+.how div{background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:10px}
+.how b{display:block;font-size:13px}
+.how span{font-size:13px;color:var(--muted);font-weight:600;line-height:1.35;display:block;margin-top:2px}
+.toast{position:absolute;left:50%;top:16px;transform:translateX(-50%);background:#111827;color:#FFD93D;font-weight:900;letter-spacing:.06em;padding:8px 14px;border-radius:999px;font-size:14px;opacity:0;transition:.2s;pointer-events:none;white-space:nowrap;z-index:5}
+.toast.show{opacity:1;top:20px}
+.footer{ text-align:center;font-weight:700;color:var(--muted);font-size:13px;margin-top:14px}
+@media(max-width:380px){ h1{font-size:36px} .hud b{font-size:20px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>BIKE <span>RUSH</span></h1>
+      <div class="sub">Desert highway • Dodge traffic • Near miss = bonus</div>
+    </div>
+    <div class="badge">🏍️ Vishal Riding</div>
+  </div>
+
+  <div class="hud">
+    <div><label>Score</label><b id="score">0</b></div>
+    <div><label>Speed</label><b id="speed">0 <small style="font-size:12px">km/h</small></b></div>
+    <div><label>Lives</label><b id="lives" class="red">♥♥♥</b></div>
+    <div><label>Best</label><b id="best">0</b></div>
+  </div>
+
+  <div class="stage" id="stage">
+    <canvas id="game" width="420" height="620"></canvas>
+    <div class="toast" id="toast">NEAR MISS +50</div>
+
+    <!-- START OVERLAY -->
+    <div class="overlay" id="startOverlay">
+      <!-- Side-view superbike with Vishal on it - inline SVG -->
+      <svg width="310" height="155" viewBox="0 0 320 160" fill="none" aria-label="Vishal on a red sports bike">
+        <!-- ground shadow -->
+        <ellipse cx="160" cy="140" rx="118" ry="7" fill="rgba(0,0,0,.14)"/>
+        <!-- wheels -->
+        <circle cx="62" cy="118" r="30" fill="#111827" stroke="#000" stroke-width="3"/><circle cx="62" cy="118" r="13" fill="#E5E7EB" stroke="#111" stroke-width="2"/><circle cx="62" cy="118" r="4" fill="#111"/>
+        <circle cx="258" cy="118" r="30" fill="#111827" stroke="#000" stroke-width="3"/><circle cx="258" cy="118" r="13" fill="#E5E7EB" stroke="#111" stroke-width="2"/><circle cx="258" cy="118" r="4" fill="#111"/>
+        <!-- swingarm + fork -->
+        <path d="M62 118 L150 104 L258 118" stroke="#374151" stroke-width="9" stroke-linecap="round"/>
+        <path d="M258 118 L232 66" stroke="#111827" stroke-width="7" stroke-linecap="round"/>
+        <!-- main superbike body - chunky fairing -->
+        <path d="M58 118 L92 82 L128 74 L150 88 L138 108 L96 112 Z" fill="#B80F1F" stroke="#111827" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M128 74 L186 62 L238 66 L258 96 L214 108 L168 104 L138 92 Z" fill="#E11D2E" stroke="#111827" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M186 62 L222 54 L244 64 L238 66 Z" fill="#111827" stroke="#111" stroke-width="2"/>
+        <path d="M196 76 L232 78 L242 94 L206 100 Z" fill="#FF7A00" opacity=".95"/>
+        <rect x="146" y="86" width="54" height="13" rx="6" fill="#FFD93D" stroke="#111" stroke-width="2"/>
+        <text x="173" y="96" text-anchor="middle" font-family="Arial Black, Arial" font-size="8" font-weight="900" fill="#111">RUSH • 1000</text>
+        <!-- seat -->
+        <path d="M108 72 L152 66 L158 76 L116 82 Z" fill="#111827"/>
+        <!-- rider Vishal - bent legs on footpegs, not touching ground -->
+        <path d="M150 62 L182 78 L174 102" stroke="#1E40AF" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <ellipse cx="172" cy="105" rx="11" ry="6" fill="#111"/>
+        <path d="M138 60 L168 74 L158 88 L128 76 Z" fill="#1E40AF"/>
+        <!-- torso leaning forward -->
+        <path d="M132 38 Q160 28 182 44 L176 68 Q150 70 136 58 Z" fill="#111827" stroke="#000" stroke-width="2"/>
+        <text x="142" y="54" font-size="8.5" font-weight="900" fill="#FFD93D" letter-spacing="1">VISHAL</text>
+        <!-- arm to handlebar -->
+        <path d="M172 44 L206 54 L230 62" stroke="#111827" stroke-width="10" stroke-linecap="round" fill="none"/>
+        <circle cx="232" cy="63" r="5" fill="#FFD9B3" stroke="#111" stroke-width="1.5"/>
+        <!-- head with spiky hair + gold earring -->
+        <circle cx="162" cy="24" r="16" fill="#FFD9B3" stroke="#111827" stroke-width="2.5"/>
+        <path d="M146 20 L150 6 L156 16 L162 4 L168 15 L176 6 L178 20 Q162 10 146 20Z" fill="#111827"/>
+        <circle cx="178" cy="32" r="3.2" fill="#FFC400" stroke="#111" stroke-width="1"/>
+        <circle cx="168" cy="24" r="2" fill="#111"/><path d="M154 32 Q162 36 168 32" stroke="#111" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      </svg>
+      <div class="rider-chip">RIDER: <i>VISHAL</i> &nbsp;•&nbsp; BIKE: <i>RED SUPERBIKE</i></div>
+      <h2>YOU ARE ON<br><span>THE BIKE, BHAI!</span></h2>
+      <p>That’s you on the red superbike. Lean left &amp; right, dodge cars and trucks, and chase near-miss bonuses. Speed keeps rising — 3 lives only!</p>
+      <button class="big-btn" id="startBtn">▶ &nbsp;START RIDE</button>
+      <div class="small-row"><span class="pill">👆 Drag / Swipe</span><span class="pill">◀ ▶ Buttons</span><span class="pill">⌨️ Arrow Keys</span></div>
+    </div>
+
+    <!-- GAME OVER OVERLAY -->
+    <div class="overlay hidden" id="overOverlay">
+      <div style="font-size:52px;line-height:1">💥</div>
+      <h2>RIDE <span>OVER!</span></h2>
+      <p id="finalText">Score: 0 • Distance: 0 m</p>
+      <p style="font-size:14px">Vishal is okay — helmet saved him! Dust off and ride again.</p>
+      <button class="big-btn" id="againBtn">↻ &nbsp;RIDE AGAIN</button>
+      <div class="small-row"><span class="pill">Tip: Near miss gives +50</span></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="ctrl" id="leftBtn" aria-label="Move left">◀</button>
+    <div class="center-btns">
+      <button id="pauseBtn">⏸ PAUSE</button>
+      <button id="soundBtn">🔊 SOUND: ON</button>
+    </div>
+    <button class="ctrl" id="rightBtn" aria-label="Move right">▶</button>
+  </div>
+
+  <div class="how">
+    <div><b>🏁 How to score</b><span>Distance + near misses. Every near miss = +50 points.</span></div>
+    <div><b>⚡ Speed rush</b><span>Speed grows every few seconds. Trucks are wider — give them space.</span></div>
+    <div><b>❤️ 3 Lives</b><span>Crash = 1 life gone. After a crash you blink &amp; are safe for 2 seconds.</span></div>
+  </div>
+
+  <p class="footer">ASHVISH PLAY ZONE • SAMPLE — Bike Rush</p>
+</div>
+
+<script>
+(function(){
+  var canvas=document.getElementById('game'), ctx=canvas.getContext('2d');
+  var W=420,H=620, ROAD_X=62, ROAD_W=296;
+  var scoreEl=document.getElementById('score'), speedEl=document.getElementById('speed'), livesEl=document.getElementById('lives'), bestEl=document.getElementById('best');
+  var startOverlay=document.getElementById('startOverlay'), overOverlay=document.getElementById('overOverlay'), toast=document.getElementById('toast'), finalText=document.getElementById('finalText');
+
+  var playing=false, paused=false, gameOver=false, score=0, best=0, lives=3, distance=0, speed=5.2, roadOff=0, frame=0, invincible=0, shake=0, soundOn=true;
+  var player={x:W/2, y:492, w:48, h:86, targetX:W/2, lean:0};
+  var enemies=[], scenery=[], keys={}, steer=0;
+  var audioCtx=null, engineOsc=null, engineGain=null;
+
+  function ensureAudio(){
+    if(!audioCtx){
+      try{
+        audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+        engineOsc=audioCtx.createOscillator(); engineGain=audioCtx.createGain();
+        engineOsc.type='sawtooth'; engineOsc.frequency.value=70; engineGain.gain.value=0.015;
+        engineOsc.connect(engineGain); engineGain.connect(audioCtx.destination); engineOsc.start();
+      }catch(e){}
+    }
+    if(audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+  }
+  function beep(freq,dur,type,vol){
+    if(!soundOn||!audioCtx) return;
+    var o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.type=type||'square'; o.frequency.value=freq; g.gain.value=vol||0.06;
+    o.connect(g); g.connect(audioCtx.destination); o.start();
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+(dur||0.12)); o.stop(audioCtx.currentTime+(dur||0.12));
+  }
+  function showToast(txt){
+    toast.textContent=txt; toast.classList.add('show');
+    setTimeout(function(){toast.classList.remove('show')},900);
+  }
+
+  function reset(){
+    score=0; lives=3; distance=0; speed=5.2; enemies=[]; scenery=[]; frame=0; invincible=0; shake=0;
+    player.x=W/2; player.targetX=W/2;
+    for(var i=0;i<7;i++) scenery.push(newScenery(-Math.random()*H));
+    updateHUD();
+  }
+  function kmh(){ return playing ? Math.round(22+speed*10) : 0; }
+  function updateHUD(){
+    scoreEl.textContent=Math.floor(score);
+    speedEl.innerHTML=kmh()+' <small style="font-size:12px">km/h</small>';
+    livesEl.textContent=lives>0 ? '♥'.repeat(lives) : '—';
+    bestEl.textContent=Math.floor(best);
+  }
+  function newScenery(y){
+    var side=Math.random()<0.5?0:1;
+    var x= side? (ROAD_X+ROAD_W+8+Math.random()*38) : (6+Math.random()*38);
+    var types=['cactus','rock','bush','sign'];
+    return {x:x,y:(y!==undefined?y:-30), type:types[Math.floor(Math.random()*types.length)], s:0.7+Math.random()*0.7};
+  }
+  function spawnEnemy(){
+    var lanes=[ROAD_X+48, ROAD_X+110, ROAD_X+182, ROAD_X+248];
+    var lx=lanes[Math.floor(Math.random()*lanes.length)] + (Math.random()*14-7);
+    // avoid spawning on top of recent enemy in same lane
+    for(var i=0;i<enemies.length;i++){ if(Math.abs(enemies[i].x-lx)<55 && enemies[i].y<140) return; }
+    var r=Math.random();
+    var type= r<0.58?'car':(r<0.82?'taxi':'truck');
+    var colors=['#22C55E','#3B82F6','#A855F7','#EC4899','#F97316','#06B6D4'];
+    enemies.push({
+      x:lx, y:type==='truck'?-170:-110,
+      w:type==='truck'?62:54, h:type==='truck'?148:92,
+      type:type, color:colors[Math.floor(Math.random()*colors.length)],
+      speed: 1.1+Math.random()*0.9, passed:false, nearDone:false, wob:Math.random()*0.4-0.2
+    });
+  }
+
+  // Drawing helpers
+  function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+  function drawSceneryItem(s){
+    ctx.save(); ctx.translate(s.x,s.y); ctx.scale(s.s,s.s);
+    if(s.type==='cactus'){
+      ctx.fillStyle='#16A34A'; roundRect(-6,-18,12,36,6); ctx.fill();
+      ctx.fillStyle='#16A34A'; roundRect(-16,-6,10,16,5); ctx.fill(); roundRect(6,2,10,14,5); ctx.fill();
+      ctx.fillStyle='#F472B6'; ctx.beginPath(); ctx.arc(0,-20,4,0,7); ctx.fill();
+    }else if(s.type==='rock'){
+      ctx.fillStyle='#B45309'; ctx.beginPath(); ctx.moveTo(-14,12); ctx.lineTo(-8,-10); ctx.lineTo(8,-12); ctx.lineTo(16,12); ctx.closePath(); ctx.fill();
+      ctx.fillStyle='#D97706'; ctx.beginPath(); ctx.moveTo(-8,-10); ctx.lineTo(2,-4); ctx.lineTo(-2,12); ctx.lineTo(-14,12); ctx.closePath(); ctx.fill();
+    }else if(s.type==='bush'){
+      ctx.fillStyle='#65A30D'; ctx.beginPath(); ctx.arc(-8,6,10,0,7); ctx.arc(6,4,12,0,7); ctx.arc(0,-4,9,0,7); ctx.fill();
+    }else{
+      ctx.fillStyle='#92400E'; ctx.fillRect(-3,-16,6,28);
+      ctx.fillStyle='#F59E0B'; roundRect(-14,-22,28,16,4); ctx.fill(); ctx.fillStyle='#111'; ctx.font='900 9px Arial'; ctx.textAlign='center'; ctx.fillText('▲',0,-11);
+    }
+    ctx.restore();
+  }
+
+  function drawCar(e){
+    ctx.save(); ctx.translate(e.x,e.y);
+    ctx.fillStyle='rgba(0,0,0,.25)'; roundRect(-e.w/2+3,-e.h/2+5,e.w,e.h,14); ctx.fill();
+    var col= e.type==='taxi' ? '#FACC15' : e.color;
+    if(e.type==='truck'){
+      // cab (facing down - coming towards player, so front at bottom)
+      ctx.fillStyle=col; roundRect(-e.w/2, 28, e.w, 48, 10); ctx.fill();
+      ctx.fillStyle='#111827'; roundRect(-e.w/2+8, 52, e.w-16, 16, 4); ctx.fill(); // windshield at bottom front
+      ctx.fillStyle='#E5E7EB'; roundRect(-e.w/2+4,-e.h/2, e.w-8, 74, 6); ctx.fill();
+      ctx.fillStyle='#9CA3AF'; ctx.fillRect(-e.w/2+10,-e.h/2+10, e.w-20, 4); ctx.fillRect(-e.w/2+10,-e.h/2+24, e.w-20, 4);
+      ctx.fillStyle='#111'; ctx.fillRect(-e.w/2-4,-e.h/2+8,8,20); ctx.fillRect(e.w/2-4,-e.h/2+8,8,20); ctx.fillRect(-e.w/2-4,44,8,20); ctx.fillRect(e.w/2-4,44,8,20);
+      ctx.fillStyle='#FDE68A'; ctx.beginPath(); ctx.arc(-18,72,5,0,7); ctx.arc(18,72,5,0,7); ctx.fill();
+    }else{
+      ctx.fillStyle=col; roundRect(-e.w/2,-e.h/2,e.w,e.h,14); ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,.28)'; roundRect(-e.w/2+6,-e.h/2+8,e.w-12,18,8); ctx.fill();
+      ctx.fillStyle='#111827'; roundRect(-e.w/2+7,-12,e.w-14,28,6); ctx.fill(); // windshield/roof
+      ctx.fillStyle='#1F2937'; roundRect(-e.w/2+9,22,e.w-18,16,5); ctx.fill();
+      ctx.fillStyle='#111'; ctx.fillRect(-e.w/2-3,-e.h/2+10,7,18); ctx.fillRect(e.w/2-4,-e.h/2+10,7,18); ctx.fillRect(-e.w/2-3,e.h/2-28,7,18); ctx.fillRect(e.w/2-4,e.h/2-28,7,18);
+      ctx.fillStyle='#FDE68A'; ctx.beginPath(); ctx.arc(-16,e.h/2-4,5,0,7); ctx.arc(16,e.h/2-4,5,0,7); ctx.fill();
+      ctx.fillStyle='#EF4444'; ctx.beginPath(); ctx.arc(-16,-e.h/2+4,4,0,7); ctx.arc(16,-e.h/2+4,4,0,7); ctx.fill();
+      if(e.type==='taxi'){ ctx.fillStyle='#111'; roundRect(-14,-6,28,12,3); ctx.fill(); ctx.fillStyle='#FACC15'; ctx.font='900 8px Arial'; ctx.textAlign='center'; ctx.fillText('TAXI',0,3); }
+    }
+    ctx.restore();
+  }
+
+  function drawBike(){
+    var px=player.x, py=player.y;
+    ctx.save(); ctx.translate(px,py); ctx.rotate(player.lean*0.18);
+    if(invincible>0 && Math.floor(frame/6)%2===0) ctx.globalAlpha=0.35;
+    // shadow
+    ctx.fillStyle='rgba(0,0,0,.3)'; ctx.beginPath(); ctx.ellipse(4,6,20,46,0,0,7); ctx.fill();
+    // exhaust smoke / speed streaks
+    if(playing && !paused){
+      ctx.fillStyle='rgba(255,255,255,.35)';
+      ctx.fillRect(-16,48,3,18+Math.random()*10); ctx.fillRect(13,48,3,14+Math.random()*10);
+    }
+    // rear wheel + front wheel (top-down bike is vertical)
+    ctx.fillStyle='#0B0F19'; roundRect(-7,28,14,22,7); ctx.fill(); // rear tyre
+    roundRect(-6,-50,12,22,6); ctx.fill(); // front tyre
+    // bike body - red superbike
+    ctx.fillStyle='#B80F1F'; roundRect(-13,-6,26,42,10); ctx.fill(); // rear / seat area
+    ctx.fillStyle='#E11D2E'; roundRect(-16,-38,32,38,12); ctx.fill(); // tank + fairing
+    ctx.fillStyle='#111827'; roundRect(-17,-52,34,18,8); ctx.fill(); // front nose
+    ctx.fillStyle='#FDE68A'; ctx.beginPath(); ctx.arc(0,-46,5,0,7); ctx.fill(); // headlight
+    ctx.fillStyle='#FFD93D'; roundRect(-11,-28,22,7,3); ctx.fill();
+    ctx.fillStyle='#111'; ctx.font='900 6px Arial'; ctx.textAlign='center'; ctx.fillText('RUSH',0,-22.5);
+    // handlebar
+    ctx.strokeStyle='#111827'; ctx.lineWidth=5; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(-20,-34); ctx.lineTo(20,-34); ctx.stroke();
+    // RIDER - Vishal (top-down: helmet/head at top, body over tank, legs on sides)
+    // legs in blue jeans
+    ctx.strokeStyle='#1E40AF'; ctx.lineWidth=10; ctx.beginPath(); ctx.moveTo(-10,2); ctx.lineTo(-19,22); ctx.stroke(); ctx.beginPath(); ctx.moveTo(10,2); ctx.lineTo(19,22); ctx.stroke();
+    ctx.fillStyle='#111'; ctx.beginPath(); ctx.arc(-20,26,6,0,7); ctx.arc(20,26,6,0,7); ctx.fill(); // boots
+    // arms in black jacket to handlebar
+    ctx.strokeStyle='#111827'; ctx.lineWidth=9; ctx.beginPath(); ctx.moveTo(-11,-16); ctx.lineTo(-19,-32); ctx.stroke(); ctx.beginPath(); ctx.moveTo(11,-16); ctx.lineTo(19,-32); ctx.stroke();
+    ctx.fillStyle='#FFD9B3'; ctx.beginPath(); ctx.arc(-19,-33,5,0,7); ctx.arc(19,-33,5,0,7); ctx.fill(); // hands
+    // torso - black jacket with VISHAL on back
+    ctx.fillStyle='#111827'; roundRect(-14,-20,28,30,10); ctx.fill();
+    ctx.fillStyle='#E11D2E'; ctx.fillRect(-14,-2,28,4);
+    ctx.fillStyle='#FFD93D'; ctx.font='900 7px Arial'; ctx.textAlign='center'; ctx.fillText('VISHAL',0,-8);
+    ctx.font='700 5px Arial'; ctx.fillStyle='#fff'; ctx.fillText('★ RIDER ★',0,6);
+    // head / helmet - red helmet with visor stripe, hair peeking
+    ctx.fillStyle='#E11D2E'; ctx.beginPath(); ctx.arc(0,-26,12,0,7); ctx.fill();
+    ctx.fillStyle='#111827'; roundRect(-10,-32,20,7,3); ctx.fill(); // visor
+    ctx.fillStyle='#FFC400'; ctx.beginPath(); ctx.arc(0,-38,3.5,0,7); ctx.fill(); // top dot / mohawk accent
+    ctx.restore();
+  }
+
+  function draw(){
+    ctx.save();
+    if(shake>0){ ctx.translate((Math.random()-0.5)*shake,(Math.random()-0.5)*shake); shake*=0.85; if(shake<0.5) shake=0; }
+    // desert sand
+    var grad=ctx.createLinearGradient(0,0,0,H); grad.addColorStop(0,'#FDE68A'); grad.addColorStop(1,'#F6C453');
+    ctx.fillStyle=grad; ctx.fillRect(-10,-10,W+20,H+20);
+    // sand dots
+    ctx.fillStyle='rgba(180,120,20,.18)';
+    for(var i=0;i<14;i++){ var yy=((i*67+roadOff*0.9)%H); ctx.fillRect((i*37)%ROAD_X, yy, 14,3); ctx.fillRect(ROAD_X+ROAD_W+((i*29)%50), yy+20, 12,3); }
+    scenery.forEach(drawSceneryItem);
+    // road
+    ctx.fillStyle='#3A3F4A'; ctx.fillRect(ROAD_X,0,ROAD_W,H);
+    ctx.fillStyle='#FACC15'; ctx.fillRect(ROAD_X,0,5,H); ctx.fillRect(ROAD_X+ROAD_W-5,0,5,H);
+    // dashed lane lines
+    ctx.fillStyle='rgba(255,255,255,.9)';
+    var dashH=34, gap=26;
+    [ROAD_X+ROAD_W/3, ROAD_X+ROAD_W*2/3].forEach(function(lx){
+      for(var y=-60+ (roadOff%(dashH+gap)); y<H; y+=dashH+gap){ ctx.fillRect(lx-3,y,6,dashH); }
+    });
+    // hazard top/bottom hint in start state
+    enemies.forEach(drawCar);
+    drawBike();
+    ctx.restore();
+    // speed vignette lines when fast
+    if(playing && speed>9){
+      ctx.fillStyle='rgba(255,255,255,.18)';
+      for(var k=0;k<6;k++){ ctx.fillRect(20+k*68, (frame*14+k*90)%H, 2, 26); }
+    }
+  }
+
+  function loop(){
+    requestAnimationFrame(loop);
+    if(playing && !paused && !gameOver){
+      frame++;
+      speed=Math.min(13.5, speed+0.0035);
+      roadOff+=speed;
+      distance+=speed*0.55; score+=speed*0.08;
+      // steering
+      var input=0;
+      if(keys['ArrowLeft']||keys['a']||keys['A']) input-=1;
+      if(keys['ArrowRight']||keys['d']||keys['D']) input+=1;
+      input+=steer;
+      player.targetX+=input*6.2;
+      player.targetX=Math.max(ROAD_X+28, Math.min(ROAD_X+ROAD_W-28, player.targetX));
+      player.lean+= ((input*0.9)-player.lean)*0.18;
+      player.x+= (player.targetX-player.x)*0.22;
+      // scenery
+      scenery.forEach(function(s){ s.y+=speed; });
+      if(Math.random()<0.04) scenery.push(newScenery(-30));
+      scenery=scenery.filter(function(s){return s.y<H+40});
+      // enemies
+      if(frame%52===0 || (frame>400 && frame%40===0)) spawnEnemy();
+      if(frame%30===0) spawnEnemy();
+      enemies.forEach(function(e){
+        e.y+= speed - e.speed + 1.2; e.x+=Math.sin(frame*0.02+e.wob*10)*0.15;
+        // near miss
+        if(!e.nearDone && Math.abs(e.y-player.y)<54 && Math.abs(e.x-player.x)>34 && Math.abs(e.x-player.x)<62){
+          e.nearDone=true; score+=50; showToast('NEAR MISS +50'); beep(880,0.09,'sine',0.07);
+          if(navigator.vibrate) navigator.vibrate(20);
+        }
+        if(!e.passed && e.y>player.y+70){ e.passed=true; score+=10; }
+        // collision - forgiving box
+        if(invincible<=0 && Math.abs(e.x-player.x) < (e.w/2+player.w/2-14) && Math.abs(e.y-player.y) < (e.h/2+player.h/2-16)){
+          lives--; invincible=120; shake=14; beep(120,0.3,'sawtooth',0.12); if(navigator.vibrate) navigator.vibrate([80,40,80]);
+          showToast(lives>0 ? 'CRASH! '+lives+' LIFE LEFT' : 'CRASH!');
+          e.y=-999; // remove crasher
+          updateHUD();
+          if(lives<=0){ endGame(); }
+        }
+      });
+      enemies=enemies.filter(function(e){return e.y<H+190 && e.y>-1000});
+      if(invincible>0) invincible--;
+      if(engineOsc && soundOn){ engineOsc.frequency.value=58+speed*9+Math.sin(frame*0.3)*3; engineGain.gain.value=0.014; }
+      else if(engineGain){ engineGain.gain.value=0; }
+      updateHUD();
+    } else {
+      roadOff+= playing?0:0.6; // gentle scroll on menu
+      scenery.forEach(function(s){ s.y+=0.6; if(s.y>H+30){ s.y=-30; s.x=Math.random()<0.5? 6+Math.random()*38 : ROAD_X+ROAD_W+8+Math.random()*38; }});
+      if(engineGain) engineGain.gain.value=0;
+    }
+    draw();
+  }
+
+  function startGame(){
+    ensureAudio(); reset(); playing=true; paused=false; gameOver=false;
+    startOverlay.classList.add('hidden'); overOverlay.classList.add('hidden');
+    document.getElementById('pauseBtn').textContent='⏸ PAUSE';
+    beep(523,0.09,'square',0.06); setTimeout(function(){beep(784,0.12,'square',0.06)},110);
+  }
+  function endGame(){
+    gameOver=true; playing=false; best=Math.max(best, Math.floor(score)); updateHUD();
+    finalText.textContent='Score: '+Math.floor(score)+'  •  Distance: '+Math.floor(distance)+' m  •  Top speed: '+Math.round(22+speed*10)+' km/h';
+    overOverlay.classList.remove('hidden');
+  }
+
+  document.getElementById('startBtn').addEventListener('click', startGame);
+  document.getElementById('againBtn').addEventListener('click', startGame);
+  document.getElementById('pauseBtn').addEventListener('click', function(){
+    if(!playing) return; paused=!paused; this.textContent= paused?'▶ RESUME':'⏸ PAUSE'; ensureAudio();
+  });
+  document.getElementById('soundBtn').addEventListener('click', function(){
+    soundOn=!soundOn; this.textContent= soundOn?'🔊 SOUND: ON':'🔇 SOUND: OFF'; if(engineGain) engineGain.gain.value=0;
+  });
+
+  // steering buttons - hold to steer
+  function bindHold(id,val){
+    var el=document.getElementById(id);
+    function on(e){ e.preventDefault(); ensureAudio(); steer=val; }
+    function off(e){ e.preventDefault(); if(steer===val) steer=0; }
+    el.addEventListener('pointerdown',on); el.addEventListener('pointerup',off); el.addEventListener('pointerleave',off); el.addEventListener('pointercancel',off);
+  }
+  bindHold('leftBtn',-1); bindHold('rightBtn',1);
+
+  // drag / swipe on canvas
+  var dragging=false;
+  canvas.addEventListener('pointerdown',function(e){ dragging=true; ensureAudio(); moveTo(e); canvas.setPointerCapture(e.pointerId); });
+  canvas.addEventListener('pointermove',function(e){ if(dragging) moveTo(e); });
+  canvas.addEventListener('pointerup',function(){ dragging=false; });
+  canvas.addEventListener('pointercancel',function(){ dragging=false; });
+  function moveTo(e){
+    var r=canvas.getBoundingClientRect();
+    var x=(e.clientX-r.left)/r.width*W;
+    player.targetX=Math.max(ROAD_X+28, Math.min(ROAD_X+ROAD_W-28, x));
+  }
+  window.addEventListener('keydown',function(e){ keys[e.key]=true; if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' '].includes(e.key)) e.preventDefault(); if(e.key===' ' && !playing) startGame(); });
+  window.addEventListener('keyup',function(e){ keys[e.key]=false; });
+
+  reset(); loop();
+})();
+</script>
+</body>
+</html>
