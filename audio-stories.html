@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audio Stories — Ashvish Creative Studio</title>
+<meta name="description" content="Listen to fun kids audio stories from Ashvish Creative Studio — in English and Hindi.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#FFF9EC;color:#3d3436;font:16px/1.55 "DM Sans",Arial,sans-serif}
+  a{color:inherit}
+  /* ---------- Header ---------- */
+  .topbar{max-width:1080px;margin:0 auto;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+  .brand-mark{width:46px;height:46px;border-radius:12px;background:#FF9AA2;color:#fff;display:flex;align-items:center;justify-content:center;font:800 26px "DM Sans",Arial,sans-serif}
+  .brand-name{font:800 20px/1.05 "DM Sans",Arial,sans-serif;letter-spacing:.5px}
+  .brand-name span{display:block;font:600 11px/1.2 "DM Sans",Arial,sans-serif;letter-spacing:3px;color:#8a7a7d}
+  .home-link{display:inline-block;text-decoration:none;font-weight:700;font-size:15px;color:#fff;background:#FF9AA2;border-radius:999px;padding:10px 20px;box-shadow:0 6px 16px rgba(255,154,162,.45)}
+  .home-link:hover{background:#ff8a94}
+  /* ---------- Page heading ---------- */
+  .page-head{max-width:1080px;margin:6px auto 0;padding:10px 20px 4px;text-align:center}
+  .page-head h1{font-family:'Dancing Script',cursive;font-weight:700;font-size:clamp(44px,6vw,64px);line-height:1.1;margin:0;color:#3d3436}
+  .page-head p{font-family:'Dancing Script',cursive;font-weight:700;font-size:clamp(20px,2.6vw,26px);margin:6px 0 0;color:#8a7a7d}
+  /* ---------- Story list ---------- */
+  .stories{max-width:1080px;margin:26px auto 0;padding:0 20px 10px;display:flex;flex-direction:column;gap:26px}
+  .story-card{background:#fff;border:2px solid #FFDAC1;border-radius:22px;overflow:hidden;display:flex;box-shadow:0 14px 34px rgba(61,52,54,.10)}
+  .story-cover{flex:0 0 300px}
+  .story-cover img{display:block;width:100%;height:100%;object-fit:cover;aspect-ratio:2/3}
+  .story-body{flex:1;padding:26px 28px 24px;min-width:0}
+  .story-body h2{font-family:'Dancing Script',cursive;font-weight:700;font-size:clamp(30px,3.4vw,38px);line-height:1.15;margin:0 0 2px}
+  .story-body .hi-title{font:700 19px/1.4 "DM Sans",Arial,sans-serif;color:#8a7a7d;margin:0 0 16px}
+  .player{margin:0 0 16px}
+  .player label{display:block;font-weight:800;font-size:15px;margin-bottom:6px}
+  .player label .lang-en{color:#e2606f}
+  .player label .lang-hi{color:#6a5acd}
+  .player audio{width:100%;display:block}
+  .moral{margin:4px 0 0;padding:14px 16px;background:#F7F3C7;border-left:5px solid #B5EAD7;border-radius:0 12px 12px 0;font-size:15.5px}
+  .moral b{color:#3d7a5e}
+  /* ---------- Coming soon ---------- */
+  .coming-soon{max-width:1080px;margin:6px auto 0;padding:6px 20px 30px;text-align:center}
+  .coming-soon p{display:inline-block;margin:0;background:#C7CEFF;color:#3d3436;font-weight:700;font-size:16px;border-radius:999px;padding:12px 26px}
+  /* ---------- Footer ---------- */
+  .footer{border-top:3px solid #FF9AA2;background:#FFDAC1;text-align:center;padding:22px 20px 26px;font-size:15px}
+  .footer a{font-weight:800;color:#3d3436}
+  /* ---------- Mobile ---------- */
+  @media(max-width:640px){
+    .story-card{flex-direction:column}
+    .story-cover{flex:none;max-width:300px;margin:0 auto}
+    .story-cover img{aspect-ratio:2/3}
+    .story-body{padding:20px 18px}
+    .topbar{padding:14px 16px}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="https://ashvishcreativestudio.com">
+    <span class="brand-mark">A</span>
+    <span class="brand-name">ASHVISH<span>CREATIVE STUDIO</span></span>
+  </a>
+  <a class="home-link" href="https://ashvishcreativestudio.com">← Back to Home</a>
+</header>
+
+<div class="page-head">
+  <h1>Audio Stories</h1>
+  <p>Listen, laugh and learn — stories for little ears, in English and Hindi.</p>
+</div>
+
+<main class="stories">
+
+  <!-- ===== STORY CARD 1: The Monkey and the Crocodile ===== -->
+  <article class="story-card">
+    <div class="story-cover">
+      <img src="monkey-crocodile-cover.webp" alt="The Monkey and the Crocodile — a monkey on a jamun tree above a crocodile in the river">
+    </div>
+    <div class="story-body">
+      <h2>The Monkey and the Crocodile</h2>
+      <p class="hi-title">बंदर और मगरमच्छ</p>
+
+      <div class="player">
+        <label><span class="lang-en">🎧 English — 3:43</span></label>
+        <audio controls preload="metadata" src="Monkey_and_Crocodile_Story_English.mp3"></audio>
+      </div>
+
+      <div class="player">
+        <label><span class="lang-hi">🎧 Hindi — 4:25</span></label>
+        <audio controls preload="metadata" src="Monkey_and_Crocodile_Story_Hindi.mp3"></audio>
+      </div>
+
+      <p class="moral"><b>Moral (सीख):</b> Stay calm, think quickly, and a clever mind can save you from the greatest danger.</p>
+    </div>
+  </article>
+  <!-- ===== END OF STORY CARD 1 ===== -->
+
+  <!-- ADD THE NEXT STORY CARD HERE (copy the article.story-card block above, same pattern: cover, titles, English + Hindi players, moral) -->
+
+</main>
+
+<div class="coming-soon">
+  <p>🎧 More stories coming soon — new stories every week!</p>
+</div>
+
+<footer class="footer">
+  <p>More fun stories, games and free tools at <a href="https://ashvishcreativestudio.com">ashvishcreativestudio.com</a></p>
+</footer>
+
+</body>
+</html>
