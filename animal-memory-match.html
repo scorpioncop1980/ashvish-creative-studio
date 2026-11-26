@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Animal Memory Match</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #fff6e8;
+        --surface: #ffffff;
+        --ink: #43302a;
+        --ink-soft: #7a5f55;
+        --coral: #ff6b4a;
+        --coral-dark: #e5502f;
+        --teal: #0e9594;
+        --sunny: #ffc53d;
+        --card-back: #ff8a3d;
+        --card-back-deep: #f96d2b;
+        --ring: #39b56a;
+        --chip-bg: #ffffff;
+        --chip-border: #f3ddc2;
+        --shadow: 0 6px 18px rgba(120, 66, 20, 0.14);
+        --win-bg: #ffffff;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #211c31;
+          --surface: #2e2745;
+          --ink: #fdf3e3;
+          --ink-soft: #cbb9a6;
+          --coral: #ff7d5c;
+          --coral-dark: #ff6b4a;
+          --teal: #2ec4b6;
+          --sunny: #ffd166;
+          --card-back: #e56b2e;
+          --card-back-deep: #cf5a20;
+          --ring: #4ade80;
+          --chip-bg: #2e2745;
+          --chip-border: #4a3f66;
+          --shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+          --win-bg: #2e2745;
+        }
+      }
+
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        font-family: "Nunito", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        min-height: 100vh;
+        -webkit-tap-highlight-color: transparent;
+      }
+      button { font-family: inherit; min-height: 2.75rem; }
+
+      .wrap {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 20px 14px 40px;
+      }
+
+      /* ---------- Header ---------- */
+      header { text-align: center; margin-bottom: 14px; }
+      h1 {
+        font-family: "Fredoka", "Nunito", sans-serif;
+        font-weight: 700;
+        font-size: clamp(30px, 7vw, 46px);
+        line-height: 1.08;
+        margin: 4px 0 6px;
+        letter-spacing: 0.01em;
+      }
+      h1 .paw { display: inline-block; vertical-align: -0.08em; margin-right: 0.12em; }
+      h1 .word-match { color: var(--coral); }
+      .sub {
+        margin: 0 auto;
+        max-width: 34em;
+        font-size: clamp(15px, 3.8vw, 18px);
+        font-weight: 700;
+        color: var(--ink-soft);
+      }
+
+      /* ---------- Stats bar ---------- */
+      .stats {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 16px 0 12px;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: var(--chip-bg);
+        border: 2.5px solid var(--chip-border);
+        border-radius: 999px;
+        padding: 7px 14px;
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: 17px;
+        box-shadow: var(--shadow);
+      }
+      .chip svg { flex: none; }
+      .chip .num { color: var(--coral-dark); min-width: 1.2ch; text-align: center; }
+      @media (prefers-color-scheme: dark) { .chip .num { color: var(--sunny); } }
+      .stats .spacer { flex: 1; }
+      .icon-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        width: 46px; height: 46px;
+        border-radius: 50%;
+        border: 2.5px solid var(--chip-border);
+        background: var(--chip-bg);
+        color: var(--ink);
+        cursor: pointer;
+        box-shadow: var(--shadow);
+        padding: 0;
+      }
+      .icon-btn:active { transform: scale(0.93); }
+      .icon-btn .off-icon { display: none; }
+      .icon-btn[aria-pressed="false"] .on-icon { display: none; }
+      .icon-btn[aria-pressed="false"] .off-icon { display: block; }
+
+      /* ---------- Level picker ---------- */
+      .levels {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+      .levels .lbl {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: 17px;
+        margin-right: 2px;
+      }
+      .lvl-btn {
+        flex: 1 1 0;
+        min-width: 96px;
+        border: 3px solid var(--chip-border);
+        background: var(--surface);
+        color: var(--ink);
+        border-radius: 16px;
+        padding: 8px 6px 7px;
+        cursor: pointer;
+        box-shadow: var(--shadow);
+        line-height: 1.15;
+      }
+      .lvl-btn .lvl-name { display: block; font-family: "Fredoka", sans-serif; font-weight: 600; font-size: 19px; }
+      .lvl-btn .lvl-sub { display: block; font-size: 13px; font-weight: 800; color: var(--ink-soft); }
+      .lvl-btn.active {
+        background: var(--coral);
+        border-color: var(--coral-dark);
+        color: #fff;
+      }
+      .lvl-btn.active .lvl-sub { color: #ffe3d9; }
+      .lvl-btn:active { transform: scale(0.96); }
+
+      /* ---------- Board ---------- */
+      .board-zone { position: relative; }
+      .board {
+        display: grid;
+        gap: 10px;
+      }
+      .board.lvl-easy   { grid-template-columns: repeat(4, 1fr); }
+      .board.lvl-medium { grid-template-columns: repeat(4, 1fr); }
+      .board.lvl-tricky { grid-template-columns: repeat(5, 1fr); }
+      @media (max-width: 560px) {
+        .board { gap: 8px; }
+        .board.lvl-easy   { grid-template-columns: repeat(3, 1fr); }
+        .board.lvl-tricky { grid-template-columns: repeat(4, 1fr); }
+      }
+
+      .card {
+        perspective: 700px;
+        background: none;
+        border: none;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+        aspect-ratio: 1 / 1;
+        min-height: 0;
+        border-radius: 18px;
+      }
+      .card:focus-visible { outline: 3.5px dashed var(--teal); outline-offset: 3px; }
+      .card-inner {
+        display: block;
+        position: relative;
+        width: 100%; height: 100%;
+        transform-style: preserve-3d;
+        transition: transform 0.45s cubic-bezier(0.34, 1.35, 0.5, 1);
+      }
+      .card.flipped .card-inner { transform: rotateY(180deg); }
+      .face {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 18px;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        overflow: hidden;
+      }
+      /* Face-down side */
+      .face-back {
+        background-color: var(--card-back);
+        background-image: radial-gradient(rgba(255,255,255,0.22) 2.2px, transparent 2.6px);
+        background-size: 22px 22px;
+        border: 3.5px solid var(--card-back-deep);
+        box-shadow: inset 0 0 0 3px rgba(255,255,255,0.35), var(--shadow);
+      }
+      .face-back svg { width: 46%; height: 46%; filter: drop-shadow(0 3px 0 rgba(0,0,0,0.12)); }
+      .card:not(.flipped):hover .face-back { filter: brightness(1.06); }
+      /* Animal side */
+      .face-front {
+        transform: rotateY(180deg);
+        background: var(--tint, #ffe9c9);
+        border: 3.5px solid #ffffff;
+        box-shadow: var(--shadow);
+        padding: 5% 5% 3%;
+        gap: 1%;
+      }
+      @media (prefers-color-scheme: dark) {
+        .face-front { border-color: rgba(255,255,255,0.55); }
+      }
+      .face-front img {
+        width: 100%;
+        flex: 1 1 auto;
+        min-height: 0;
+        object-fit: contain;
+        pointer-events: none;
+        user-select: none;
+        -webkit-user-drag: none;
+      }
+      .face-front .name {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: clamp(11px, 3.4vw, 18px);
+        color: #5b4636;
+        line-height: 1.1;
+        text-align: center;
+      }
+      /* Matched state */
+      .card.matched { cursor: default; animation: pop 0.5s ease; }
+      .card.matched .face-front {
+        border-color: var(--ring);
+        box-shadow: 0 0 0 3px var(--ring), var(--shadow);
+      }
+      .card .star {
+        position: absolute;
+        top: 5px; right: 5px;
+        width: 26%; max-width: 30px;
+        opacity: 0;
+        transform: scale(0) rotate(-30deg);
+        transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.34, 1.6, 0.5, 1);
+        z-index: 2;
+        pointer-events: none;
+      }
+      .card.matched .star { opacity: 1; transform: scale(1) rotate(0deg); }
+      @keyframes pop {
+        0% { transform: scale(1); }
+        40% { transform: scale(1.09); }
+        100% { transform: scale(1); }
+      }
+
+      /* ---------- Win panel ---------- */
+      .win {
+        position: absolute;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        z-index: 5;
+      }
+      .win.show { display: flex; }
+      .win-card {
+        background: var(--win-bg);
+        border: 3.5px solid var(--sunny);
+        border-radius: 26px;
+        box-shadow: 0 18px 44px rgba(90, 45, 0, 0.28);
+        text-align: center;
+        padding: 26px 24px 22px;
+        max-width: 400px;
+        width: 100%;
+        animation: winIn 0.45s cubic-bezier(0.34, 1.45, 0.5, 1);
+      }
+      @keyframes winIn {
+        from { transform: scale(0.7) translateY(24px); opacity: 0; }
+        to { transform: scale(1) translateY(0); opacity: 1; }
+      }
+      .win-stars { display: flex; justify-content: center; gap: 6px; margin-bottom: 6px; }
+      .win-stars svg { width: 44px; height: 44px; }
+      .win-stars svg:nth-child(2) { transform: translateY(-8px) scale(1.18); }
+      .win-card h2 {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 700;
+        font-size: clamp(32px, 8vw, 44px);
+        margin: 2px 0 6px;
+        color: var(--coral-dark);
+      }
+      @media (prefers-color-scheme: dark) { .win-card h2 { color: var(--sunny); } }
+      .win-card p {
+        margin: 0 0 18px;
+        font-size: 17px;
+        font-weight: 800;
+        color: var(--ink-soft);
+      }
+      .win-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+      .btn-big {
+        font-family: "Fredoka", sans-serif;
+        font-weight: 600;
+        font-size: 20px;
+        border-radius: 999px;
+        padding: 12px 26px;
+        cursor: pointer;
+        border: 3px solid transparent;
+      }
+      .btn-play {
+        background: var(--coral);
+        border-color: var(--coral-dark);
+        color: #fff;
+        box-shadow: 0 5px 0 var(--coral-dark);
+      }
+      .btn-play:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--coral-dark); }
+      .btn-next {
+        background: var(--surface);
+        border-color: var(--teal);
+        color: var(--teal);
+      }
+      .btn-next:active { transform: scale(0.96); }
+
+      #confetti {
+        position: fixed;
+        inset: 0;
+        width: 100%; height: 100%;
+        pointer-events: none;
+        z-index: 50;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .card-inner { transition: none; }
+        .card.matched { animation: none; }
+        .win-card { animation: none; }
+        .card .star { transition: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>
+          <svg class="paw" width="0.95em" height="0.95em" viewBox="0 0 100 100" aria-hidden="true"><g fill="#ff8a3d"><ellipse cx="50" cy="66" rx="21" ry="17"/><ellipse cx="22" cy="42" rx="9.5" ry="13" transform="rotate(-18 22 42)"/><ellipse cx="40" cy="31" rx="10" ry="14" transform="rotate(-6 40 31)"/><ellipse cx="61" cy="31" rx="10" ry="14" transform="rotate(6 61 31)"/><ellipse cx="79" cy="42" rx="9.5" ry="13" transform="rotate(18 79 42)"/></g></svg>Animal <span class="word-match">Memory Match</span>
+        </h1>
+        <p class="sub">Tap a card to turn it over. Find two animals that are the same!</p>
+      </header>
+
+      <div class="stats" role="group" aria-label="Game scores and sound">
+        <span class="chip" aria-live="polite">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 17c4-1 5-4 5-8V4l3 2 3-2v5c0 4 1 7 5 8-2 2-5 3-8 3s-6-1-8-3Z" fill="#0e9594"/></svg>
+          Moves <span class="num" id="movesNum">0</span>
+        </span>
+        <span class="chip" aria-live="polite">
+          <svg width="19" height="19" viewBox="0 0 100 100" aria-hidden="true"><g fill="#ff6b4a"><ellipse cx="50" cy="66" rx="21" ry="17"/><ellipse cx="22" cy="42" rx="9.5" ry="13" transform="rotate(-18 22 42)"/><ellipse cx="40" cy="31" rx="10" ry="14" transform="rotate(-6 40 31)"/><ellipse cx="61" cy="31" rx="10" ry="14" transform="rotate(6 61 31)"/><ellipse cx="79" cy="42" rx="9.5" ry="13" transform="rotate(18 79 42)"/></g></svg>
+          Pairs <span class="num"><span id="pairsNum">0</span>/<span id="pairsTotal">6</span></span>
+        </span>
+        <span class="spacer"></span>
+        <button class="icon-btn" id="restartBtn" type="button" aria-label="Start again — shuffle the cards" title="Start again">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+        </button>
+        <button class="icon-btn" id="soundBtn" type="button" aria-pressed="true" aria-label="Sound on or off" title="Sound on/off">
+          <svg class="on-icon" width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z" fill="currentColor" stroke="none"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.2 6a9 9 0 0 1 0 12"/></svg>
+          <svg class="off-icon" width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z" fill="currentColor" stroke="none"/><path d="m16 9.5 5 5M21 9.5l-5 5"/></svg>
+        </button>
+      </div>
+
+      <div class="levels" role="group" aria-label="Choose a level">
+        <span class="lbl">Level:</span>
+        <button class="lvl-btn active" type="button" data-level="easy" aria-pressed="true">
+          <span class="lvl-name">Easy</span><span class="lvl-sub">6 pairs</span>
+        </button>
+        <button class="lvl-btn" type="button" data-level="medium" aria-pressed="false">
+          <span class="lvl-name">Medium</span><span class="lvl-sub">8 pairs</span>
+        </button>
+        <button class="lvl-btn" type="button" data-level="tricky" aria-pressed="false">
+          <span class="lvl-name">Tricky</span><span class="lvl-sub">10 pairs</span>
+        </button>
+      </div>
+
+      <div class="board-zone">
+        <div class="board lvl-easy" id="board" aria-label="Memory cards"></div>
+
+        <div class="win" id="winPanel" role="dialog" aria-labelledby="winTitle" aria-hidden="true">
+          <div class="win-card">
+            <div class="win-stars" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 2.6l2.8 5.9 6.5.8-4.8 4.4 1.3 6.4L12 17l-5.8 3.1 1.3-6.4L2.7 9.3l6.5-.8L12 2.6Z" fill="#ffc53d" stroke="#e8a20c" stroke-width="1.2" stroke-linejoin="round"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2.6l2.8 5.9 6.5.8-4.8 4.4 1.3 6.4L12 17l-5.8 3.1 1.3-6.4L2.7 9.3l6.5-.8L12 2.6Z" fill="#ffc53d" stroke="#e8a20c" stroke-width="1.2" stroke-linejoin="round"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2.6l2.8 5.9 6.5.8-4.8 4.4 1.3 6.4L12 17l-5.8 3.1 1.3-6.4L2.7 9.3l6.5-.8L12 2.6Z" fill="#ffc53d" stroke="#e8a20c" stroke-width="1.2" stroke-linejoin="round"/></svg>
+            </div>
+            <h2 id="winTitle">Great job!</h2>
+            <p id="winText">You found all the animals!</p>
+            <div class="win-actions">
+              <button class="btn-big btn-play" id="playAgainBtn" type="button">Play again</button>
+              <button class="btn-big btn-next" id="nextLevelBtn" type="button" hidden></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <canvas id="confetti" aria-hidden="true"></canvas>
+
+    <script>
+      (function () {
+        "use strict";
+
+        var ANIMALS = [
+          { id: "lion",     name: "Lion",     tint: "#ffe1a8" },
+          { id: "elephant", name: "Elephant", tint: "#cfe4f7" },
+          { id: "giraffe",  name: "Giraffe",  tint: "#fff0a6" },
+          { id: "rabbit",   name: "Rabbit",   tint: "#ffd9e8" },
+          { id: "bear",     name: "Bear",     tint: "#ecd3ac" },
+          { id: "fox",      name: "Fox",      tint: "#ffcfa8" },
+          { id: "zebra",    name: "Zebra",    tint: "#e2e7f0" },
+          { id: "monkey",   name: "Monkey",   tint: "#dff0c2" },
+          { id: "panda",    name: "Panda",    tint: "#d7f0e0" },
+          { id: "deer",     name: "Deer",     tint: "#f9dcc0" }
+        ];
+        var LEVELS = {
+          easy:   { pairs: 6,  next: "medium", nextLabel: "Try Medium!" },
+          medium: { pairs: 8,  next: "tricky", nextLabel: "Try Tricky!" },
+          tricky: { pairs: 10, next: null,     nextLabel: "" }
+        };
+        var PAW_SVG = '<svg viewBox="0 0 100 100" aria-hidden="true"><g fill="#ffffff"><ellipse cx="50" cy="66" rx="21" ry="17"/><ellipse cx="22" cy="42" rx="9.5" ry="13" transform="rotate(-18 22 42)"/><ellipse cx="40" cy="31" rx="10" ry="14" transform="rotate(-6 40 31)"/><ellipse cx="61" cy="31" rx="10" ry="14" transform="rotate(6 61 31)"/><ellipse cx="79" cy="42" rx="9.5" ry="13" transform="rotate(18 79 42)"/></g></svg>';
+        var STAR_SVG = '<svg class="star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.8 5.9 6.5.8-4.8 4.4 1.3 6.4L12 17l-5.8 3.1 1.3-6.4L2.7 9.3l6.5-.8L12 2.6Z" fill="#ffc53d" stroke="#e8a20c" stroke-width="1.2" stroke-linejoin="round"/></svg>';
+
+        var board = document.getElementById("board");
+        var movesNum = document.getElementById("movesNum");
+        var pairsNum = document.getElementById("pairsNum");
+        var pairsTotal = document.getElementById("pairsTotal");
+        var winPanel = document.getElementById("winPanel");
+        var winText = document.getElementById("winText");
+        var nextLevelBtn = document.getElementById("nextLevelBtn");
+        var soundBtn = document.getElementById("soundBtn");
+        var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        var level = "easy";
+        var firstCard = null;
+        var lockBoard = false;
+        var moves = 0;
+        var found = 0;
+        var totalPairs = LEVELS[level].pairs;
+        var soundOn = true;
+
+        /* ---------------- Sound (Web Audio, synthesised) ---------------- */
+        var audioCtx = null;
+        function ac() {
+          if (!audioCtx) {
+            var AC = window.AudioContext || window.webkitAudioContext;
+            if (!AC) return null;
+            audioCtx = new AC();
+          }
+          if (audioCtx.state === "suspended") audioCtx.resume();
+          return audioCtx;
+        }
+        function tone(freqStart, freqEnd, delay, dur, type, vol) {
+          if (!soundOn) return;
+          var ctx = ac();
+          if (!ctx) return;
+          var t0 = ctx.currentTime + delay;
+          var osc = ctx.createOscillator();
+          var gain = ctx.createGain();
+          osc.type = type || "sine";
+          osc.frequency.setValueAtTime(freqStart, t0);
+          if (freqEnd && freqEnd !== freqStart) {
+            osc.frequency.exponentialRampToValueAtTime(freqEnd, t0 + dur);
+          }
+          gain.gain.setValueAtTime(0.0001, t0);
+          gain.gain.exponentialRampToValueAtTime(vol || 0.15, t0 + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(t0);
+          osc.stop(t0 + dur + 0.05);
+        }
+        function flipSound() {
+          // soft little "fwip-pop"
+          tone(420, 780, 0, 0.1, "triangle", 0.12);
+          tone(900, 1300, 0.02, 0.06, "sine", 0.05);
+        }
+        function matchSound() {
+          // happy rising arpeggio
+          var notes = [523.25, 659.25, 783.99, 1046.5];
+          for (var i = 0; i < notes.length; i++) {
+            tone(notes[i], notes[i], i * 0.075, 0.22, "triangle", 0.16);
+          }
+        }
+        function winSound() {
+          var melody = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5, 1318.5];
+          for (var i = 0; i < melody.length; i++) {
+            tone(melody[i], melody[i], i * 0.13, 0.3, "triangle", 0.17);
+            tone(melody[i] * 2, melody[i] * 2, i * 0.13, 0.18, "sine", 0.05);
+          }
+        }
+
+        /* ---------------- Confetti ---------------- */
+        var cCanvas = document.getElementById("confetti");
+        var cCtx = cCanvas.getContext("2d");
+        var pieces = [];
+        var confettiRunning = false;
+        function sizeConfetti() {
+          cCanvas.width = window.innerWidth;
+          cCanvas.height = window.innerHeight;
+        }
+        window.addEventListener("resize", sizeConfetti);
+        sizeConfetti();
+        function launchConfetti() {
+          if (reducedMotion) return;
+          var colors = ["#ff6b4a", "#ffc53d", "#2ec4b6", "#ff8fab", "#4d96ff", "#95d5b2", "#ff8a3d"];
+          pieces = [];
+          for (var i = 0; i < 150; i++) {
+            pieces.push({
+              x: Math.random() * cCanvas.width,
+              y: -20 - Math.random() * cCanvas.height * 0.35,
+              w: 7 + Math.random() * 7,
+              h: 5 + Math.random() * 6,
+              vy: 2.2 + Math.random() * 3.2,
+              vx: -1.4 + Math.random() * 2.8,
+              rot: Math.random() * Math.PI * 2,
+              vr: -0.12 + Math.random() * 0.24,
+              color: colors[i % colors.length],
+              circle: Math.random() < 0.35
+            });
+          }
+          if (!confettiRunning) {
+            confettiRunning = true;
+            requestAnimationFrame(confettiTick);
+          }
+        }
+        var confettiStart = 0;
+        function confettiTick(ts) {
+          if (!confettiStart) confettiStart = ts;
+          cCtx.clearRect(0, 0, cCanvas.width, cCanvas.height);
+          var alive = false;
+          for (var i = 0; i < pieces.length; i++) {
+            var p = pieces[i];
+            p.x += p.vx + Math.sin((ts / 300) + p.rot) * 0.7;
+            p.y += p.vy;
+            p.rot += p.vr;
+            if (p.y < cCanvas.height + 30) alive = true;
+            cCtx.save();
+            cCtx.translate(p.x, p.y);
+            cCtx.rotate(p.rot);
+            cCtx.fillStyle = p.color;
+            if (p.circle) {
+              cCtx.beginPath();
+              cCtx.arc(0, 0, p.w / 2, 0, Math.PI * 2);
+              cCtx.fill();
+            } else {
+              cCtx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.sin(p.rot * 2)) + 1.5);
+            }
+            cCtx.restore();
+          }
+          if (alive && ts - confettiStart < 6000) {
+            requestAnimationFrame(confettiTick);
+          } else {
+            confettiRunning = false;
+            confettiStart = 0;
+            cCtx.clearRect(0, 0, cCanvas.width, cCanvas.height);
+          }
+        }
+
+        /* ---------------- Game ---------------- */
+        function shuffle(arr) {
+          for (var i = arr.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+          }
+          return arr;
+        }
+
+        function startGame(newLevel) {
+          level = newLevel;
+          totalPairs = LEVELS[level].pairs;
+          firstCard = null;
+          lockBoard = false;
+          moves = 0;
+          found = 0;
+          movesNum.textContent = "0";
+          pairsNum.textContent = "0";
+          pairsTotal.textContent = String(totalPairs);
+          winPanel.classList.remove("show");
+          winPanel.setAttribute("aria-hidden", "true");
+
+          var lvlBtns = document.querySelectorAll(".lvl-btn");
+          for (var b = 0; b < lvlBtns.length; b++) {
+            var isActive = lvlBtns[b].getAttribute("data-level") === level;
+            lvlBtns[b].classList.toggle("active", isActive);
+            lvlBtns[b].setAttribute("aria-pressed", isActive ? "true" : "false");
+          }
+
+          // Pick a random set of animals for this round, double them, shuffle.
+          var chosen = shuffle(ANIMALS.slice()).slice(0, totalPairs);
+          var deck = shuffle(chosen.concat(chosen));
+
+          board.className = "board lvl-" + level;
+          board.innerHTML = "";
+          for (var i = 0; i < deck.length; i++) {
+            board.appendChild(makeCard(deck[i]));
+          }
+        }
+
+        function makeCard(animal) {
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "card";
+          btn.setAttribute("data-animal", animal.id);
+          btn.setAttribute("aria-label", "Hidden card — tap to turn it over");
+          btn.innerHTML =
+            '<span class="card-inner">' +
+              '<span class="face face-back">' + PAW_SVG + "</span>" +
+              '<span class="face face-front" style="--tint:' + animal.tint + '">' +
+                STAR_SVG +
+                '<img src="assets/' + animal.id + '.png" alt="" draggable="false" />' +
+                '<span class="name">' + animal.name + "</span>" +
+              "</span>" +
+            "</span>";
+          btn.addEventListener("click", function () { onCardTap(btn, animal); });
+          return btn;
+        }
+
+        function onCardTap(card, animal) {
+          if (lockBoard) return;
+          if (card.classList.contains("flipped") || card.classList.contains("matched")) return;
+          ac(); // unlock audio on the tap itself
+          card.classList.add("flipped");
+          card.setAttribute("aria-label", animal.name);
+          flipSound();
+
+          if (!firstCard) {
+            firstCard = { el: card, animal: animal };
+            return;
+          }
+          moves++;
+          movesNum.textContent = String(moves);
+          var first = firstCard;
+          firstCard = null;
+
+          if (first.animal.id === animal.id) {
+            // Match!
+            found++;
+            pairsNum.textContent = String(found);
+            setTimeout(function () {
+              first.el.classList.add("matched");
+              card.classList.add("matched");
+              first.el.setAttribute("aria-label", animal.name + " — matched!");
+              card.setAttribute("aria-label", animal.name + " — matched!");
+              matchSound();
+              if (found === totalPairs) {
+                setTimeout(winGame, 650);
+              }
+            }, 260);
+          } else {
+            lockBoard = true;
+            setTimeout(function () {
+              first.el.classList.remove("flipped");
+              card.classList.remove("flipped");
+              first.el.setAttribute("aria-label", "Hidden card — tap to turn it over");
+              card.setAttribute("aria-label", "Hidden card — tap to turn it over");
+              lockBoard = false;
+            }, 950);
+          }
+        }
+
+        function winGame() {
+          winText.textContent =
+            "You found all " + totalPairs + " pairs in " + moves + (moves === 1 ? " move" : " moves") + "!";
+          var next = LEVELS[level].next;
+          if (next) {
+            nextLevelBtn.hidden = false;
+            nextLevelBtn.textContent = LEVELS[level].nextLabel;
+            nextLevelBtn.setAttribute("data-next", next);
+          } else {
+            nextLevelBtn.hidden = true;
+          }
+          winPanel.classList.add("show");
+          winPanel.setAttribute("aria-hidden", "false");
+          winSound();
+          launchConfetti();
+          document.getElementById("playAgainBtn").focus();
+        }
+
+        /* ---------------- Controls ---------------- */
+        var lvlBtnsAll = document.querySelectorAll(".lvl-btn");
+        for (var k = 0; k < lvlBtnsAll.length; k++) {
+          lvlBtnsAll[k].addEventListener("click", function () {
+            ac();
+            startGame(this.getAttribute("data-level"));
+            flipSound();
+          });
+        }
+        document.getElementById("restartBtn").addEventListener("click", function () {
+          ac();
+          startGame(level);
+          flipSound();
+        });
+        document.getElementById("playAgainBtn").addEventListener("click", function () {
+          ac();
+          startGame(level);
+          flipSound();
+        });
+        nextLevelBtn.addEventListener("click", function () {
+          ac();
+          startGame(this.getAttribute("data-next") || "medium");
+          flipSound();
+        });
+        soundBtn.addEventListener("click", function () {
+          soundOn = !soundOn;
+          soundBtn.setAttribute("aria-pressed", soundOn ? "true" : "false");
+          if (soundOn) { ac(); flipSound(); }
+        });
+
+        startGame("easy");
+      })();
+    </script>
+  </body>
+</html>

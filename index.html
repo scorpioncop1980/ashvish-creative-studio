@@ -10,7 +10,7 @@
 <meta name="description" content="Ashvish Creative Studio — Firefly Brothers children's books, E-Books and Blog, all in one website."/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=DM+Sans:wght@400;500;600;700;800&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#fffaf0; --bg-2:#fdf3e0; --surface:#fffefa; --surface-2:#f2fbfd;
@@ -189,6 +189,45 @@ html[data-theme="night"] .btn.primary{color:#062a38}
 .rb3{background:#20bf86!important;color:#fff!important;border-color:#20bf86!important;box-shadow:none!important}
 .rb4{background:#168bfa!important;color:#fff!important;border-color:#168bfa!important;box-shadow:none!important}
 .rb5{background:#a04af4!important;color:#fff!important;border-color:#a04af4!important;box-shadow:none!important}
+/* ---------- Play Zone — Candy Shop Adventure ---------- */
+#page-play .section{background:linear-gradient(180deg,#fdf3f5 0%,#fffdf5 55%,#f2fbf7 100%)}
+html[data-theme="night"] #page-play .section{background:linear-gradient(180deg,#0a2e3d 0%,#07242f 55%,#0a2c3b 100%)}
+#page-play .section-head h2{display:inline-block}
+#page-play .section-head h2,#page-tools .section-head h2{font-family:'Dancing Script',cursive;font-weight:700;letter-spacing:0;font-size:clamp(38px,4.2vw,52px)}
+#page-play .section-head p,#page-tools .section-head p{font-family:'Dancing Script',cursive;font-weight:700;font-size:clamp(19px,2.2vw,23px)}
+#tabPlay.pt-active{background:#ff9aa2!important;border-color:#ff9aa2!important;color:#3d3436!important}
+#page-play .rb1{background:#ff9aa2!important;color:#3d3436!important;border-color:#ff9aa2!important}
+#page-play .rb2{background:#ffdac1!important;color:#3d3436!important;border-color:#ffdac1!important}
+#page-play .rb3{background:#b5ead7!important;color:#3d3436!important;border-color:#b5ead7!important}
+#page-play .rb4{background:#c7ceff!important;color:#3d3436!important;border-color:#c7ceff!important}
+#page-play .rb5{background:#f7f3c7!important;color:#3d3436!important;border-color:#f7f3c7!important}
+/* Poster cards - Play Zone + Free Tools (Candy Shop borders kept) */
+#page-play .buy-card.poster-card,#page-tools .buy-card.poster-card{padding:0;overflow:hidden;display:block;text-decoration:none;color:inherit}
+#page-play .buy-card.poster-card .poster-img,#page-tools .buy-card.poster-card .poster-img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+#page-play .buy-card.poster-card .poster-img,#page-tools .buy-card.poster-card .poster-img{transition:transform .35s ease}
+#page-play .buy-card.poster-card:hover .poster-img,#page-tools .buy-card.poster-card:hover .poster-img{transform:scale(1.05)}
+#page-play .buy-card.poster-card h3,#page-tools .buy-card.poster-card h3{padding:14px 18px 18px;margin:0;font-size:1.05rem;line-height:1.3}
+#page-tools .buy-card.poster-card .btn{margin:0 18px 18px}
+#page-tools .buy-grid{grid-template-columns:repeat(3,1fr)}
+#page-play .buy-grid{grid-template-columns:repeat(3,1fr)}
+#ff-recommended .prod-poster{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+/* ---------- Homepage Play Zone hero banner ---------- */
+#page-firefly .play-hero{max-width:1280px;margin:0 auto;padding:28px 28px 0}
+#page-firefly .play-hero-banner{position:relative;display:block;overflow:hidden;border-radius:22px;text-decoration:none;box-shadow:var(--shadow-sm)}
+#page-firefly .play-hero-img{display:block;width:100%;aspect-ratio:3/1;object-fit:cover;transition:transform .35s ease}
+#page-firefly .play-hero-banner:hover .play-hero-img{transform:scale(1.02)}
+#page-firefly .play-hero-overlay{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;gap:8px;padding:28px 32px;background:linear-gradient(90deg,rgba(10,10,30,.72) 0%,rgba(10,10,30,.45) 55%,rgba(10,10,30,.05) 100%)}
+#page-firefly .play-hero-kicker{color:#fff;font-family:var(--head-font);font-weight:900;font-size:2.1rem;line-height:1.1;letter-spacing:.5px;text-shadow:0 2px 12px rgba(0,0,0,.45)}
+#page-firefly .play-hero-sub{color:#ffe9f3;font-weight:600;font-size:1.05rem;text-shadow:0 1px 8px rgba(0,0,0,.5)}
+#page-firefly .play-hero-btn{display:inline-block;background:#ff9aa2;color:#3d3436;font-weight:800;padding:10px 22px;border-radius:999px;font-size:1rem;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+@media (max-width:640px){
+#page-firefly .play-hero{padding:18px 16px 0}
+#page-firefly .play-hero-kicker{font-size:1.5rem}
+#page-firefly .play-hero-sub{font-size:.9rem}
+#page-firefly .play-hero-overlay{padding:18px 20px;gap:6px}
+#page-firefly .play-hero-img{aspect-ratio:16/9}
+}
+
 .checks{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
 .checks span{display:inline-flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--card-line);border-radius:999px;padding:9px 16px;font:700 14px var(--head-font);color:var(--ink-strong);box-shadow:var(--shadow-sm)}
 .checks span b{color:var(--accent-deep)}
@@ -274,6 +313,8 @@ html[data-theme="night"] .btn.primary{color:#062a38}
   .mini-card img{height:auto}
   .mini-card h3{font-size:14px}.mini-card p{font-size:12px}
   .grid4,.buy-grid{grid-template-columns:1fr}
+  #page-tools .buy-grid{grid-template-columns:1fr}
+  #page-play .buy-grid{grid-template-columns:1fr}
   .card img{height:auto}
   .btn{padding:14px 22px;font-size:15px}
   .footer-in{padding:22px 16px}
@@ -362,6 +403,17 @@ html[data-theme="night"] .btn.primary{color:#062a38}
 
 <main id="top">
 <div id="page-firefly" class="page-view">
+  <!-- ================= HOMEPAGE PLAY ZONE HERO BANNER ================= -->
+  <section class="play-hero">
+    <a class="play-hero-banner" href="#/play" aria-label="Play Zone — 12 free games">
+      <img class="play-hero-img" src="posters/pinball-poster.webp" alt="Play Zone — 12 free games">
+      <span class="play-hero-overlay">
+        <span class="play-hero-kicker">🎮 Play Zone</span>
+        <span class="play-hero-sub">12 Free Games — no sign-up, no download</span>
+        <span class="play-hero-btn">Play Now ↗</span>
+      </span>
+    </a>
+  </section>
   <!-- ================= FIREFLY HERO : same pattern as the first Ashvish homepage ================= -->
   <section class="hero">
     <div class="hero-in">
@@ -409,6 +461,28 @@ html[data-theme="night"] .btn.primary{color:#062a38}
       <a class="btn" href="#ff-recommended">Shop Recommended Supplies →</a>
     </div>
   </div>
+  <!-- ================= RECOMMENDED FOR YOUNG ARTISTS ================= -->
+  <section class="section" id="ff-recommended">
+    <div class="wrap">
+      <div class="section-head">
+        <div><h2>Recommended for Young Artists</h2><p>Art supplies we love for colouring-book time — pencils, pastels, sketchbooks and diyas, all on Amazon.in.</p></div>
+        <span class="pill" style="margin-left:auto">✦ SHOP ON AMAZON</span>
+      </div>
+      <div class="grid4">
+        <article class="card" style="border:2px solid #ff4f7d"><img class="prod-poster" src="posters/faber-castell-pencils-poster.webp" alt="Faber-Castell Triangular Colour Pencils, 48"><div class="c-body"><h3>Faber-Castell Triangular Colour Pencils, 48</h3><p>The trusted colour-pencil brand — triangular grip made for kids.</p><p class="prod-price">₹386</p><a class="mini-btn rb1" href="https://www.amazon.in/dp/B0825W7LP8?tag=ashvishstudio-21" target="_blank" rel="noopener noreferrer">Buy on Amazon ↗</a></div></article>
+        <article class="card" style="border:2px solid #ffad32"><img class="prod-poster" src="posters/doms-oil-pastel-poster.webp" alt="DOMS 50 Shades Oil Pastel with Case"><div class="c-body"><h3>DOMS 50 Shades Oil Pastel with Case</h3><p>Bestselling pastel set with case, scraper and colour pen.</p><p class="prod-price">₹209</p><a class="mini-btn rb2" href="https://www.amazon.in/dp/B07B9WW6MJ?tag=ashvishstudio-21" target="_blank" rel="noopener noreferrer">Buy on Amazon ↗</a></div></article>
+        <article class="card" style="border:2px solid #20bf86"><img class="prod-poster" src="posters/anupam-sketchbook-poster.webp" alt="Anupam Sketch-O Sketchbook A5, 140 GSM"><div class="c-body"><h3>Anupam Sketch-O Sketchbook A5, 140 GSM</h3><p>Spiral sketchbook, thick 140 GSM paper — no bleed-through.</p><p class="prod-price">₹150</p><a class="mini-btn rb3" href="https://www.amazon.in/dp/B0BZP6PC25?tag=ashvishstudio-21" target="_blank" rel="noopener noreferrer">Buy on Amazon ↗</a></div></article>
+        <article class="card" style="border:2px solid #168bfa"><img class="prod-poster" src="posters/wishkey-art-set-poster.webp" alt="WISHKEY 150 Pieces Art Set for Kids"><div class="c-body"><h3>WISHKEY 150 Pieces Art Set for Kids</h3><p>The complete art box — markers, crayons, pastels and paints in one case.</p><p class="prod-price">₹499</p><a class="mini-btn rb4" href="https://www.amazon.in/dp/B0DB1M75VQ?tag=ashvishstudio-21" target="_blank" rel="noopener noreferrer">Buy on Amazon ↗</a></div></article>
+        <article class="card" style="border:2px solid #a04af4"><img class="prod-poster" src="posters/doms-brush-pens-poster.webp" alt="DOMS Pastel Brush Pens, 14 Shades"><div class="c-body"><h3>DOMS Pastel Brush Pens, 14 Shades</h3><p>Brush-tip pens kids love — watercolour effect, washable.</p><p class="prod-price">₹145</p><a class="mini-btn rb5" href="https://www.amazon.in/dp/B0BL3X9Q4Q?tag=ashvishstudio-21" target="_blank" rel="noopener noreferrer">Buy on Amazon ↗</a></div></article>
+        <article class="card" style="border:2px solid #ff4f7d"><img class="prod-poster" src="posters/camel-water-colour-poster.webp" alt="Camel Student Water Colour Tubes, 18 Shades"><div class="c-body"><h3>Camel Student Water Colour Tubes, 18 Shades</h3><p>India's classic school watercolour set — easy add-to-cart.</p><p class="prod-price">₹145</p><a class="mini-btn rb1" href="https://www.amazon.in/dp/B00LY14BA4?tag=ashvishstudio-21" target="_blank" rel="noopener noreferrer">Buy on Amazon ↗</a></div></article>
+        <article class="card" style="border:2px solid #ffad32"><img class="prod-poster" src="posters/camel-oil-pastel-poster.webp" alt="Camel Oil Pastel, 50 Shades"><div class="c-body"><h3>Camel Oil Pastel, 50 Shades</h3><p>Smooth, bright pastels in a reusable plastic box.</p><p class="prod-price">₹161</p><a class="mini-btn rb2" href="https://www.amazon.in/dp/B00LPD51SC?tag=ashvishstudio-21" target="_blank" rel="noopener noreferrer">Buy on Amazon ↗</a></div></article>
+        <article class="card" style="border:2px solid #20bf86"><img class="prod-poster" src="posters/akhand-diya-poster.webp" alt="Collectible India Akhand Diya, Brass Crystal"><div class="c-body"><h3>Collectible India Akhand Diya, Brass Crystal</h3><p>Decorative brass diya for the home mandir — a lovely gift.</p><p class="prod-price">₹349</p><a class="mini-btn rb3" href="https://www.amazon.in/dp/B071W7D1SB?tag=ashvishstudio-21" target="_blank" rel="noopener noreferrer">Buy on Amazon ↗</a></div></article>
+        <article class="card" style="border:2px solid #168bfa"><img class="prod-poster" src="posters/lamina-diya-set-poster.webp" alt="Lamina Brass Diya for Puja, Set of 2"><div class="c-body"><h3>Lamina Brass Diya for Puja, Set of 2</h3><p>Genuine brass Kuber diya for daily puja.</p><p class="prod-price">₹563</p><a class="mini-btn rb4" href="https://www.amazon.in/dp/B09Y7GQS11?tag=ashvishstudio-21" target="_blank" rel="noopener noreferrer">Buy on Amazon ↗</a></div></article>
+        <article class="card" style="border:2px solid #a04af4"><img class="prod-poster" src="posters/maped-crayons-poster.webp" alt="Maped Wax Jumbo Crayons, 24 Shades"><div class="c-body"><h3>Maped Wax Jumbo Crayons, 24 Shades</h3><p>Jumbo easy-grip crayons made for little hands, ages 3+.</p><p class="prod-price">₹130</p><a class="mini-btn rb5" href="https://www.amazon.in/dp/B07KJSLBG4?tag=ashvishstudio-21" target="_blank" rel="noopener noreferrer">Buy on Amazon ↗</a></div></article>
+      </div>
+      <p class="assoc-note">As an Amazon Associate, we earn from qualifying purchases.</p>
+    </div>
+  </section>
 
   <!-- ================= FIREFLY BOOKS ================= -->
   <section class="section" id="ff-books">
@@ -468,29 +542,6 @@ html[data-theme="night"] .btn.primary{color:#062a38}
         <article class="buy-card"><h3>Colouring Books</h3><p>Dino Friends, Spooky Friends, Christmas Friends and Bonfire Night · Big scenes, bold outlines, colour guide inside.</p><div class="buy-links"><a class="btn primary rb4" href="https://www.amazon.com/dp/B0HP82WFLG" target="_blank" rel="noopener noreferrer">Dino Friends — $12.99 ↗</a><a class="btn primary rb5" href="https://www.amazon.com/dp/B0HP84LR3R" target="_blank" rel="noopener noreferrer">Spooky Friends — $12.99 ↗</a><a class="btn primary rb1" href="https://www.amazon.com/dp/B0HQJ7CBT9" target="_blank" rel="noopener noreferrer">Christmas Friends — $12.99 ↗</a><a class="btn primary rb2" href="https://www.amazon.com/dp/B0HPZN5GBC" target="_blank" rel="noopener noreferrer">Bonfire Night — $12.99 ↗</a></div><small class="note">This is a preview for now — no payment is processed.</small></article>
         <article class="buy-card"><h3>Bedtime Tales — Free</h3><p>Bedtime Tales from the Night Forest is a free book — a gift for young readers everywhere.</p><button class="btn ghost rb2" type="button" data-notice="Bedtime Tales — Free|The free read and download link for Bedtime Tales from the Night Forest will be added here when the edition is ready.">Read Link Coming Soon</button><small class="note">This section will be updated as soon as the free edition arrives.</small></article>
       </div>
-    </div>
-  </section>
-
-  <!-- ================= RECOMMENDED FOR YOUNG ARTISTS ================= -->
-  <section class="section" id="ff-recommended">
-    <div class="wrap">
-      <div class="section-head">
-        <div><h2>Recommended for Young Artists</h2><p>Art supplies we love for colouring-book time — pencils, pastels, sketchbooks and diyas, all on Amazon.in.</p></div>
-        <span class="pill" style="margin-left:auto">✦ SHOP ON AMAZON</span>
-      </div>
-      <div class="grid4">
-        <article class="card" style="border:2px solid #ff4f7d"><div class="prod-emoji" style="background:#ffedd5">✏️</div><div class="c-body"><h3>Faber-Castell Triangular Colour Pencils, 48</h3><p>The trusted colour-pencil brand — triangular grip made for kids.</p><p class="prod-price">₹386</p><a class="mini-btn rb1" href="https://www.amazon.in/dp/B0825W7LP8?tag=ashvishstudio-21" target="_blank" rel="noopener noreferrer">Buy on Amazon ↗</a></div></article>
-        <article class="card" style="border:2px solid #ffad32"><div class="prod-emoji" style="background:#ffdde4">🖍️</div><div class="c-body"><h3>DOMS 50 Shades Oil Pastel with Case</h3><p>Bestselling pastel set with case, scraper and colour pen.</p><p class="prod-price">₹209</p><a class="mini-btn rb2" href="https://www.amazon.in/dp/B07B9WW6MJ?tag=ashvishstudio-21" target="_blank" rel="noopener noreferrer">Buy on Amazon ↗</a></div></article>
-        <article class="card" style="border:2px solid #20bf86"><div class="prod-emoji" style="background:#d9fbe8">📓</div><div class="c-body"><h3>Anupam Sketch-O Sketchbook A5, 140 GSM</h3><p>Spiral sketchbook, thick 140 GSM paper — no bleed-through.</p><p class="prod-price">₹150</p><a class="mini-btn rb3" href="https://www.amazon.in/dp/B0BZP6PC25?tag=ashvishstudio-21" target="_blank" rel="noopener noreferrer">Buy on Amazon ↗</a></div></article>
-        <article class="card" style="border:2px solid #168bfa"><div class="prod-emoji" style="background:#dff7fc">🎨</div><div class="c-body"><h3>WISHKEY 150 Pieces Art Set for Kids</h3><p>The complete art box — markers, crayons, pastels and paints in one case.</p><p class="prod-price">₹499</p><a class="mini-btn rb4" href="https://www.amazon.in/dp/B0DB1M75VQ?tag=ashvishstudio-21" target="_blank" rel="noopener noreferrer">Buy on Amazon ↗</a></div></article>
-        <article class="card" style="border:2px solid #a04af4"><div class="prod-emoji" style="background:#f3e8fd">🖊️</div><div class="c-body"><h3>DOMS Pastel Brush Pens, 14 Shades</h3><p>Brush-tip pens kids love — watercolour effect, washable.</p><p class="prod-price">₹145</p><a class="mini-btn rb5" href="https://www.amazon.in/dp/B0BL3X9Q4Q?tag=ashvishstudio-21" target="_blank" rel="noopener noreferrer">Buy on Amazon ↗</a></div></article>
-        <article class="card" style="border:2px solid #ff4f7d"><div class="prod-emoji" style="background:#fff3d6">🖌️</div><div class="c-body"><h3>Camel Student Water Colour Tubes, 18 Shades</h3><p>India's classic school watercolour set — easy add-to-cart.</p><p class="prod-price">₹145</p><a class="mini-btn rb1" href="https://www.amazon.in/dp/B00LY14BA4?tag=ashvishstudio-21" target="_blank" rel="noopener noreferrer">Buy on Amazon ↗</a></div></article>
-        <article class="card" style="border:2px solid #ffad32"><div class="prod-emoji" style="background:#e9f9ef">🌈</div><div class="c-body"><h3>Camel Oil Pastel, 50 Shades</h3><p>Smooth, bright pastels in a reusable plastic box.</p><p class="prod-price">₹161</p><a class="mini-btn rb2" href="https://www.amazon.in/dp/B00LPD51SC?tag=ashvishstudio-21" target="_blank" rel="noopener noreferrer">Buy on Amazon ↗</a></div></article>
-        <article class="card" style="border:2px solid #20bf86"><div class="prod-emoji" style="background:#ffece9">🪔</div><div class="c-body"><h3>Collectible India Akhand Diya, Brass Crystal</h3><p>Decorative brass diya for the home mandir — a lovely gift.</p><p class="prod-price">₹349</p><a class="mini-btn rb3" href="https://www.amazon.in/dp/B071W7D1SB?tag=ashvishstudio-21" target="_blank" rel="noopener noreferrer">Buy on Amazon ↗</a></div></article>
-        <article class="card" style="border:2px solid #168bfa"><div class="prod-emoji" style="background:#fdeef5">🪔</div><div class="c-body"><h3>Lamina Brass Diya for Puja, Set of 2</h3><p>Genuine brass Kuber diya for daily puja.</p><p class="prod-price">₹563</p><a class="mini-btn rb4" href="https://www.amazon.in/dp/B09Y7GQS11?tag=ashvishstudio-21" target="_blank" rel="noopener noreferrer">Buy on Amazon ↗</a></div></article>
-        <article class="card" style="border:2px solid #a04af4"><div class="prod-emoji" style="background:#eef4ff">🖍️</div><div class="c-body"><h3>Maped Wax Jumbo Crayons, 24 Shades</h3><p>Jumbo easy-grip crayons made for little hands, ages 3+.</p><p class="prod-price">₹130</p><a class="mini-btn rb5" href="https://www.amazon.in/dp/B07KJSLBG4?tag=ashvishstudio-21" target="_blank" rel="noopener noreferrer">Buy on Amazon ↗</a></div></article>
-      </div>
-      <p class="assoc-note">As an Amazon Associate, we earn from qualifying purchases.</p>
     </div>
   </section>
 
@@ -870,17 +921,17 @@ html[data-theme="night"] .btn.primary{color:#062a38}
     <div class="wrap">
       <div class="section-head"><div><h2>Free Tools</h2><p>Free tools from Ashvish Creative Studio — no sign-up, no payment.</p></div></div>
       <div class="buy-grid">
-        <article class="buy-card" style="border:2px solid #168bfa"><h3>🖼️ Image Compressor</h3><p>Shrink images without losing quality — free, right in your browser.</p><button class="btn primary rb4" type="button" data-notice="Image Compressor|The link to this free tool will be added here when it is published.">Coming Soon</button></article>
-        <article class="buy-card" style="border:2px solid #a04af4"><h3>▶️ YouTube to MP3</h3><p>Download YouTube videos and convert them to MP3 — free.</p><button class="btn primary rb5" type="button" data-notice="YouTube Downloader + MP3|The link to this free tool will be added here when it is published.">Coming Soon</button></article>
-        <article class="buy-card" style="border:2px solid #ff4f7d"><h3>📄 PDF Converter</h3><p>Convert files to PDF and back — free, up to 100 pages.</p><button class="btn primary rb1" type="button" data-notice="PDF Converter|The link to this free tool will be added here when it is published.">Coming Soon</button></article>
-        <article class="buy-card" style="border:2px solid #ffad32"><h3>📖 KDP Book Maker</h3><p>Check your book’s bleed and margins before uploading to KDP — free.</p><button class="btn primary rb2" type="button" data-notice="KDP Book Maker|The link to this free tool will be added here when it is published.">Coming Soon</button></article>
-        <article class="buy-card" style="border:2px solid #ff4f7d"><h3>🛂 Passport Photo Maker</h3><p>Passport-size photos at home — 8 sizes, background change, 300 DPI print sheets.</p><a class="btn primary rb1" href="passport-photo-maker.html" target="_blank" rel="noopener noreferrer">Open Free Tool ↗</a></article>
-        <article class="buy-card" style="border:2px solid #20bf86"><h3>🖼️ Photo Resize in KB</h3><p>Shrink any photo to an exact KB size — exam photos, signatures, UPSC ready.</p><a class="btn primary rb3" href="photo-resize-in-kb.html" target="_blank" rel="noopener noreferrer">Open Free Tool ↗</a></article>
-        <article class="buy-card" style="border:2px solid #168bfa"><h3>📄 JPG to PDF Compressor</h3><p>Turn photos into PDF and shrink big PDFs — free, right in your browser.</p><a class="btn primary rb4" href="jpg-to-pdf-compressor.html" target="_blank" rel="noopener noreferrer">Open Free Tool ↗</a></article>
-        <article class="buy-card" style="border:2px solid #a04af4"><h3>🔳 QR Code Generator</h3><p>QR codes for links, UPI payment, WhatsApp and Wi-Fi — free, with print labels.</p><a class="btn primary rb5" href="qr-code-generator.html" target="_blank" rel="noopener noreferrer">Open Free Tool ↗</a></article>
-        <article class="buy-card" style="border:2px solid #ffad32"><h3>💌 Invitation Card Maker</h3><p>Wedding, birthday and festival cards — edit text, add photo, download PNG.</p><a class="btn primary rb2" href="invitation-card-poster-maker.html" target="_blank" rel="noopener noreferrer">Open Free Tool ↗</a></article>
-        <article class="buy-card" style="border:2px solid #ff4f7d"><h3>📅 Calendar Maker</h3><p>Shop photo calendars — full year on one page or 12 pages, Hindi/English, A4 PDF.</p><a class="btn primary rb1" href="calendar-maker.html" target="_blank" rel="noopener noreferrer">Open Free Tool ↗</a></article>
-        <article class="buy-card" style="border:2px solid #20bf86"><h3>☀️ Sun, Moon &amp; Rising Sign Calculator</h3><p>Your Big Three — Sun, Moon and Rising signs from your birth date, time and place. Western and Vedic, free, right in your browser.</p><a class="btn primary rb3" href="sun-moon-rising-sign-calculator.html" target="_blank" rel="noopener noreferrer">Open Free Tool ↗</a></article>
+        <a class="buy-card poster-card" style="border:2px solid #ff4f7d" href="passport-photo-maker.html" target="_blank" rel="noopener noreferrer"><img class="poster-img" src="posters/passport-photo-poster.webp" alt="Passport Photo Maker"><h3>🛂 Passport Photo Maker</h3></a>
+        <a class="buy-card poster-card" style="border:2px solid #20bf86" href="photo-resize-in-kb.html" target="_blank" rel="noopener noreferrer"><img class="poster-img" src="posters/photo-resize-poster.webp" alt="Photo Resize in KB"><h3>🖼️ Photo Resize in KB</h3></a>
+        <a class="buy-card poster-card" style="border:2px solid #168bfa" href="jpg-to-pdf-compressor.html" target="_blank" rel="noopener noreferrer"><img class="poster-img" src="posters/jpg-to-pdf-poster.webp" alt="JPG to PDF Compressor"><h3>📄 JPG to PDF Compressor</h3></a>
+        <a class="buy-card poster-card" style="border:2px solid #a04af4" href="qr-code-generator.html" target="_blank" rel="noopener noreferrer"><img class="poster-img" src="posters/qr-code-poster.webp" alt="QR Code Generator"><h3>🔳 QR Code Generator</h3></a>
+        <a class="buy-card poster-card" style="border:2px solid #ffad32" href="invitation-card-poster-maker.html" target="_blank" rel="noopener noreferrer"><img class="poster-img" src="posters/invitation-card-poster.webp" alt="Invitation Card Maker"><h3>💌 Invitation Card Maker</h3></a>
+        <a class="buy-card poster-card" style="border:2px solid #ff4f7d" href="calendar-maker.html" target="_blank" rel="noopener noreferrer"><img class="poster-img" src="posters/calendar-maker-poster.webp" alt="Calendar Maker"><h3>📅 Calendar Maker</h3></a>
+        <a class="buy-card poster-card" style="border:2px solid #20bf86" href="sun-moon-rising-sign-calculator.html" target="_blank" rel="noopener noreferrer"><img class="poster-img" src="posters/sun-moon-poster.webp" alt="Sun, Moon &amp; Rising Sign Calculator"><h3>☀️ Sun, Moon &amp; Rising Sign Calculator</h3></a>
+        <article class="buy-card poster-card" style="border:2px solid #168bfa"><img class="poster-img" src="posters/image-compressor-poster.webp" alt="Image Compressor"><h3>🖼️ Image Compressor</h3><button class="btn primary rb4" type="button" data-notice="Image Compressor|The link to this free tool will be added here when it is published.">Coming Soon</button></article>
+        <article class="buy-card poster-card" style="border:2px solid #a04af4"><img class="poster-img" src="posters/youtube-to-mp3-poster.webp" alt="YouTube to MP3"><h3>▶️ YouTube to MP3</h3><button class="btn primary rb5" type="button" data-notice="YouTube Downloader + MP3|The link to this free tool will be added here when it is published.">Coming Soon</button></article>
+        <article class="buy-card poster-card" style="border:2px solid #ff4f7d"><img class="poster-img" src="posters/pdf-converter-poster.webp" alt="PDF Converter"><h3>📄 PDF Converter</h3><button class="btn primary rb1" type="button" data-notice="PDF Converter|The link to this free tool will be added here when it is published.">Coming Soon</button></article>
+        <article class="buy-card poster-card" style="border:2px solid #ffad32"><img class="poster-img" src="posters/kdp-book-poster.webp" alt="KDP Book Maker"><h3>📖 KDP Book Maker</h3><button class="btn primary rb2" type="button" data-notice="KDP Book Maker|The link to this free tool will be added here when it is published.">Coming Soon</button></article>
       </div>
       <div class="next-step" style="display:none">
         <div><span class="ns-tag">NEXT STEP</span><h2>Next: The Divya Drishti Page</h2><p>First look at this Firefly Brothers page — after that, Divya Drishti, then E-Books and JanmaPatri, each its own page in this same pattern, all joined in this one website.</p></div>
@@ -895,16 +946,18 @@ html[data-theme="night"] .btn.primary{color:#062a38}
     <div class="wrap">
       <div class="section-head"><div><h2>Play Zone</h2><p>Free games from Ashvish Creative Studio — play right in your browser, no sign-up, no download.</p></div></div>
       <div class="buy-grid">
-        <article class="buy-card" style="border:2px solid #ff4f7d"><h3>🕹️ Pinball</h3><p>Neon arcade pinball — flip, bounce and chase the high score.</p><a class="btn primary rb1" href="pinball-game-sample.html" target="_blank" rel="noopener noreferrer">Play Now ↗</a></article>
-        <article class="buy-card" style="border:2px solid #20bf86"><h3>👾 Maze Chase</h3><p>Pac-Man-style maze chase — eat all 162 dots, dodge 4 ghosts, grab the power pellets.</p><a class="btn primary rb3" href="maze-chase-sample.html" target="_blank" rel="noopener noreferrer">Play Now ↗</a></article>
-        <article class="buy-card" style="border:2px solid #168bfa"><h3>🚗 Traffic Dodge</h3><p>Desert highway dodging — 3 lanes, 3 lives, near-miss bonus points.</p><a class="btn primary rb4" href="traffic-dodge-sample.html" target="_blank" rel="noopener noreferrer">Play Now ↗</a></article>
-        <article class="buy-card" style="border:2px solid #a04af4"><h3>🏍️ Bike Rush</h3><p>Red superbike rush — weave through traffic, near miss +50, speed keeps rising.</p><a class="btn primary rb5" href="bike-rush-sample.html" target="_blank" rel="noopener noreferrer">Play Now ↗</a></article>
-        <article class="buy-card" style="border:2px solid #ffad32"><h3>🧱 Tetris</h3><p>Classic block stacking — all 7 pieces, ghost piece, Next and Hold boxes, level up every 10 lines.</p><a class="btn primary rb2" href="tetris.html" target="_blank" rel="noopener noreferrer">Play Now ↗</a></article>
-        <article class="buy-card" style="border:2px solid #ff4f7d"><h3>🐶 Match the Shadow</h3><p>Match each animal to its shadow — a quick, fun game for little ones.</p><a class="btn primary rb1" href="match-the-shadow.html" target="_blank" rel="noopener noreferrer">Play Now ↗</a></article>
-        <article class="buy-card" style="border:2px solid #20bf86"><h3>🗣️ Word Pronounce with Voice</h3><p>Learn 21 animal names — tap a card and hear the word spoken aloud.</p><a class="btn primary rb3" href="word-pronounce-with-voice.html" target="_blank" rel="noopener noreferrer">Play Now ↗</a></article>
-        <article class="buy-card" style="border:2px solid #168bfa"><h3>🍉 Fruit Slice Frenzy</h3><p>Swipe to slice juicy fruit, dodge the bombs and build combos — daily challenge included.</p><a class="btn primary rb4" href="fruit-slice-frenzy.html" target="_blank" rel="noopener noreferrer">Play Now ↗</a></article>
-        <article class="buy-card" style="border:2px solid #a04af4"><h3>🎲 Ludo Classic</h3><p>The classic board game — play Ludo right in your browser.</p><a class="btn primary rb5" href="ludo-classic.html" target="_blank" rel="noopener noreferrer">Play Now ↗</a></article>
-        <article class="buy-card" style="border:2px solid #ffad32"><h3>🏔️ Hill Climb Racer</h3><p>Drive over steep hills, collect coins and fuel — the weather changes as you drive, from clear skies to rain and sandstorms.</p><a class="btn primary rb2" href="hill-climb-racer.html" target="_blank" rel="noopener noreferrer">Play Now ↗</a></article>
+        <a class="buy-card poster-card" style="border:2px solid #FF9AA2" href="pinball-game-sample.html" target="_blank" rel="noopener noreferrer"><img class="poster-img" src="posters/pinball-poster.webp" alt="Pinball"><h3>🕹️ Pinball</h3></a>
+        <a class="buy-card poster-card" style="border:2px solid #B5EAD7" href="maze-chase-sample.html" target="_blank" rel="noopener noreferrer"><img class="poster-img" src="posters/maze-chase-poster.webp" alt="Maze Chase"><h3>👾 Maze Chase</h3></a>
+        <a class="buy-card poster-card" style="border:2px solid #C7CEFF" href="traffic-dodge-sample.html" target="_blank" rel="noopener noreferrer"><img class="poster-img" src="posters/traffic-dodge-poster.webp" alt="Traffic Dodge"><h3>🚗 Traffic Dodge</h3></a>
+        <a class="buy-card poster-card" style="border:2px solid #F7F3C7" href="bike-rush-sample.html" target="_blank" rel="noopener noreferrer"><img class="poster-img" src="posters/bike-rush-poster.webp" alt="Bike Rush"><h3>🏍️ Bike Rush</h3></a>
+        <a class="buy-card poster-card" style="border:2px solid #FFDAC1" href="tetris.html" target="_blank" rel="noopener noreferrer"><img class="poster-img" src="posters/tetris-poster.webp" alt="Tetris"><h3>🧱 Tetris</h3></a>
+        <a class="buy-card poster-card" style="border:2px solid #FF9AA2" href="match-the-shadow.html" target="_blank" rel="noopener noreferrer"><img class="poster-img" src="posters/match-the-shadow-poster.webp" alt="Match the Shadow"><h3>🐶 Match the Shadow</h3></a>
+        <a class="buy-card poster-card" style="border:2px solid #B5EAD7" href="word-pronounce-with-voice.html" target="_blank" rel="noopener noreferrer"><img class="poster-img" src="posters/word-pronounce-poster.webp" alt="Word Pronounce with Voice"><h3>🗣️ Word Pronounce with Voice</h3></a>
+        <a class="buy-card poster-card" style="border:2px solid #C7CEFF" href="fruit-slice-frenzy.html" target="_blank" rel="noopener noreferrer"><img class="poster-img" src="posters/fruit-slice-poster.webp" alt="Fruit Slice Frenzy"><h3>🍉 Fruit Slice Frenzy</h3></a>
+        <a class="buy-card poster-card" style="border:2px solid #F7F3C7" href="ludo-classic.html" target="_blank" rel="noopener noreferrer"><img class="poster-img" src="posters/ludo-classic-poster.webp" alt="Ludo Classic"><h3>🎲 Ludo Classic</h3></a>
+        <a class="buy-card poster-card" style="border:2px solid #FFDAC1" href="hill-climb-racer.html" target="_blank" rel="noopener noreferrer"><img class="poster-img" src="posters/hill-climb-poster.webp" alt="Hill Climb Racer"><h3>🏔️ Hill Climb Racer</h3></a>
+        <a class="buy-card poster-card" style="border:2px solid #FF9AA2" href="bubble-shooter.html" target="_blank" rel="noopener noreferrer"><img class="poster-img" src="posters/bubble-shooter-poster.webp" alt="Bubble Shooter"><h3>🫧 Bubble Shooter</h3></a>
+        <a class="buy-card poster-card" style="border:2px solid #B5EAD7" href="animal-memory-match.html" target="_blank" rel="noopener noreferrer"><img class="poster-img" src="posters/memory-match-poster.webp" alt="Animal Memory Match"><h3>🃏 Animal Memory Match</h3></a>
       </div>
     </div>
   </section>
