@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>About Us — Ashvish Creative Studio</title>
-<meta name="description" content="About Ashvish Creative Studio — an independent creative studio making joyful picture storybooks, colouring books, free online tools, games and audio stories for children and families.">
+<meta name="description" content="About Ashvish Creative Studio — an independent creative studio making Firefly Brothers colouring books, 12 free Play Zone games, 10 free online tools, audio stories and custom portraits for children and families.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
@@ -39,7 +39,7 @@
   }
   header .back-link:hover { text-decoration: underline; }
   main {
-    max-width: 900px;
+    max-width: 960px;
     margin: 0 auto;
     padding: 32px 20px 48px;
   }
@@ -58,17 +58,152 @@
     color: #8E2F24;
     font-size: 32px;
     line-height: 1.25;
-    margin: 36px 0 10px;
+    margin: 40px 0 10px;
+  }
+  h3 {
+    color: #8E2F24;
+    font-size: 19px;
+    margin: 0 0 4px;
   }
   p { margin: 0 0 16px; }
   ul { margin: 0 0 16px; padding-left: 24px; }
   li { margin-bottom: 8px; }
   li strong { color: #8E2F24; }
+  a { color: #B03A2E; }
   .intro {
     font-size: 18px;
-    text-align: center;
     max-width: 720px;
     margin: 0 auto 8px;
+    text-align: center;
+  }
+  /* Hero: intro + characters */
+  .hero {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+    margin: 8px 0 8px;
+  }
+  .hero-text { flex: 1 1 55%; }
+  .hero-text p { margin-bottom: 14px; }
+  .hero-img {
+    flex: 0 0 300px;
+    text-align: center;
+  }
+  .hero-img img {
+    width: 100%;
+    max-height: 480px;
+    object-fit: contain;
+    border-radius: 12px;
+    border: 2px solid #B03A2E;
+    background: #ffffff;
+    display: block;
+  }
+  .caption {
+    font-size: 14px;
+    color: #6b625c;
+    text-align: center;
+    margin-top: 8px;
+  }
+  /* Stats strip */
+  .stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 28px 0 8px;
+    justify-content: center;
+  }
+  .stat {
+    background: #ffffff;
+    border: 2px solid #B03A2E;
+    border-radius: 12px;
+    padding: 14px 18px;
+    text-align: center;
+    min-width: 150px;
+    flex: 1 1 150px;
+  }
+  .stat b {
+    display: block;
+    font-size: 30px;
+    line-height: 1.1;
+    color: #B03A2E;
+  }
+  .stat span { font-size: 14px; color: #6b625c; }
+  /* Image grids */
+  .grid {
+    display: grid;
+    gap: 16px;
+    margin: 18px 0 8px;
+  }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .card {
+    background: #ffffff;
+    border: 1px solid #e8d9c8;
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+  }
+  .card .frame {
+    background: #ffffff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .card .frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+  .frame-tall { height: 280px; }
+  .frame-wide { aspect-ratio: 16 / 9; }
+  .card h3 { margin-top: 10px; }
+  .card p { font-size: 14px; color: #6b625c; margin: 0; line-height: 1.5; }
+  .price-note {
+    text-align: center;
+    font-size: 15px;
+    color: #6b625c;
+    margin: 4px 0 8px;
+  }
+  /* Audio story row */
+  .story-row {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    margin: 18px 0 8px;
+  }
+  .story-row img {
+    flex: 0 0 200px;
+    width: 200px;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 12px;
+    border: 2px solid #B03A2E;
+    background: #ffffff;
+    display: block;
+  }
+  .story-row .story-text { flex: 1 1 auto; }
+  /* Portraits callout */
+  .portrait-box {
+    background: #ffffff;
+    border: 2px solid #B03A2E;
+    border-radius: 12px;
+    padding: 22px 26px;
+    margin: 18px 0 8px;
+  }
+  .portrait-box h3 {
+    font-family: 'Dancing Script', cursive;
+    font-weight: 700;
+    color: #8E2F24;
+    font-size: 28px;
+    margin: 0 0 8px;
+  }
+  .portrait-box p:last-child { margin-bottom: 0; }
+  .portrait-box .price {
+    font-size: 20px;
+    font-weight: 700;
+    color: #B03A2E;
   }
   .mission {
     background: #ffffff;
@@ -90,13 +225,23 @@
   }
   footer a { color: #ffffff; text-decoration: none; }
   footer a:hover { text-decoration: underline; }
+  footer .foot-links { margin: 6px 0; }
+  footer .foot-links a { margin: 0 10px; }
+  @media (max-width: 760px) {
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .hero { flex-direction: column; }
+    .hero-img { flex: 0 0 auto; width: 260px; }
+    .story-row { flex-direction: column; align-items: center; }
+    .story-row img { flex: 0 0 auto; }
+  }
   @media (max-width: 600px) {
     body { font-size: 16px; }
     header .site-name { font-size: 34px; }
     h1 { font-size: 34px; }
     h2 { font-size: 28px; }
     main { padding: 24px 16px 40px; }
-    .mission { padding: 20px; }
+    .mission, .portrait-box { padding: 20px; }
+    .frame-tall { height: 230px; }
   }
 </style>
 </head>
@@ -112,25 +257,129 @@
 
   <p class="intro">Ashvish Creative Studio is an independent creative studio making joyful things for children and families — picture storybooks, colouring books, free online tools and games, and audio stories.</p>
 
+  <div class="hero">
+    <div class="hero-text">
+      <p>Our best-known characters are <strong>Vishu and Wally, the Firefly Brothers</strong> — two brothers whose adventures are full of fun, friendship and happy endings. Vishu is the elder brother with spiky black hair and a gold earring; Wally is the younger brother in his brown hoodie, with his big headphones always on. Riding along on Wally's headphone is <strong>Sparkle</strong>, a tiny glowing firefly who spots the smallest clues.</p>
+      <p>Every Firefly Brothers story is made for fun only — no sad ends, and the culprit always becomes a friend. Our colouring pages are full, rich scenes in pure black-on-white line art, drawn fully inside the frame, so children can colour a whole little world on every page.</p>
+    </div>
+    <div class="hero-img">
+      <img src="about-images/characters-vishu-wally.webp" alt="Vishu and Wally, the Firefly Brothers, with Sparkle the firefly">
+      <p class="caption">Meet Vishu &amp; Wally — with Sparkle the firefly</p>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b>4</b><span>Colouring Books</span></div>
+    <div class="stat"><b>12</b><span>Free Games</span></div>
+    <div class="stat"><b>10</b><span>Free Tools</span></div>
+    <div class="stat"><b>31</b><span>Portrait Styles</span></div>
+    <div class="stat"><b>EN + HI</b><span>Audio Stories</span></div>
+  </div>
+
   <h2>Our Story</h2>
   <p>Ashvish Creative Studio began with a simple idea: children learn best when they are laughing, imagining and making things with their own hands. From that idea grew a small studio that creates picture storybooks, colouring books, free online tools, playful games and audio stories — all made with care, colour and a love of good stories. Every book, game and tool we make is designed to bring a little more joy, curiosity and creativity into a child's day, whether they are reading with a parent, colouring with a friend, or playing and learning on their own.</p>
 
   <h2>What We Make</h2>
-  <ul>
-    <li><strong>Firefly Brothers kids' storybooks and colouring books</strong> — cheerful adventures for young readers, including detective adventures, Christmas friends, dinosaurs and spooky fun.</li>
-    <li><strong>Free Tools</strong> — handy everyday tools that anyone can use for free, including a passport photo maker, a photo resizer, a QR code generator, an invitation card maker, a calendar maker and image tools.</li>
-    <li><strong>Play Zone</strong> — free games for kids, including pinball, maze chase, tetris, memory match and more. There is no sign-up and nothing to download — just open a game and play.</li>
-    <li><strong>Audio Stories</strong> — classic tales retold for children in English and Hindi, perfect for listening together at home, in the car, or at bedtime.</li>
-  </ul>
+
+  <h3>Firefly Brothers Colouring Books</h3>
+  <p>Big scenes to colour, with a colour guide inside every book. Our four colouring books are available as paperbacks on Amazon.</p>
+  <div class="grid grid-4">
+    <div class="card">
+      <div class="frame frame-tall"><img src="about-images/book-dino-friends.jpg" alt="Dino Friends colouring book cover"></div>
+      <h3>Dino Friends</h3>
+      <p>Look &amp; Colour! 40 big dinosaur scenes to colour.</p>
+    </div>
+    <div class="card">
+      <div class="frame frame-tall"><img src="about-images/book-spooky-friends.jpg" alt="Spooky Friends colouring book cover"></div>
+      <h3>Spooky Friends</h3>
+      <p>Friendly spooky fun — big scenes to colour.</p>
+    </div>
+    <div class="card">
+      <div class="frame frame-tall"><img src="about-images/book-christmas-friends.jpg" alt="Christmas Friends colouring book cover"></div>
+      <h3>Christmas Friends</h3>
+      <p>30 big festive scenes — Jolly, Ruby, Pip and Noel.</p>
+    </div>
+    <div class="card">
+      <div class="frame frame-tall"><img src="about-images/book-bonfire-night.jpg" alt="Bonfire Night colouring book cover"></div>
+      <h3>Bonfire Night</h3>
+      <p>Fireworks, bonfires, family and fairground fun.</p>
+    </div>
+  </div>
+  <p class="price-note">Paperbacks — $12.99 each on Amazon.</p>
+
+  <h3>Play Zone — 12 Free Games</h3>
+  <p>Free games for kids, right on our website. There is no sign-up and nothing to download — just open a game and play. Our games are Pinball, Maze Chase, Traffic Dodge, Bike Rush, Tetris, Match the Shadow, Word Pronounce with Voice, Fruit Slice Frenzy, Ludo Classic, Hill Climb Racer, Bubble Shooter and Animal Memory Match.</p>
+  <div class="grid grid-4">
+    <div class="card">
+      <div class="frame frame-wide"><img src="about-images/game-pinball.webp" alt="Pinball game"></div>
+      <h3>Pinball</h3>
+      <p>Classic arcade fun.</p>
+    </div>
+    <div class="card">
+      <div class="frame frame-wide"><img src="about-images/game-maze-chase.webp" alt="Maze Chase game"></div>
+      <h3>Maze Chase</h3>
+      <p>Race through the maze.</p>
+    </div>
+    <div class="card">
+      <div class="frame frame-wide"><img src="about-images/game-ludo-classic.webp" alt="Ludo Classic game"></div>
+      <h3>Ludo Classic</h3>
+      <p>The family board game.</p>
+    </div>
+    <div class="card">
+      <div class="frame frame-wide"><img src="about-images/game-bubble-shooter.webp" alt="Bubble Shooter game"></div>
+      <h3>Bubble Shooter</h3>
+      <p>Pop the bubbles.</p>
+    </div>
+  </div>
+
+  <h3>Free Online Tools</h3>
+  <p>Handy everyday tools that anyone can use for free: Passport Photo Maker, Photo Resize in KB, JPG to PDF Compressor, QR Code Generator, Invitation Card Maker, Calendar Maker, Sun Moon &amp; Rising Calculator, Image Compressor, PDF Converter and KDP Book Maker. Everything runs in the browser — no sign-up, no download.</p>
+  <div class="grid grid-4">
+    <div class="card">
+      <div class="frame frame-wide"><img src="about-images/tool-passport-photo.webp" alt="Passport Photo Maker tool"></div>
+      <h3>Passport Photo Maker</h3>
+      <p>Passport-size photos in seconds.</p>
+    </div>
+    <div class="card">
+      <div class="frame frame-wide"><img src="about-images/tool-qr-code.webp" alt="QR Code Generator tool"></div>
+      <h3>QR Code Generator</h3>
+      <p>Free QR codes, instantly.</p>
+    </div>
+    <div class="card">
+      <div class="frame frame-wide"><img src="about-images/tool-invitation-card.webp" alt="Invitation Card Maker tool"></div>
+      <h3>Invitation Card Maker</h3>
+      <p>Beautiful cards for any occasion.</p>
+    </div>
+    <div class="card">
+      <div class="frame frame-wide"><img src="about-images/tool-sun-moon.webp" alt="Sun Moon and Rising Calculator tool"></div>
+      <h3>Sun Moon &amp; Rising Calculator</h3>
+      <p>Find your sun, moon and rising signs.</p>
+    </div>
+  </div>
+
+  <h3>Audio Stories</h3>
+  <div class="story-row">
+    <img src="about-images/story-monkey-crocodile.webp" alt="The Monkey and the Crocodile audio story cover">
+    <div class="story-text">
+      <p>Classic tales retold for children in English and Hindi, perfect for listening together at home, in the car, or at bedtime. Our first story is <strong>The Monkey and the Crocodile</strong>, a Panchatantra favourite — the clever monkey in his jamun tree and the friendly crocodile in the river below.</p>
+      <p>New stories are added regularly, so there is always another tale waiting to be heard.</p>
+    </div>
+  </div>
+
+  <div class="portrait-box">
+    <h3>Custom Portraits — Your Photo, Reimagined as Art</h3>
+    <p>We turn your photo into a beautiful custom portrait — <span class="price">$20 flat, in 31 styles</span>. Pick your favourite style, send us your photo, and receive a high-resolution PNG and PDF within 24–48 hours.</p>
+    <p>Order by sending us a direct message on Instagram: <a href="https://www.instagram.com/ashvishcreativestudio">@ashvishcreativestudio</a>.</p>
+  </div>
 
   <h2>For Parents &amp; Teachers</h2>
   <p>Everything we make is designed to be safe, simple and fun. Our free tools and games need no sign-up, so children can play and create without accounts or fuss. Our books and stories are made to be enjoyed together — read aloud at home, shared in a classroom, or coloured in on a quiet afternoon. We keep things friendly, wholesome and easy to use, so parents and teachers can feel confident sharing them with the children in their care.</p>
 
   <h2>Our Founder</h2>
-  <p>Ashvish Creative Studio was founded by Vishal Kashyap, a children's book author and creator who believes that stories and drawing help children learn, imagine and grow. His work brings together playful characters, gentle humour and bright, welcoming art — the same spirit you will find in every book, game and story on this website.</p>
+  <p>Ashvish Creative Studio was founded by <strong>Vishal Kashyap</strong>, a children's book author and creator who believes that stories and drawing help children learn, imagine and grow. His work brings together playful characters, gentle humour and bright, welcoming art — the same spirit you will find in every book, game and story on this website.</p>
 
   <h2>Contact Us</h2>
-  <p>We love hearing from readers, parents and teachers. If you have a question, a suggestion, or simply want to say hello, please reach us through our website at <a href="https://ashvishcreativestudio.com">ashvishcreativestudio.com</a>.</p>
+  <p>We love hearing from readers, parents and teachers. If you have a question, a suggestion, or simply want to say hello, please write to us at <a href="mailto:vishal.kashyap11@gmail.com">vishal.kashyap11@gmail.com</a>, message us on Instagram at <a href="https://www.instagram.com/ashvishcreativestudio">@ashvishcreativestudio</a>, or visit our website at <a href="https://ashvishcreativestudio.com">ashvishcreativestudio.com</a>.</p>
 
   <div class="mission">
     <h2>Our Mission</h2>
@@ -140,7 +389,7 @@
 
 <footer>
   <p>&copy; 2026 Ashvish Creative Studio</p>
-  <p><a href="https://ashvishcreativestudio.com">Visit our Home Page</a></p>
+  <p class="foot-links"><a href="https://ashvishcreativestudio.com">Home</a> <a href="privacy-policy.html">Privacy Policy</a> <a href="contact-us.html">Contact Us</a> <a href="custom-portraits.html">Custom Portraits</a></p>
 </footer>
 
 </body>

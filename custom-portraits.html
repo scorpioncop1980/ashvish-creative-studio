@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Custom Portraits — $20 Flat | Ashvish Creative Studio</title>
-<meta name="description" content="Custom Portraits from Ashvish Creative Studio — $20 flat for your portrait in 15 styles at once. High-resolution PNG + PDF files, delivered within 24–48 hours. Order by Instagram DM.">
+<meta name="description" content="Custom Portraits from Ashvish Creative Studio — $20 flat for your portrait in 31 styles at once. High-resolution PNG + PDF files, delivered within 24–48 hours. Order by Instagram DM.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
@@ -180,6 +180,37 @@
   }
   footer.site-footer a { color: #fff; font-weight: 600; }
 
+
+  /* Hero sample */
+  .hero .sample { margin: 6px auto 20px; max-width: 520px; }
+  .hero .sample img { width: 100%; height: auto; display: block; border-radius: 16px; border: 2px solid #f0d9c8; }
+  .hero .sample figcaption { font-size: 16px; color: #5a4636; margin-top: 12px; }
+  .hero .sample figcaption strong { color: #8E2F24; }
+
+  /* Styles grid */
+  .styles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+  }
+  .style-card {
+    background: #fff;
+    border: 1px solid #f0d9c8;
+    border-radius: 14px;
+    padding: 10px 10px 12px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+  }
+  .style-card img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    background: #fff;
+    border-radius: 10px;
+    display: block;
+  }
+  .style-card p { text-align: center; font-weight: 700; color: #8E2F24; font-size: 16px; margin: 10px 0 0; }
+  .styles-note { text-align: center; color: #5a4636; margin-bottom: 20px; }
+
   @media (max-width: 600px) {
     header.site-header h1 { font-size: 32px; }
     .hero h2 { font-size: 36px; }
@@ -204,12 +235,16 @@
 
     <section class="hero">
       <h2>Custom Portraits</h2>
-      <p class="tagline">Your photo, turned into a beautiful custom portrait &mdash; in fifteen different styles, all in one order. Our signature look is Chibi style: big-head, tiny-body characters full of charm &mdash; like our sample portrait of a couple with their two orange cats.</p>
+      <p class="tagline">Your photo, turned into a beautiful custom portrait &mdash; in thirty-one different styles, all in one order. Our signature look is Chibi style: big-head, tiny-body characters full of charm &mdash; like our sample portrait of a couple with their two orange cats.</p>
+      <figure class="sample">
+        <img src="portrait-styles/chibi.jpg" alt="Chibi portrait sample &mdash; a couple with their two orange cats">
+        <figcaption><strong>Our sample &mdash; Chibi style:</strong> Super-cute chibi version of your family &mdash; big heads, tiny bodies, extra adorable. A favourite for couples &amp; pet parents.</figcaption>
+      </figure>
       <div class="price">$20</div>
-      <p class="price-note">Flat price &middot; 15 styles at once</p>
-      <p>One order, fifteen portraits. Send us your photo and your ideas, and we will create your portrait in 15 styles, delivered as high-resolution PNG and PDF files within 24&ndash;48 hours.</p>
-      <a class="cta" href="https://ashvishcreativestudio.com">Order Your Portrait &mdash; $20</a>
-      <p class="cta-sub">To order, DM us on Instagram (link on our homepage) or visit <a href="https://ashvishcreativestudio.com">ashvishcreativestudio.com</a>.</p>
+      <p class="price-note">Flat price &middot; 31 styles at once</p>
+      <p>One order, thirty-one portraits. Send us your photo and your ideas, and we will create your portrait in 31 styles, delivered as high-resolution PNG and PDF files within 24&ndash;48 hours.</p>
+      <a class="cta" href="https://www.instagram.com/ashvishcreativestudio">Order Your Portrait &mdash; $20</a>
+      <p class="cta-sub">To order, DM us on Instagram with your photo &mdash; <a href="https://www.instagram.com/ashvishcreativestudio">@ashvishcreativestudio</a>.</p>
     </section>
 
     <section>
@@ -217,8 +252,8 @@
       <div class="grid">
         <div class="card">
           <div class="icon">&#127912;</div>
-          <h3>15 Styles at Once</h3>
-          <p>Your portrait created in 15 different styles in a single order, so you can pick your favourites and share them everywhere.</p>
+          <h3>31 Styles at Once</h3>
+          <p>Your portrait created in 31 different styles in a single order, so you can pick your favourites and share them everywhere.</p>
         </div>
         <div class="card">
           <div class="icon">&#128444;</div>
@@ -233,12 +268,144 @@
       </div>
     </section>
 
+
+    <section>
+      <h2>All 31 Styles</h2>
+      <p class="styles-note">One order gives you your portrait in every style below &mdash; all 31, for the same $20 flat price. A second style of the same photo is $15.</p>
+      <div class="styles-grid">
+        <div class="style-card">
+          <img src="portrait-styles/portrait-oil-painting.jpg" alt="Oil Painting portrait sample" loading="lazy">
+          <p>Oil Painting</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/flat.jpg" alt="Flat Vector portrait sample" loading="lazy">
+          <p>Flat Vector</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/portrait-ghibli.jpg" alt="Studio Ghibli portrait sample" loading="lazy">
+          <p>Studio Ghibli</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/watercolor.jpg" alt="Watercolor portrait sample" loading="lazy">
+          <p>Watercolor</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/portrait-disney.jpg" alt="Disney Classic portrait sample" loading="lazy">
+          <p>Disney Classic</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/pixar.jpg" alt="Pixar-Style 3D portrait sample" loading="lazy">
+          <p>Pixar-Style 3D</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/portrait-simpsons.jpg" alt="Simpsons Style portrait sample" loading="lazy">
+          <p>Simpsons Style</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/anime.jpg" alt="Anime portrait sample" loading="lazy">
+          <p>Anime</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/portrait-renaissance.jpg" alt="Renaissance portrait sample" loading="lazy">
+          <p>Renaissance</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/caricature.jpg" alt="Caricature portrait sample" loading="lazy">
+          <p>Caricature</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/portrait-charcoal.jpg" alt="Charcoal Drawing portrait sample" loading="lazy">
+          <p>Charcoal Drawing</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/clay.jpg" alt="Clay 3D portrait sample" loading="lazy">
+          <p>Clay 3D</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/portrait-lego.jpg" alt="LEGO Portrait portrait sample" loading="lazy">
+          <p>LEGO Portrait</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/vintage.jpg" alt="Vintage Retro portrait sample" loading="lazy">
+          <p>Vintage Retro</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/portrait-vintage-1930s.jpg" alt="1930s Vintage Cartoon portrait sample" loading="lazy">
+          <p>1930s Vintage Cartoon</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/pencil.jpg" alt="Pencil Sketch portrait sample" loading="lazy">
+          <p>Pencil Sketch</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/portrait-calvin-hobbes.jpg" alt="Calvin & Hobbes Style portrait sample" loading="lazy">
+          <p>Calvin & Hobbes Style</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/popart.jpg" alt="Pop Art portrait sample" loading="lazy">
+          <p>Pop Art</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/portrait-comic-book.jpg" alt="Comic Book portrait sample" loading="lazy">
+          <p>Comic Book</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/gothic.jpg" alt="Gothic portrait sample" loading="lazy">
+          <p>Gothic</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/portrait-cyberpunk.jpg" alt="Cyberpunk portrait sample" loading="lazy">
+          <p>Cyberpunk</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/superhero.jpg" alt="Superhero portrait sample" loading="lazy">
+          <p>Superhero</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/portrait-fantasy-storybook.jpg" alt="Fantasy Storybook portrait sample" loading="lazy">
+          <p>Fantasy Storybook</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/doodle.jpg" alt="Doodle portrait sample" loading="lazy">
+          <p>Doodle</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/portrait-big-eye.jpg" alt="Big-Eye Cartoon portrait sample" loading="lazy">
+          <p>Big-Eye Cartoon</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/folk.jpg" alt="Folk Art portrait sample" loading="lazy">
+          <p>Folk Art</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/portrait-pixel-art.jpg" alt="Pixel Art portrait sample" loading="lazy">
+          <p>Pixel Art</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/retro90.jpg" alt="90s Retro portrait sample" loading="lazy">
+          <p>90s Retro</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/portrait-pastel.jpg" alt="Pastel Drawing portrait sample" loading="lazy">
+          <p>Pastel Drawing</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/chibi.jpg" alt="Chibi portrait sample" loading="lazy">
+          <p>Chibi</p>
+        </div>
+        <div class="style-card">
+          <img src="portrait-styles/portrait-badly-drawn.jpg" alt="Badly Drawn portrait sample" loading="lazy">
+          <p>Badly Drawn</p>
+        </div>
+      </div>
+    </section>
+
     <section>
       <h2>How It Works</h2>
       <ol class="steps">
         <li>
           <strong>DM us on Instagram with your photo</strong>
-          <p>Send us a message on Instagram DM with the photo you would like turned into a portrait. The link to our Instagram is on our homepage.</p>
+          <p>Send us a message on Instagram DM with the photo you would like turned into a portrait. Our Instagram is <a href="https://www.instagram.com/ashvishcreativestudio">@ashvishcreativestudio</a> &mdash; just tap Message and send your photo.</p>
         </li>
         <li>
           <strong>Tell us your style ideas</strong>
@@ -246,11 +413,11 @@
         </li>
         <li>
           <strong>Pay $20 via PayPal</strong>
-          <p>Pay the flat $20 price securely via PayPal. That is the full price for all 15 styles &mdash; no extra charges.</p>
+          <p>Pay the flat $20 price securely via PayPal. That is the full price for all 31 styles &mdash; no extra charges.</p>
         </li>
         <li>
           <strong>Receive your portraits in 24&ndash;48 hours</strong>
-          <p>We create your portrait in 15 styles and deliver your high-resolution PNG and PDF files within 24&ndash;48 hours.</p>
+          <p>We create your portrait in 31 styles and deliver your high-resolution PNG and PDF files within 24&ndash;48 hours.</p>
         </li>
       </ol>
     </section>
@@ -283,6 +450,10 @@
         <p>You pay the flat $20 via PayPal. We will share the payment details with you when you message us on Instagram DM.</p>
       </div>
       <div class="faq-item">
+        <h3>Can I get one more style of the same photo?</h3>
+        <p>Yes &mdash; a second style of the same photo is $15. Just tell us which style you would like when you message us.</p>
+      </div>
+      <div class="faq-item">
         <h3>When do I get my portraits?</h3>
         <p>You will receive your portraits within 24&ndash;48 hours of your order, as high-resolution PNG and PDF files.</p>
       </div>
@@ -290,8 +461,8 @@
 
     <section class="order-box">
       <h2>Ready for Your Portrait?</h2>
-      <p>One photo, fifteen styles, $20 flat. DM us on Instagram (link on our homepage) with your photo and your ideas, pay via PayPal, and your portraits will be with you in 24&ndash;48 hours.</p>
-      <p><a href="https://ashvishcreativestudio.com">Visit ashvishcreativestudio.com</a></p>
+      <p>One photo, thirty-one styles, $20 flat. DM us on Instagram <a href="https://www.instagram.com/ashvishcreativestudio">@ashvishcreativestudio</a> with your photo and your ideas, pay via PayPal, and your portraits will be with you in 24&ndash;48 hours.</p>
+      <p><a href="https://www.instagram.com/ashvishcreativestudio">DM us on Instagram &mdash; @ashvishcreativestudio</a></p>
     </section>
 
   </div>
