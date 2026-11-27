@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Custom Portraits — $20 Flat | Ashvish Creative Studio</title>
+<meta name="description" content="Custom Portraits from Ashvish Creative Studio — $20 flat for your portrait in 15 styles at once. High-resolution PNG + PDF files, delivered within 24–48 hours. Order by Instagram DM.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #FFF8F0;
+    color: #2b2118;
+    line-height: 1.65;
+    font-size: 17px;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+  header.site-header {
+    background: #B03A2E;
+    color: #fff;
+    padding: 22px 0 18px;
+    text-align: center;
+  }
+  header.site-header h1 {
+    font-family: 'Dancing Script', cursive;
+    font-weight: 700;
+    font-size: 42px;
+    line-height: 1.15;
+  }
+  header.site-header p { font-size: 15px; opacity: 0.95; margin-top: 4px; }
+  .back-link {
+    display: block;
+    background: #8E2F24;
+    color: #fff;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 10px 20px;
+  }
+  .back-link:hover { text-decoration: underline; }
+  .back-link .container { text-align: left; }
+  main { padding: 36px 0 48px; }
+  section { margin-bottom: 44px; }
+  h2 {
+    font-family: 'Dancing Script', cursive;
+    font-weight: 700;
+    color: #B03A2E;
+    font-size: 36px;
+    line-height: 1.2;
+    text-align: center;
+    margin-bottom: 18px;
+  }
+  h3 { color: #8E2F24; font-size: 20px; margin-bottom: 6px; }
+  p { margin-bottom: 14px; }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    background: #fff;
+    border: 2px solid #B03A2E;
+    border-radius: 18px;
+    padding: 36px 24px 32px;
+    box-shadow: 0 6px 24px rgba(176, 58, 46, 0.12);
+  }
+  .hero h2 { font-size: 46px; margin-bottom: 8px; }
+  .hero .tagline { font-size: 19px; color: #5a4636; max-width: 640px; margin: 0 auto 20px; }
+  .price {
+    font-size: 76px;
+    font-weight: 800;
+    color: #B03A2E;
+    line-height: 1;
+    margin: 10px 0 4px;
+  }
+  .price-note { font-size: 20px; font-weight: 700; color: #8E2F24; margin-bottom: 18px; }
+  .hero .cta {
+    display: inline-block;
+    background: #B03A2E;
+    color: #fff;
+    font-size: 19px;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 14px 32px;
+    border-radius: 999px;
+    margin-top: 8px;
+  }
+  .hero .cta:hover { background: #8E2F24; }
+  .hero .cta-sub { font-size: 15px; color: #5a4636; margin-top: 14px; margin-bottom: 0; }
+  .hero .cta-sub a { color: #B03A2E; font-weight: 600; }
+
+  /* Cards */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid #f0d9c8;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+  }
+  .card .icon { font-size: 34px; line-height: 1; margin-bottom: 10px; }
+  .card p { margin-bottom: 0; font-size: 16px; }
+
+  /* Steps */
+  .steps { counter-reset: step; list-style: none; }
+  .steps li {
+    counter-increment: step;
+    background: #fff;
+    border: 1px solid #f0d9c8;
+    border-left: 6px solid #B03A2E;
+    border-radius: 12px;
+    padding: 18px 20px 18px 66px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 16px;
+    top: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #B03A2E;
+    color: #fff;
+    font-weight: 800;
+    font-size: 19px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .steps li strong { color: #8E2F24; font-size: 18px; display: block; margin-bottom: 2px; }
+  .steps li p { margin-bottom: 0; font-size: 16px; }
+
+  /* Perfect For */
+  .chips { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+  .chip {
+    background: #B03A2E;
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 10px 22px;
+    border-radius: 999px;
+  }
+  .chip:nth-child(even) { background: #8E2F24; }
+
+  /* FAQ */
+  .faq-item {
+    background: #fff;
+    border: 1px solid #f0d9c8;
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin-bottom: 14px;
+  }
+  .faq-item h3 { margin-bottom: 4px; }
+  .faq-item p { margin-bottom: 0; font-size: 16px; }
+
+  .order-box {
+    text-align: center;
+    background: #B03A2E;
+    color: #fff;
+    border-radius: 18px;
+    padding: 32px 24px;
+  }
+  .order-box h2 { color: #fff; }
+  .order-box p { max-width: 600px; margin-left: auto; margin-right: auto; }
+  .order-box a { color: #fff; font-weight: 700; }
+
+  footer.site-footer {
+    background: #8E2F24;
+    color: #fff;
+    text-align: center;
+    padding: 24px 20px;
+    font-size: 15px;
+  }
+  footer.site-footer a { color: #fff; font-weight: 600; }
+
+  @media (max-width: 600px) {
+    header.site-header h1 { font-size: 32px; }
+    .hero h2 { font-size: 36px; }
+    .price { font-size: 60px; }
+    h2 { font-size: 30px; }
+    body { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <h1>Ashvish Creative Studio</h1>
+    <p>Handmade portraits, made just for you</p>
+  </div>
+</header>
+<a class="back-link" href="https://ashvishcreativestudio.com"><span class="container">&larr; Back to Home</span></a>
+
+<main>
+  <div class="container">
+
+    <section class="hero">
+      <h2>Custom Portraits</h2>
+      <p class="tagline">Your photo, turned into a beautiful custom portrait &mdash; in fifteen different styles, all in one order. Our signature look is Chibi style: big-head, tiny-body characters full of charm &mdash; like our sample portrait of a couple with their two orange cats.</p>
+      <div class="price">$20</div>
+      <p class="price-note">Flat price &middot; 15 styles at once</p>
+      <p>One order, fifteen portraits. Send us your photo and your ideas, and we will create your portrait in 15 styles, delivered as high-resolution PNG and PDF files within 24&ndash;48 hours.</p>
+      <a class="cta" href="https://ashvishcreativestudio.com">Order Your Portrait &mdash; $20</a>
+      <p class="cta-sub">To order, DM us on Instagram (link on our homepage) or visit <a href="https://ashvishcreativestudio.com">ashvishcreativestudio.com</a>.</p>
+    </section>
+
+    <section>
+      <h2>What You Get</h2>
+      <div class="grid">
+        <div class="card">
+          <div class="icon">&#127912;</div>
+          <h3>15 Styles at Once</h3>
+          <p>Your portrait created in 15 different styles in a single order, so you can pick your favourites and share them everywhere.</p>
+        </div>
+        <div class="card">
+          <div class="icon">&#128444;</div>
+          <h3>High-Resolution PNG + PDF</h3>
+          <p>Your portraits delivered as high-resolution PNG and PDF files &mdash; sharp for printing, framing, and sharing online.</p>
+        </div>
+        <div class="card">
+          <div class="icon">&#9200;</div>
+          <h3>Delivered in 24&ndash;48 Hours</h3>
+          <p>Your finished portraits arrive within 24&ndash;48 hours of your order, ready to print, gift, or post.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>How It Works</h2>
+      <ol class="steps">
+        <li>
+          <strong>DM us on Instagram with your photo</strong>
+          <p>Send us a message on Instagram DM with the photo you would like turned into a portrait. The link to our Instagram is on our homepage.</p>
+        </li>
+        <li>
+          <strong>Tell us your style ideas</strong>
+          <p>Share your ideas &mdash; the styles you like, the mood you want, colours, outfits, or anything special you would like included.</p>
+        </li>
+        <li>
+          <strong>Pay $20 via PayPal</strong>
+          <p>Pay the flat $20 price securely via PayPal. That is the full price for all 15 styles &mdash; no extra charges.</p>
+        </li>
+        <li>
+          <strong>Receive your portraits in 24&ndash;48 hours</strong>
+          <p>We create your portrait in 15 styles and deliver your high-resolution PNG and PDF files within 24&ndash;48 hours.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Perfect For</h2>
+      <div class="chips">
+        <span class="chip">Couples</span>
+        <span class="chip">Families</span>
+        <span class="chip">Gifts</span>
+        <span class="chip">Birthdays</span>
+        <span class="chip">Anniversaries</span>
+        <span class="chip">Profile Pictures</span>
+      </div>
+      <p style="text-align: center; margin-top: 20px;">A custom portrait makes a thoughtful gift for someone you love, a keepsake for your family, or a profile picture that is truly yours.</p>
+    </section>
+
+    <section>
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-item">
+        <h3>Can I request changes?</h3>
+        <p>Yes. Just tell us what you would like changed when you message us, and we will do our best to adjust your portrait for you.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What photo should I send?</h3>
+        <p>Send a clear, well-lit photo where faces are easy to see. A close, front-facing photo works best for a great portrait.</p>
+      </div>
+      <div class="faq-item">
+        <h3>How do I pay?</h3>
+        <p>You pay the flat $20 via PayPal. We will share the payment details with you when you message us on Instagram DM.</p>
+      </div>
+      <div class="faq-item">
+        <h3>When do I get my portraits?</h3>
+        <p>You will receive your portraits within 24&ndash;48 hours of your order, as high-resolution PNG and PDF files.</p>
+      </div>
+    </section>
+
+    <section class="order-box">
+      <h2>Ready for Your Portrait?</h2>
+      <p>One photo, fifteen styles, $20 flat. DM us on Instagram (link on our homepage) with your photo and your ideas, pay via PayPal, and your portraits will be with you in 24&ndash;48 hours.</p>
+      <p><a href="https://ashvishcreativestudio.com">Visit ashvishcreativestudio.com</a></p>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <p>&copy; 2026 Ashvish Creative Studio &middot; <a href="https://ashvishcreativestudio.com">ashvishcreativestudio.com</a></p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KDP Book Maker — Free KDP Interior PDF Generator — Ashvish Creative Studio</title>
+<meta name="description" content="Make a print-ready KDP book interior PDF in your browser — title page, copyright page and numbered content pages, free. Your text never leaves your device.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: #FFF8F0;
+    color: #33302c;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+  }
+  header {
+    background: #B03A2E;
+    color: #ffffff;
+    padding: 28px 20px 24px;
+    text-align: center;
+  }
+  header .site-name {
+    font-family: 'Dancing Script', cursive;
+    font-weight: 700;
+    font-size: 44px;
+    line-height: 1.2;
+    margin: 0 0 8px;
+  }
+  header .back-link {
+    color: #ffe9d6;
+    font-size: 15px;
+    text-decoration: none;
+  }
+  header .back-link:hover { text-decoration: underline; }
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 20px 48px;
+  }
+  h1 {
+    font-family: 'Dancing Script', cursive;
+    font-weight: 700;
+    color: #B03A2E;
+    font-size: 42px;
+    line-height: 1.2;
+    text-align: center;
+    margin: 8px 0 12px;
+  }
+  h2 {
+    font-family: 'Dancing Script', cursive;
+    font-weight: 700;
+    color: #8E2F24;
+    font-size: 32px;
+    line-height: 1.25;
+    margin: 36px 0 10px;
+  }
+  .intro {
+    text-align: center;
+    font-size: 18px;
+    max-width: 680px;
+    margin: 0 auto 28px;
+  }
+  .card {
+    background: #ffffff;
+    border: 1px solid #ead9c8;
+    border-radius: 12px;
+    padding: 24px;
+    margin: 0 0 24px;
+    box-shadow: 0 2px 10px rgba(142, 47, 36, 0.06);
+  }
+  label {
+    display: block;
+    font-weight: 700;
+    margin: 16px 0 6px;
+  }
+  label:first-child { margin-top: 0; }
+  .hint { font-weight: 400; font-size: 14px; color: #6b625a; }
+  input[type="text"], select, textarea {
+    width: 100%;
+    padding: 11px 12px;
+    font-size: 16px;
+    font-family: inherit;
+    color: #33302c;
+    background: #FFF8F0;
+    border: 1px solid #d8c4ae;
+    border-radius: 8px;
+  }
+  input[type="text"]:focus, select:focus, textarea:focus {
+    outline: 2px solid #B03A2E;
+    outline-offset: 1px;
+    border-color: #B03A2E;
+  }
+  textarea { min-height: 180px; resize: vertical; line-height: 1.6; }
+  .row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .row > div { flex: 1 1 200px; }
+  .btn {
+    display: inline-block;
+    background: #B03A2E;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 13px 26px;
+    font-size: 17px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+  .btn:hover { background: #8E2F24; }
+  .btn-secondary {
+    background: #ffffff;
+    color: #8E2F24;
+    border: 2px solid #B03A2E;
+    padding: 9px 18px;
+    font-size: 15px;
+    margin-top: 8px;
+  }
+  .btn-secondary:hover { background: #FFF8F0; }
+  .btn-download {
+    display: none;
+    text-decoration: none;
+    text-align: center;
+  }
+  .btn-download.show { display: inline-block; }
+  #errorBox {
+    display: none;
+    background: #fdecea;
+    border: 1px solid #B03A2E;
+    color: #8E2F24;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+  #statusBox {
+    display: none;
+    background: #eef7ee;
+    border: 1px solid #4a7c4a;
+    color: #2c5a2c;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 16px;
+  }
+  .steps { padding-left: 22px; }
+  .steps li { margin-bottom: 8px; }
+  .note {
+    background: #FFF8F0;
+    border-left: 4px solid #B03A2E;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+  }
+  footer {
+    text-align: center;
+    padding: 24px 20px 32px;
+    color: #6b625a;
+    font-size: 15px;
+  }
+  footer a { color: #B03A2E; }
+  @media (max-width: 600px) {
+    header .site-name { font-size: 34px; }
+    h1 { font-size: 34px; }
+    h2 { font-size: 28px; }
+    .card { padding: 18px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <p class="site-name">Ashvish Creative Studio</p>
+  <a class="back-link" href="https://ashvishcreativestudio.com">&larr; Back to Home</a>
+</header>
+<main>
+  <h1>KDP Book Maker</h1>
+  <p class="intro">Make a print-ready KDP book interior PDF in your browser &mdash; title page, copyright page and numbered content pages, free. Your text never leaves your device.</p>
+
+  <div class="card">
+    <form id="bookForm" novalidate>
+      <label for="bookTitle">Book Title *</label>
+      <input type="text" id="bookTitle" name="bookTitle" required maxlength="200" placeholder="My Wonderful Book">
+
+      <label for="authorName">Author Name *</label>
+      <input type="text" id="authorName" name="authorName" required maxlength="120" placeholder="Your Name">
+
+      <label for="subtitle">Subtitle <span class="hint">(optional)</span></label>
+      <input type="text" id="subtitle" name="subtitle" maxlength="200" placeholder="A story to remember">
+
+      <div class="row">
+        <div>
+          <label for="trimSize">Trim Size</label>
+          <select id="trimSize" name="trimSize">
+            <option value="6x9" selected>6&quot; x 9&quot;</option>
+            <option value="8.5x11">8.5&quot; x 11&quot;</option>
+            <option value="8.5x8.5">8.5&quot; x 8.5&quot;</option>
+            <option value="5.5x8.5">5.5&quot; x 8.5&quot;</option>
+          </select>
+        </div>
+        <div>
+          <label for="pageCount">Page Count <span class="hint">(4&ndash;200)</span></label>
+          <input type="text" id="pageCount" name="pageCount" inputmode="numeric" value="24">
+        </div>
+      </div>
+
+      <label for="manuscript">Manuscript <span class="hint">(optional &mdash; paste your book text here and it will be flowed across the content pages)</span></label>
+      <textarea id="manuscript" name="manuscript" placeholder="Once upon a time..."></textarea>
+      <p style="margin:8px 0 0; font-size:15px; color:#6b625a;">Leave the manuscript empty for a lined journal interior &mdash; ruled lines on every content page, ready to write in.</p>
+      <button type="button" class="btn btn-secondary" id="sampleBtn">Load a sample paragraph</button>
+
+      <br>
+      <button type="submit" class="btn" id="generateBtn">Generate PDF</button>
+
+      <div id="errorBox" role="alert"></div>
+      <div id="statusBox" role="status"></div>
+      <br>
+      <a id="downloadLink" class="btn btn-download" href="#" download="my-book-interior.pdf">Download your PDF</a>
+    </form>
+  </div>
+
+  <h2>How it works</h2>
+  <ol class="steps">
+    <li><strong>Fill in your book details</strong> &mdash; title, author, trim size and how many pages you want.</li>
+    <li><strong>Paste your manuscript</strong> (or leave it empty for a lined journal) and press Generate PDF.</li>
+    <li><strong>Download your interior PDF</strong> and upload it to KDP as your book interior file.</li>
+  </ol>
+
+  <h2>Before you upload</h2>
+  <p class="note">Check KDP&rsquo;s current guidelines before uploading; trim sizes and margins follow KDP&rsquo;s standard recommendations. This tool makes the interior file only &mdash; your book cover is uploaded separately in KDP.</p>
+</main>
+<footer>
+  <p>&copy; 2026 Ashvish Creative Studio &middot; <a href="https://ashvishcreativestudio.com">ashvishcreativestudio.com</a></p>
+</footer>
+
+<script>
+/* KDP interior PDF generator. Pure client-side PDF writer: no libraries,
+   no network needed. Builds a valid PDF 1.4 file with Helvetica text,
+   a correct cross-reference table and trailer. */
+(function () {
+  'use strict';
+
+  var TRIM_SIZES = {
+    '6x9':     { label: '6" x 9"',     width: 432, height: 648 },
+    '8.5x11':  { label: '8.5" x 11"',  width: 612, height: 792 },
+    '8.5x8.5': { label: '8.5" x 8.5"', width: 612, height: 612 },
+    '5.5x8.5': { label: '5.5" x 8.5"', width: 396, height: 612 }
+  };
+
+  /* Helvetica character widths (units per 1000 em), ASCII 32-126. */
+  var WIDTHS = {
+    32:278,33:278,34:355,35:556,36:556,37:889,38:667,39:191,40:333,41:333,
+    42:389,43:584,44:278,45:333,46:278,47:278,48:556,49:556,50:556,51:556,
+    52:556,53:556,54:556,55:556,56:556,57:556,58:278,59:278,60:584,61:584,
+    62:584,63:556,64:1015,65:667,66:667,67:722,68:722,69:667,70:611,71:778,
+    72:722,73:278,74:500,75:667,76:556,77:833,78:722,79:778,80:667,81:778,
+    82:722,83:667,84:611,85:722,86:667,87:944,88:667,89:667,90:611,91:278,
+    92:278,93:278,94:469,95:556,96:333,97:556,98:556,99:500,100:556,101:556,
+    102:278,103:556,104:556,105:222,106:222,107:500,108:222,109:833,110:556,
+    111:556,112:556,113:556,114:333,115:500,116:278,117:556,118:500,119:722,
+    120:500,121:500,122:500,123:334,124:260,125:334,126:584
+  };
+
+  function sanitize(str) {
+    /* Map common punctuation to WinAnsi-safe characters; drop the rest. */
+    var map = { '\u2018': "'", '\u2019': "'", '\u201C': '"', '\u201D': '"',
+      '\u2013': '-', '\u2014': '-', '\u2026': '...', '\u00A0': ' ',
+      '\u00A9': '\u00A9', '\u201A': "'", '\u201E': '"' };
+    var out = '';
+    for (var i = 0; i < str.length; i++) {
+      var ch = str.charAt(i);
+      if (map.hasOwnProperty(ch)) { out += map[ch]; continue; }
+      var code = str.charCodeAt(i);
+      if (code >= 32 && code <= 126) { out += ch; }
+      else if (code === 169) { out += ch; }
+      else if (code === 10 || code === 13) { out += '\n'; }
+      else if (code > 126) { out += '?'; }
+    }
+    return out;
+  }
+
+  function textWidth(str, size) {
+    var w = 0;
+    for (var i = 0; i < str.length; i++) {
+      var code = str.charCodeAt(i);
+      w += (WIDTHS[code] || 556);
+    }
+    return w * size / 1000;
+  }
+
+  function pdfEscape(str) {
+    return str.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+  }
+
+  function wrapText(text, maxWidth, size) {
+    var words = text.split(/\s+/).filter(function (w) { return w.length > 0; });
+    var lines = [];
+    var line = '';
+    for (var i = 0; i < words.length; i++) {
+      var word = words[i];
+      var test = line ? line + ' ' + word : word;
+      if (textWidth(test, size) <= maxWidth || line === '') {
+        line = test;
+      } else {
+        lines.push(line);
+        line = word;
+      }
+      /* A single very long word: hard-break it so it never overflows. */
+      while (textWidth(line, size) > maxWidth && line.length > 1) {
+        var cut = line.length;
+        while (cut > 1 && textWidth(line.slice(0, cut), size) > maxWidth) { cut--; }
+        lines.push(line.slice(0, cut));
+        line = line.slice(cut);
+      }
+    }
+    if (line !== '') { lines.push(line); }
+    return lines;
+  }
+
+  function strToBytes(s) {
+    var a = new Uint8Array(s.length);
+    for (var i = 0; i < s.length; i++) { a[i] = s.charCodeAt(i) & 0xFF; }
+    return a;
+  }
+
+  function concatBytes(parts) {
+    var total = 0;
+    for (var i = 0; i < parts.length; i++) { total += parts[i].length; }
+    var out = new Uint8Array(total);
+    var pos = 0;
+    for (var j = 0; j < parts.length; j++) {
+      out.set(parts[j], pos);
+      pos += parts[j].length;
+    }
+    return out;
+  }
+
+  /* Build the interior PDF. Returns { bytes: Uint8Array, totalPages, extended }.
+     opts: { title, author, subtitle, trimKey, pageCount, manuscript } */
+  function buildInteriorPdf(opts) {
+    var trim = TRIM_SIZES[opts.trimKey] || TRIM_SIZES['6x9'];
+    var W = trim.width, H = trim.height;
+    var title = sanitize(opts.title);
+    var author = sanitize(opts.author);
+    var subtitle = sanitize(opts.subtitle || '');
+    var manuscript = sanitize(opts.manuscript || '');
+
+    var gutter = 54;   /* 0.75 inch inside margin */
+    var outer = 43;    /* ~0.6 inch outside margin */
+    var topMargin = 54, bottomMargin = 54;
+    var bodySize = 11, leading = 16;
+    var bodyTop = H - 72;      /* first baseline area */
+    var bodyBottom = 72;
+    var linesPerPage = Math.max(1, Math.floor((bodyTop - bodyBottom) / leading));
+
+    /* Flow the manuscript into wrapped lines. */
+    var isJournal = manuscript.trim() === '';
+    var flowedLines = [];
+    if (!isJournal) {
+      var paras = manuscript.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+      var maxW = W - gutter - outer;
+      for (var p = 0; p < paras.length; p++) {
+        var para = paras[p].trim();
+        if (para === '') {
+          if (flowedLines.length > 0) { flowedLines.push(''); }
+          continue;
+        }
+        var wrapped = wrapText(para, maxW, bodySize);
+        for (var w = 0; w < wrapped.length; w++) { flowedLines.push(wrapped[w]); }
+        flowedLines.push(''); /* paragraph gap */
+      }
+      while (flowedLines.length && flowedLines[flowedLines.length - 1] === '') {
+        flowedLines.pop();
+      }
+    }
+
+    var requestedTotal = opts.pageCount;
+    var requestedContent = Math.max(1, requestedTotal - 2);
+    var neededContent = isJournal
+      ? requestedContent
+      : Math.max(1, Math.ceil(flowedLines.length / linesPerPage));
+    var contentPages = Math.max(requestedContent, neededContent);
+    var totalPages = 2 + contentPages;
+    var extended = totalPages > requestedTotal;
+
+    /* ---- content-stream builders (one string per page) ---- */
+    function drawText(stream, x, y, str, size, font) {
+      stream.push('BT /' + font + ' ' + size + ' Tf 1 0 0 1 ' +
+        x.toFixed(2) + ' ' + y.toFixed(2) + ' Tm (' + pdfEscape(str) + ') Tj ET\n');
+    }
+    function drawCentred(stream, cx, y, str, size, font) {
+      var x = cx - textWidth(str, size) / 2;
+      drawText(stream, x, y, str, size, font);
+    }
+    function headerFooter(stream, pageNum, isOdd) {
+      var left = isOdd ? gutter : outer;
+      var right = isOdd ? outer : gutter;
+      /* Header: book title, small, at the top. */
+      drawText(stream, left, H - 36, title, 9, 'F1');
+      /* Thin rule under the header. */
+      stream.push('0.5 w 0.85 0.85 0.85 RG ' + left + ' ' + (H - 44) +
+        ' m ' + (W - right) + ' ' + (H - 44) + ' l S\n');
+      /* Footer: page number centred. */
+      drawCentred(stream, W / 2, 36, String(pageNum), 10, 'F1');
+    }
+
+    function titlePageStream() {
+      var s = [];
+      var cx = W / 2;
+      var titleLines = wrapText(title, W - 144, 28);
+      var blockHeight = titleLines.length * 36 + (subtitle ? 44 : 0) + 60;
+      var y = H / 2 + blockHeight / 2 - 10;
+      for (var i = 0; i < titleLines.length; i++) {
+        drawCentred(s, cx, y, titleLines[i], 28, 'F2');
+        y -= 36;
+      }
+      if (subtitle) {
+        y -= 8;
+        var subLines = wrapText(subtitle, W - 144, 14);
+        for (var j = 0; j < subLines.length; j++) {
+          drawCentred(s, cx, y, subLines[j], 14, 'F1');
+          y -= 20;
+        }
+      }
+      y -= 24;
+      drawCentred(s, cx, y, author, 14, 'F1');
+      return s.join('');
+    }
+
+    function copyrightPageStream() {
+      var s = [];
+      var x = gutter;
+      var y = H - 120;
+      var lines = [
+        'Copyright \u00A9 2026 ' + author + '. All rights reserved.',
+        '',
+        'Published by Ashvish Creative Studio',
+        '',
+        'No part of this book may be reproduced without written permission',
+        'from the author, except for brief quotations in a review.'
+      ];
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i] !== '') { drawText(s, x, y, lines[i], 11, 'F1'); }
+        y -= 18;
+      }
+      return s.join('');
+    }
+
+    function contentPageStream(pageNum, pageLines, journal) {
+      var s = [];
+      var isOdd = (pageNum % 2 === 1);
+      var left = isOdd ? gutter : outer;
+      var right = isOdd ? outer : gutter;
+      headerFooter(s, pageNum, isOdd);
+      if (journal) {
+        var lineY = bodyTop;
+        while (lineY >= bodyBottom + 4) {
+          s.push('0.5 w 0.75 0.75 0.75 RG ' + left + ' ' + lineY.toFixed(2) +
+            ' m ' + (W - right).toFixed(2) + ' ' + lineY.toFixed(2) + ' l S\n');
+          lineY -= 28;
+        }
+      } else {
+        var y = bodyTop;
+        for (var i = 0; i < pageLines.length; i++) {
+          if (pageLines[i] !== '') { drawText(s, left, y, pageLines[i], bodySize, 'F1'); }
+          y -= leading;
+        }
+      }
+      return s.join('');
+    }
+
+    /* ---- assemble pages ---- */
+    var streams = [];
+    streams.push(titlePageStream());
+    streams.push(copyrightPageStream());
+    for (var c = 0; c < contentPages; c++) {
+      var pageNum = 3 + c;
+      var chunk = isJournal ? [] : flowedLines.slice(c * linesPerPage, (c + 1) * linesPerPage);
+      streams.push(contentPageStream(pageNum, chunk, isJournal));
+    }
+
+    /* ---- assemble the PDF file with a correct xref table ---- */
+    var numObjects = 4 + streams.length * 2; /* 1 catalog, 2 pages, 3/4 fonts, then 2 per page */
+    var offsets = [];
+    var parts = [];
+    var pos = 0;
+    function pushBytes(bytes) { parts.push(bytes); pos += bytes.length; }
+    function pushStr(s) { pushBytes(strToBytes(s)); }
+
+    pushStr('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n');
+
+    /* 1: Catalog */
+    offsets[1] = pos;
+    pushStr('1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
+    /* 2: Pages */
+    var kids = [];
+    for (var k = 0; k < streams.length; k++) { kids.push((5 + k * 2) + ' 0 R'); }
+    offsets[2] = pos;
+    pushStr('2 0 obj\n<< /Type /Pages /Kids [' + kids.join(' ') + '] /Count ' + streams.length + ' >>\nendobj\n');
+    /* 3: Helvetica, 4: Helvetica-Bold */
+    offsets[3] = pos;
+    pushStr('3 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>\nendobj\n');
+    offsets[4] = pos;
+    pushStr('4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>\nendobj\n');
+    /* Pages + contents */
+    for (var pi = 0; pi < streams.length; pi++) {
+      var pageObj = 5 + pi * 2;
+      var contentObj = 6 + pi * 2;
+      var contentBytes = strToBytes(streams[pi]);
+      offsets[pageObj] = pos;
+      pushStr(pageObj + ' 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + W + ' ' + H +
+        '] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ' + contentObj + ' 0 R >>\nendobj\n');
+      offsets[contentObj] = pos;
+      pushStr(contentObj + ' 0 obj\n<< /Length ' + contentBytes.length + ' >>\nstream\n');
+      pushBytes(contentBytes);
+      pushStr('\nendstream\nendobj\n');
+    }
+
+    var xrefPos = pos;
+    var xref = 'xref\n0 ' + (numObjects + 1) + '\n0000000000 65535 f \n';
+    for (var oi = 1; oi <= numObjects; oi++) {
+      var off = offsets[oi] || 0;
+      xref += ('0000000000' + off).slice(-10) + ' 00000 n \n';
+    }
+    xref += 'trailer\n<< /Size ' + (numObjects + 1) + ' /Root 1 0 R >>\nstartxref\n' +
+      xrefPos + '\n%%EOF\n';
+    pushStr(xref);
+
+    return {
+      bytes: concatBytes(parts),
+      totalPages: totalPages,
+      extended: extended,
+      requestedTotal: requestedTotal,
+      trimLabel: trim.label
+    };
+  }
+
+  /* Expose the pure builder for testing; the form wiring below uses it. */
+  window.buildInteriorPdf = buildInteriorPdf;
+
+  /* ---- form wiring ---- */
+  var form = document.getElementById('bookForm');
+  var errorBox = document.getElementById('errorBox');
+  var statusBox = document.getElementById('statusBox');
+  var downloadLink = document.getElementById('downloadLink');
+  var currentUrl = null;
+
+  document.getElementById('sampleBtn').addEventListener('click', function () {
+    document.getElementById('manuscript').value =
+      'Once upon a time, in a small village beside a wide river, there lived a curious little fox named Milo. ' +
+      'Every morning Milo walked to the riverbank to watch the sun rise over the water.\n\n' +
+      'One morning he found a small wooden boat tied to a post. Nobody knew whose boat it was. ' +
+      'Milo looked left and right, then climbed in carefully and pushed off from the bank. ' +
+      'The river carried him gently past green fields and tall trees, and Milo smiled. ' +
+      'Today, he thought, would be a day for a real adventure.';
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    errorBox.style.display = 'none';
+    statusBox.style.display = 'none';
+    downloadLink.classList.remove('show');
+
+    var title = document.getElementById('bookTitle').value.trim();
+    var author = document.getElementById('authorName').value.trim();
+    var subtitle = document.getElementById('subtitle').value.trim();
+    var trimKey = document.getElementById('trimSize').value;
+    var pageCountRaw = document.getElementById('pageCount').value.trim();
+    var manuscript = document.getElementById('manuscript').value;
+
+    var errors = [];
+    if (!title) { errors.push('Please enter a book title.'); }
+    if (!author) { errors.push('Please enter the author name.'); }
+    var pageCount = Number(pageCountRaw);
+    if (pageCountRaw === '' || !isFinite(pageCount) || Math.floor(pageCount) !== pageCount) {
+      errors.push('Page count must be a whole number.');
+    } else if (pageCount < 4 || pageCount > 200) {
+      errors.push('Page count must be between 4 and 200.');
+    }
+    if (errors.length > 0) {
+      errorBox.textContent = errors.join(' ');
+      errorBox.style.display = 'block';
+      return;
+    }
+
+    var result;
+    try {
+      result = buildInteriorPdf({
+        title: title, author: author, subtitle: subtitle,
+        trimKey: trimKey, pageCount: pageCount, manuscript: manuscript
+      });
+    } catch (err) {
+      errorBox.textContent = 'Sorry, the PDF could not be made. Please try again with shorter text.';
+      errorBox.style.display = 'block';
+      return;
+    }
+
+    var blob = new Blob([result.bytes], { type: 'application/pdf' });
+    if (currentUrl) { URL.revokeObjectURL(currentUrl); }
+    currentUrl = URL.createObjectURL(blob);
+    var slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
+    var filename = slug ? slug + '-interior.pdf' : 'my-book-interior.pdf';
+    downloadLink.href = currentUrl;
+    downloadLink.setAttribute('download', filename);
+    downloadLink.textContent = 'Download your PDF (' + filename + ')';
+    downloadLink.classList.add('show');
+
+    var msg = 'Your ' + result.totalPages + '-page ' + result.trimLabel +
+      ' interior PDF is ready. Download it below.';
+    if (result.extended) {
+      msg += ' Your manuscript needed more pages, so the PDF has ' + result.totalPages +
+        ' pages instead of ' + result.requestedTotal + '.';
+    }
+    statusBox.textContent = msg;
+    statusBox.style.display = 'block';
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us — Ashvish Creative Studio</title>
+<meta name="description" content="Contact Ashvish Creative Studio — email us about our books, free tools, games and audio stories, or order a custom portrait through Instagram DM.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: #FFF8F0;
+    color: #2b2118;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+  }
+  a { color: #B03A2E; text-decoration: none; }
+  a:hover { color: #8E2F24; text-decoration: underline; }
+  .container { max-width: 900px; margin: 0 auto; padding: 0 20px 60px; }
+  header.site-header {
+    background: #B03A2E;
+    color: #fff;
+    padding: 34px 20px 30px;
+    text-align: center;
+  }
+  header.site-header h1 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 44px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    line-height: 1.15;
+  }
+  header.site-header p { margin: 0; color: #ffe9e3; font-size: 15px; }
+  .back-link {
+    display: inline-block;
+    margin: 22px 0 0;
+    font-weight: 600;
+    color: #B03A2E;
+    background: #fff;
+    border: 2px solid #B03A2E;
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-size: 15px;
+  }
+  .back-link:hover { background: #B03A2E; color: #fff; text-decoration: none; }
+  main { padding-top: 10px; }
+  h2 {
+    font-family: 'Dancing Script', cursive;
+    font-weight: 700;
+    font-size: 32px;
+    color: #B03A2E;
+    margin: 38px 0 8px;
+    line-height: 1.2;
+  }
+  h2:first-child { margin-top: 26px; }
+  p { margin: 0 0 16px; }
+  ul { margin: 0 0 16px; padding-left: 24px; }
+  li { margin-bottom: 8px; }
+  .updated {
+    font-size: 14px;
+    color: #7a5c4d;
+    margin: 22px 0 0;
+  }
+  .callout {
+    background: #fff;
+    border: 1px solid #f0d9c8;
+    border-left: 5px solid #B03A2E;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 18px 0;
+  }
+  .contact-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 18px 0 8px;
+  }
+  .contact-card {
+    background: #fff;
+    border: 1px solid #f0d9c8;
+    border-radius: 12px;
+    padding: 20px 22px;
+  }
+  .contact-card h3 {
+    font-family: 'Dancing Script', cursive;
+    font-weight: 700;
+    font-size: 26px;
+    color: #B03A2E;
+    margin: 0 0 6px;
+    line-height: 1.2;
+  }
+  .contact-card p { margin: 0 0 10px; font-size: 15px; }
+  .contact-card .big-link {
+    font-weight: 700;
+    font-size: 17px;
+    word-break: break-all;
+  }
+  form.contact-form {
+    background: #fff;
+    border: 1px solid #f0d9c8;
+    border-radius: 12px;
+    padding: 22px;
+    margin: 18px 0;
+  }
+  form.contact-form label {
+    display: block;
+    font-weight: 600;
+    font-size: 15px;
+    margin: 0 0 6px;
+  }
+  form.contact-form input,
+  form.contact-form textarea {
+    width: 100%;
+    font: inherit;
+    font-size: 16px;
+    padding: 10px 12px;
+    border: 1px solid #d9c4b2;
+    border-radius: 8px;
+    background: #FFF8F0;
+    color: #2b2118;
+    margin-bottom: 16px;
+  }
+  form.contact-form textarea { min-height: 140px; resize: vertical; }
+  form.contact-form input:focus,
+  form.contact-form textarea:focus {
+    outline: 2px solid #B03A2E;
+    outline-offset: 1px;
+  }
+  form.contact-form button {
+    font: inherit;
+    font-weight: 700;
+    font-size: 16px;
+    color: #fff;
+    background: #B03A2E;
+    border: 2px solid #B03A2E;
+    border-radius: 999px;
+    padding: 10px 26px;
+    cursor: pointer;
+  }
+  form.contact-form button:hover { background: #8E2F24; border-color: #8E2F24; }
+  .form-note { font-size: 14px; color: #7a5c4d; margin: 10px 0 0; }
+  .form-status { font-weight: 600; color: #B03A2E; margin: 12px 0 0; min-height: 1.4em; }
+  footer.site-footer {
+    border-top: 1px solid #f0d9c8;
+    margin-top: 46px;
+    padding-top: 22px;
+    text-align: center;
+    font-size: 14px;
+    color: #7a5c4d;
+  }
+  footer.site-footer a { font-weight: 600; }
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.site-header h1 { font-size: 34px; }
+    h2 { font-size: 27px; }
+    .contact-cards { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <h1>Ashvish Creative Studio</h1>
+  <p>Stories, colouring books, free tools, games &amp; audio stories for young artists and families.</p>
+</header>
+
+<div class="container">
+  <a class="back-link" href="https://ashvishcreativestudio.com">&larr; Back to Home</a>
+
+  <main>
+    <p class="updated">Last updated: 27 November 2026</p>
+
+    <h2>Contact Us</h2>
+    <p>We love hearing from our readers, parents, teachers and fellow creators. Whether you enjoyed one of our books, tried a free tool, played a game, or listened to an audio story, your message makes our day. Write to us — we read every message and reply as soon as we can.</p>
+
+    <div class="contact-cards">
+      <div class="contact-card">
+        <h3>Email Us</h3>
+        <p>The fastest way to reach us about anything on the website.</p>
+        <a class="big-link" href="mailto:vishal.kashyap11@gmail.com">vishal.kashyap11@gmail.com</a>
+      </div>
+      <div class="contact-card">
+        <h3>Instagram DM</h3>
+        <p>For custom portrait orders, send us a direct message on Instagram.</p>
+        <a class="big-link" href="https://www.instagram.com/ashvishcreativestudio">@ashvishcreativestudio</a>
+      </div>
+    </div>
+
+    <h2>What Can You Write About?</h2>
+    <ul>
+      <li><strong>Book, tool or game feedback</strong> — tell us what you loved, what did not work, or what you would like us to make next.</li>
+      <li><strong>Custom portrait orders</strong> — ask about a portrait in one of our 15 styles, or send your photos through Instagram DM to get started.</li>
+      <li><strong>Audio stories</strong> — request a story, or tell us which story your child enjoyed the most.</li>
+      <li><strong>Business enquiries</strong> — collaborations, features, or anything else related to Ashvish Creative Studio.</li>
+    </ul>
+    <p>Please do not send us passwords, payment card details, or any other sensitive information by email or message. If you are writing on behalf of a child, please write as the parent or guardian.</p>
+
+    <h2>Send Us a Message</h2>
+    <p>Fill in the form below and press send. Your email app will open with your message ready to go — just press send there, and it will reach us at vishal.kashyap11@gmail.com. Nothing you type here is stored on our website.</p>
+
+    <form class="contact-form" id="contactForm">
+      <label for="contactName">Your name</label>
+      <input type="text" id="contactName" name="name" placeholder="Your Name" required>
+
+      <label for="contactSubject">Subject</label>
+      <input type="text" id="contactSubject" name="subject" placeholder="What is your message about?" required>
+
+      <label for="contactMessage">Your message</label>
+      <textarea id="contactMessage" name="message" placeholder="Write your message here..." required></textarea>
+
+      <button type="submit">Send Message</button>
+      <p class="form-status" id="formStatus" role="status"></p>
+      <p class="form-note">Pressing send opens your own email app with the message prefilled. We do not store or send anything from our servers.</p>
+    </form>
+
+    <div class="callout">
+      <p><strong>Custom Portraits:</strong> portraits are made in our Chibi style (big-head, tiny-body) — $20 flat for 15 styles at once, delivered as high-resolution PNG and PDF within 24–48 hours. Orders are taken through Instagram DM, and payment is accepted through PayPal.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 Ashvish Creative Studio &middot; <a href="https://ashvishcreativestudio.com">ashvishcreativestudio.com</a></p>
+  </footer>
+</div>
+
+<script>
+  (function () {
+    var form = document.getElementById('contactForm');
+    var statusEl = document.getElementById('formStatus');
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      var name = document.getElementById('contactName').value.trim();
+      var subject = document.getElementById('contactSubject').value.trim();
+      var message = document.getElementById('contactMessage').value.trim();
+      if (!name || !subject || !message) {
+        statusEl.textContent = 'Please fill in your name, subject and message before sending.';
+        return;
+      }
+      var body = 'Hi Ashvish Creative Studio,\n\n' + message + '\n\n— ' + name;
+      var mailtoUrl = 'mailto:vishal.kashyap11@gmail.com'
+        + '?subject=' + encodeURIComponent(subject)
+        + '&body=' + encodeURIComponent(body);
+      window.lastMailtoUrl = mailtoUrl;
+      statusEl.textContent = 'Opening your email app with your message ready to send...';
+      window.location.href = mailtoUrl;
+    });
+  })();
+</script>
+
+</body>
+</html>
