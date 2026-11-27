@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Candy Blaster · Ashvish Creative Studio</title>
+<style>
+:root{--pink:#FF9AA2;--peach:#FFDAC1;--yellow:#F7F3C7;--mint:#B5EAD7;--lav:#C7CEFF;--cream:#FFF9EE;--ink:#6b4a5e}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--cream);color:var(--ink);font-family:'Varela Round','Trebuchet MS','Arial Rounded MT Bold',system-ui,sans-serif;user-select:none;-webkit-user-select:none;touch-action:none}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+canvas{display:block;background:var(--cream);border-radius:12px}
+#hud{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:10px;z-index:5;pointer-events:none}
+#hud>div{pointer-events:auto}
+.row{display:flex;gap:6px;align-items:center}
+.pill{background:#fff;border-radius:999px;padding:6px 12px;font-weight:700;font-size:16px;box-shadow:0 3px 0 var(--peach);white-space:nowrap}
+.round{width:46px;height:46px;border-radius:50%;border:0;background:var(--lav);box-shadow:0 4px 0 #9aa3e0;font-size:20px;cursor:pointer;color:#fff}
+.round:active{transform:translateY(3px);box-shadow:none}
+#pow{position:fixed;top:64px;left:50%;transform:translateX(-50%);background:var(--yellow);box-shadow:0 3px 0 #e3d98f;z-index:5}
+.screen{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;text-align:center;background:rgba(255,249,238,.94)}
+.hidden{display:none!important}
+h1{font-family:'Dancing Script','Brush Script MT','Segoe Script',cursive;font-size:clamp(52px,13vw,84px);color:#ff7f8a;line-height:1;text-shadow:0 3px 0 var(--peach)}
+h2{font-family:'Dancing Script','Brush Script MT','Segoe Script',cursive;font-size:clamp(40px,10vw,60px);color:#ff7f8a}
+.sub{font-size:18px;max-width:340px}
+.lbl{font-weight:700;font-size:18px}
+.skins{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;max-width:460px}
+.skin{width:96px;padding:10px 4px;border-radius:20px;background:#fff;border:4px solid transparent;cursor:pointer;font:inherit;font-size:15px;font-weight:700;color:var(--ink);box-shadow:0 3px 0 var(--peach)}
+.skin small{font-weight:400;font-size:13px}
+.skin .sw{height:30px;border-radius:12px;margin-bottom:6px}
+.skin.sel{border-color:var(--mint)}
+.skin.locked{filter:grayscale(1);opacity:.55;cursor:not-allowed}
+.btn{border:0;border-radius:24px;padding:14px 30px;font:inherit;font-size:22px;font-weight:700;color:#fff;cursor:pointer;background:var(--pink);box-shadow:0 6px 0 #e07a84;min-width:220px}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 #e07a84}
+.mint{background:var(--mint);box-shadow:0 6px 0 #86c8b0}
+.lav{background:var(--lav);box-shadow:0 6px 0 #9aa3e0}
+.peach{background:var(--peach);box-shadow:0 6px 0 #e0aa88;color:var(--ink)}
+.stats{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.big{font-size:64px;font-weight:700;color:#ff7f8a;line-height:1}
+#msg{font-weight:700;min-height:22px;color:#4fb89a}
+.note{font-size:14px;opacity:.8}
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="c"></canvas></div>
+
+<div id="hud" class="hidden">
+  <div class="row"><div class="pill" id="score">Score 0</div><div class="pill" id="lives"></div></div>
+  <div class="row"><button class="round" id="snd" title="Sound (M)">🔊</button><button class="round" id="pause" title="Pause (P)">⏸</button></div>
+</div>
+<div id="pow" class="pill hidden">⭐ Double shots</div>
+
+<div id="menu" class="screen">
+  <h1>Candy Blaster</h1>
+  <p class="sub">Move to aim. The cannon fires by itself. Pop all the candy!</p>
+  <div class="lbl">Pick your cannon</div>
+  <div class="skins" id="skins"></div>
+  <button class="btn" id="play">Play</button>
+  <button class="btn lav" id="daily">Daily Challenge</button>
+  <div class="stats">
+    <div class="pill">Daily Best: <b id="dbest">0</b></div>
+    <div class="pill">All-Time Best: <b id="abest">0</b></div>
+  </div>
+  <div class="note" id="dlabel"></div>
+</div>
+
+<div id="pauseS" class="screen hidden">
+  <h2>Paused</h2>
+  <button class="btn mint" id="resume">Resume</button>
+  <button class="btn peach" id="quit">Menu</button>
+</div>
+
+<div id="over" class="screen hidden">
+  <h2>Game Over</h2>
+  <div class="lbl">Final score</div>
+  <div class="big" id="fscore">0</div>
+  <div class="sub" id="fsub"></div>
+  <button class="btn" id="again">Play Again</button>
+  <button class="btn mint" id="share">Share My Score</button>
+  <div id="msg"></div>
+  <button class="btn peach" id="menuBtn" style="min-width:160px;font-size:18px">Menu</button>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const cv=$('c'),ctx=cv.getContext('2d');
+const W=400,H=700,CW=46,RH=40,COLS=8,OY0=70,DROP=22,CANY=H-60,LINE=CANY-8;
+const PAL=['#FF9AA2','#B5EAD7','#C7CEFF','#FFB38A','#F7E27A','#FFA8D5'];
+const SKINS=[
+  {id:'mint',name:'Mint',need:0,c1:'#B5EAD7',c2:'#C7CEFF'},
+  {id:'pink',name:'Pink Cannon',need:500,c1:'#FF9AA2',c2:'#FFDAC1'},
+  {id:'gold',name:'Golden Cannon',need:1500,c1:'#F5C451',c2:'#FFE9A8'},
+  {id:'rainbow',name:'Rainbow Cannon',need:3000,rainbow:1,c1:'',c2:'#FFDAC1'}
+];
+
+/* ---------- storage ---------- */
+const store={
+  get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+let best=store.get('cb_best',0),dailyBests=store.get('cb_daily',{});
+let selSkin='mint',soundOn=true,G=null,state='menu',lastDaily=false,lastScore=0;
+
+/* ---------- date seed ---------- */
+function todayKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function dailySeed(){return parseInt(todayKey().replace(/-/g,''),10)}
+function mulberry32(a){return function(){var t=a+=0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
+
+/* ---------- Web Audio (no files) ---------- */
+let AC=null;
+function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}return AC}
+function tone(f,d,type,v,slide,delay){
+  const a=ac();if(!a||!soundOn)return;
+  const t=a.currentTime+(delay||0),o=a.createOscillator(),g=a.createGain();
+  o.type=type;o.frequency.setValueAtTime(f,t);
+  if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(40,f+slide),t+d);
+  g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);
+  o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+d+.05);
+}
+const sfx={
+  pop:()=>tone(620,.14,'square',.08,450),
+  shoot:()=>tone(880,.07,'triangle',.035,-450),
+  power:()=>tone(1100,.25,'sine',.1,700),
+  wave:()=>[523,659,784,1047].forEach((f,i)=>tone(f,.22,'triangle',.12,0,i*.12)),
+  over:()=>[392,349,330,262].forEach((f,i)=>tone(f,.38,'sawtooth',.06,0,i*.34)),
+  oops:()=>tone(220,.3,'sine',.12,-120)
+};
+function toggleSound(){soundOn=!soundOn;$('snd').textContent=soundOn?'🔊':'🔇'}
+
+/* ---------- canvas fit ---------- */
+function fit(){
+  const w=innerWidth,h=innerHeight,s=Math.min(w/W,h/H),d=devicePixelRatio||1;
+  cv.style.width=W*s+'px';cv.style.height=H*s+'px';
+  cv.width=W*s*d;cv.height=H*s*d;ctx.setTransform(s*d,0,0,s*d,0,0);
+}
+addEventListener('resize',fit);fit();
+
+/* ---------- input ---------- */
+const keys={l:0,r:0};
+function toWorld(e){const r=cv.getBoundingClientRect();return (e.clientX-r.left)/r.width*W}
+addEventListener('pointermove',e=>{if(state==='play')G.target=toWorld(e)});
+addEventListener('pointerdown',e=>{
+  if(ac()&&AC.state==='suspended')AC.resume();
+  if(state==='play'&&!e.target.closest('button'))G.target=toWorld(e);
+});
+addEventListener('keydown',e=>{
+  if(e.key==='ArrowLeft'){keys.l=1;e.preventDefault()}
+  if(e.key==='ArrowRight'){keys.r=1;e.preventDefault()}
+  if(e.key==='m'||e.key==='M')toggleSound();
+  if(e.key==='p'||e.key==='P'||e.key==='Escape')togglePause();
+});
+addEventListener('keyup',e=>{if(e.key==='ArrowLeft')keys.l=0;if(e.key==='ArrowRight')keys.r=0});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='play')togglePause()});
+
+/* ---------- screens ---------- */
+function showScreen(id){
+  ['menu','pauseS','over'].forEach(x=>$(x).classList.toggle('hidden',x!==id));
+  $('hud').classList.toggle('hidden',!(id===null||id==='pauseS'));
+}
+function renderSkins(){
+  const el=$('skins');el.innerHTML='';
+  SKINS.forEach(s=>{
+    const ok=best>=s.need;
+    const b=document.createElement('button');
+    b.className='skin'+(ok?'':' locked')+(selSkin===s.id&&ok?' sel':'');
+    const sw=s.rainbow?'linear-gradient(90deg,#FF9AA2,#F7E27A,#B5EAD7,#C7CEFF,#FFA8D5)':(s.id==='mint'?s.c1:s.c1);
+    b.innerHTML=`<div class="sw" style="background:${sw}"></div>${s.name}<br><small>${ok?'Unlocked':'🔒 '+s.need+' pts'}</small>`;
+    b.onclick=()=>{if(ok){selSkin=s.id;renderSkins()}};
+    el.appendChild(b);
+  });
+}
+function openMenu(){
+  state='menu';G=null;
+  if(best<(SKINS.find(s=>s.id===selSkin)||SKINS[0]).need)selSkin='mint';
+  renderSkins();
+  $('dbest').textContent=dailyBests[todayKey()]||0;
+  $('abest').textContent=best;
+  $('dlabel').textContent="Today's challenge: same candy pattern and speed for everyone · "+todayKey();
+  showScreen('menu');
+}
+function togglePause(){
+  if(state==='play'){state='pause';showScreen('pauseS')}
+  else if(state==='pause'){state='play';showScreen(null)}
+}
+
+/* ---------- game ---------- */
+function startGame(daily){
+  lastDaily=daily;if(ac())AC.resume&&AC.resume();
+  G={daily,rand:daily?mulberry32(dailySeed()):Math.random,score:0,lives:3,wave:0,grid:[],
+     ox:16,oy:OY0,dir:1,spd:0,cx:W/2,target:W/2,cd:0,bullets:[],parts:[],stars:[],starT:12,
+     power:0,golden:null,goldT:0,banner:'',bt:0,wait:0,t:0};
+  nextWave();state='play';showScreen(null);
+}
+function nextWave(){
+  const g=G;g.wave++;
+  const rows=Math.min(2+g.wave,7);g.grid=[];
+  for(let r=0;r<rows;r++){
+    const row=[];
+    for(let c=0;c<COLS;c++)row.push({type:Math.floor(g.rand()*4),striped:g.rand()<.15,col:PAL[Math.floor(g.rand()*PAL.length)]});
+    g.grid.push(row);
+  }
+  g.ox=16;g.oy=OY0;g.dir=1;g.spd=Math.min(20+g.wave*5,80);
+  g.golden=null;g.goldT=g.wave%3===0?2:0;g.bullets=[];
+  g.banner='Wave '+g.wave+'!';g.bt=1.5;
+}
+function extent(){
+  let l=COLS,r=-1,any=false;
+  G.grid.forEach(row=>row.forEach((cd,c)=>{if(cd){any=true;if(c<l)l=c;if(c>r)r=c}}));
+  return any?{l,r}:null;
+}
+function loseLife(){
+  G.lives--;sfx.oops();G.banner='Oops!';G.bt=1;
+  if(G.lives<=0)gameOver();
+}
+function step(dt){
+  const g=G;g.t+=dt;updParts(dt);g.bt-=dt;
+  if(g.wait>0){g.wait-=dt;if(g.wait<=0)nextWave();return}
+
+  // cannon
+  if(keys.l)g.target-=420*dt;
+  if(keys.r)g.target+=420*dt;
+  g.target=Math.max(28,Math.min(W-28,g.target));
+  g.cx+=(g.target-g.cx)*Math.min(1,dt*16);
+  if(g.power>0)g.power-=dt;
+
+  // auto fire
+  g.cd-=dt;
+  if(g.cd<=0){
+    g.cd=.3;
+    (g.power>0?[g.cx-9,g.cx+9]:[g.cx]).forEach(x=>g.bullets.push({x,y:CANY-30}));
+    sfx.shoot();
+  }
+
+  // candy group sways and drops at the edges
+  const e=extent();
+  if(e){
+    g.ox+=g.dir*g.spd*dt;
+    const L=g.ox+e.l*CW,R=g.ox+(e.r+1)*CW;
+    if(g.dir<0&&L<=2){g.ox+=2-L;g.dir=1;g.oy+=DROP}
+    else if(g.dir>0&&R>=W-2){g.ox-=R-(W-2);g.dir=-1;g.oy+=DROP}
+  }
+
+  // candies reaching the cannon line cost a life
+  let hit=false;
+  g.grid.forEach((row,r)=>{if(row.some(Boolean)&&g.oy+r*RH+38>=LINE){row.fill(null);hit=true}});
+  if(hit){loseLife();if(state!=='play')return}
+
+  // golden lollipop flies across the top
+  if(g.goldT>0){g.goldT-=dt;if(g.goldT<=0)g.golden={x:-20}}
+  if(g.golden){g.golden.x+=130*dt;if(g.golden.x>W+24)g.golden=null}
+
+  // falling star power-up
+  g.starT-=dt;
+  if(g.starT<=0){g.starT=14+g.rand()*10;g.stars.push({x:30+g.rand()*(W-60),y:-20})}
+  g.stars.forEach(s=>{
+    s.y+=130*dt;
+    if(Math.abs(s.x-g.cx)<34&&s.y>CANY-40&&s.y<CANY+30){
+      s.got=1;g.power=10;sfx.power();burst(s.x,s.y,['#F7E27A','#FFDAC1'],24);
+    }
+  });
+  g.stars=g.stars.filter(s=>!s.got&&s.y<H+20);
+
+  // bullets and hits
+  g.bullets=g.bullets.filter(b=>{
+    b.y-=560*dt;
+    if(b.y<-10)return false;
+    if(g.golden&&Math.abs(b.x-g.golden.x)<22&&Math.abs(b.y-34)<22){
+      g.golden=null;g.score+=100;sfx.pop();
+      burst(b.x,34,['#F5C451','#FFE9A8','#FFDAC1'],30);return false;
+    }
+    const r=Math.floor((b.y-g.oy)/RH),c=Math.floor((b.x-g.ox)/CW);
+    if(r>=0&&r<g.grid.length&&c>=0&&c<COLS&&g.grid[r][c]){
+      const cd=g.grid[r][c];g.grid[r][c]=null;
+      g.score+=cd.striped?50:10;sfx.pop();
+      burst(g.ox+c*CW+CW/2,g.oy+r*RH+RH/2,[cd.col,'#FFFFFF','#FFDAC1'],cd.striped?26:16);
+      return false;
+    }
+    return true;
+  });
+
+  // wave cleared
+  if(g.grid.every(row=>row.every(x=>!x))){
+    g.wait=1.4;g.golden=null;g.bullets=[];
+    sfx.wave();g.banner='Wave cleared!';g.bt=1.4;
+  }
+}
+
+function recordScore(s,daily){
+  if(s>best){best=s;store.set('cb_best',best)}
+  if(daily){const k=todayKey();if(s>(dailyBests[k]||0)){dailyBests[k]=s;store.set('cb_daily',dailyBests)}}
+}
+function gameOver(){
+  if(state!=='play')return;
+  state='over';sfx.over();
+  lastScore=G.score;recordScore(lastScore,G.daily);
+  $('fscore').textContent=lastScore;
+  $('fsub').textContent='You reached wave '+G.wave+(G.daily?" in today's Daily Challenge":'')+'.';
+  $('msg').textContent='';
+  showScreen('over');
+}
+
+/* ---------- share ---------- */
+async function copyText(t){
+  try{await navigator.clipboard.writeText(t);return true}
+  catch(e){
+    const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();let ok=false;
+    try{ok=document.execCommand('copy')}catch(_){}
+    ta.remove();return ok;
+  }
+}
+function shareScore(){
+  const txt='I scored '+lastScore+' points in Candy Blaster on Ashvish Creative Studio! Can you beat me? Play free: https://ashvishcreativestudio.com';
+  if(navigator.share){navigator.share({title:'Candy Blaster',text:txt}).catch(()=>{});return}
+  copyText(txt).then(ok=>{$('msg').textContent=ok?'Copied! Share it anywhere.':'Could not copy. Please select and copy the text.'});
+}
+
+/* ---------- particles ---------- */
+function burst(x,y,cols,n){
+  const g=G;if(!g)return;
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2,sp=90+Math.random()*190;
+    g.parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-90,life:.8+Math.random()*.5,c:cols[i%cols.length],s:4+Math.random()*4,r:Math.random()*6});
+  }
+  if(g.parts.length>260)g.parts.splice(0,g.parts.length-260);
+}
+function updParts(dt){
+  G.parts.forEach(p=>{p.vy+=420*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.r+=dt*8;p.life-=dt});
+  G.parts=G.parts.filter(p=>p.life>0);
+}
+
+/* ---------- drawing ---------- */
+function rr(x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
+}
+function drawCandy(cd,x,y){
+  const c=cd.col;ctx.save();ctx.translate(x,y);
+  if(cd.striped){
+    ctx.beginPath();ctx.arc(0,0,18,0,6.283);ctx.fillStyle=c;ctx.fill();
+    ctx.save();ctx.clip();ctx.fillStyle='#fff';ctx.rotate(.8);
+    for(let i=-4;i<=4;i++)ctx.fillRect(i*7-2.5,-30,5,60);
+    ctx.restore();
+  }else switch(cd.type){
+    case 0: // gummy bear
+      ctx.fillStyle=c;
+      ctx.beginPath();ctx.arc(-8,-12,5,0,6.283);ctx.arc(8,-12,5,0,6.283);ctx.fill();
+      ctx.beginPath();ctx.arc(0,-6,10,0,6.283);ctx.fill();
+      ctx.beginPath();ctx.ellipse(0,9,9,11,0,0,6.283);ctx.fill();
+      ctx.fillStyle='#6b4a5e';ctx.beginPath();ctx.arc(-3.5,-7,1.6,0,6.283);ctx.arc(3.5,-7,1.6,0,6.283);ctx.fill();
+      break;
+    case 1: // lollipop
+      ctx.fillStyle='#fff';ctx.fillRect(-2,8,4,12);
+      ctx.beginPath();ctx.arc(0,-4,13,0,6.283);ctx.fillStyle=c;ctx.fill();
+      ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,-4,7,0,4.7);ctx.stroke();
+      break;
+    case 2: // candy cane
+      ctx.lineCap='round';ctx.lineWidth=7;ctx.strokeStyle='#fff';
+      ctx.beginPath();ctx.moveTo(-6,16);ctx.lineTo(-6,-6);ctx.quadraticCurveTo(-6,-16,4,-16);ctx.quadraticCurveTo(12,-16,12,-8);
+      ctx.stroke();
+      ctx.strokeStyle=c;ctx.setLineDash([5,5]);ctx.stroke();ctx.setLineDash([]);
+      break;
+    default: // jelly bean
+      ctx.fillStyle=c;ctx.beginPath();ctx.ellipse(0,0,15,10,-0.5,0,6.283);ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,.7)';ctx.beginPath();ctx.ellipse(-5,-4,4,2.5,-0.5,0,6.283);ctx.fill();
+  }
+  ctx.restore();
+}
+function drawGolden(x,y){
+  ctx.save();ctx.translate(x,y);
+  ctx.fillStyle='#E8B53A';ctx.fillRect(-2.5,14,5,16);
+  ctx.beginPath();ctx.arc(0,0,18,0,6.283);ctx.fillStyle='#F5C451';ctx.fill();
+  ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,10,0,4.7);ctx.stroke();
+  ctx.restore();
+}
+function drawStar(x,y){
+  ctx.save();ctx.translate(x,y);ctx.beginPath();
+  for(let i=0;i<10;i++){const r=i%2?6:13,a=i*Math.PI/5-Math.PI/2;ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r)}
+  ctx.closePath();ctx.fillStyle='#F7E27A';ctx.strokeStyle='#FFB38A';ctx.lineWidth=2;ctx.fill();ctx.stroke();
+  ctx.restore();
+}
+function drawCannon(g){
+  const sk=SKINS.find(s=>s.id===selSkin)||SKINS[0];
+  const x=g.cx,y=CANY;
+  let f1=sk.c1;
+  if(sk.rainbow){
+    const gr=ctx.createLinearGradient(x-34,0,x+34,0);
+    gr.addColorStop(0,'#FF9AA2');gr.addColorStop(.25,'#F7E27A');gr.addColorStop(.5,'#B5EAD7');
+    gr.addColorStop(.75,'#C7CEFF');gr.addColorStop(1,'#FFA8D5');f1=gr;
+  }
+  ctx.fillStyle=sk.c2;rr(x-7,y-30,14,36,6);ctx.fill();
+  ctx.fillStyle=f1;rr(x-34,y,68,26,13);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x-11,y+12,6,0,6.283);ctx.arc(x+11,y+12,6,0,6.283);ctx.fill();
+  ctx.fillStyle='#6b4a5e';ctx.beginPath();ctx.arc(x-10,y+13,2.6,0,6.283);ctx.arc(x+12,y+13,2.6,0,6.283);ctx.fill();
+}
+function draw(){
+  ctx.fillStyle='#FFF9EE';ctx.fillRect(0,0,W,H);
+  ctx.globalAlpha=.35;
+  [['#FF9AA2',60,120,90],['#B5EAD7',340,260,70],['#C7CEFF',80,460,80],['#F7F3C7',330,560,100]]
+    .forEach(([c,x,y,r])=>{ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,r,0,6.283);ctx.fill()});
+  ctx.globalAlpha=1;
+  if(!G)return;
+  const g=G;
+  ctx.setLineDash([6,6]);ctx.strokeStyle='#FFB3BA';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(0,LINE);ctx.lineTo(W,LINE);ctx.stroke();ctx.setLineDash([]);
+  g.grid.forEach((row,r)=>row.forEach((cd,c)=>{if(cd)drawCandy(cd,g.ox+c*CW+CW/2,g.oy+r*RH+RH/2)}));
+  if(g.golden)drawGolden(g.golden.x,34);
+  g.stars.forEach(s=>drawStar(s.x,s.y));
+  ctx.fillStyle='#FF9AA2';
+  g.bullets.forEach(b=>{rr(b.x-3.5,b.y-9,7,16,3.5);ctx.fill()});
+  drawCannon(g);
+  g.parts.forEach(p=>{
+    ctx.save();ctx.globalAlpha=Math.max(0,Math.min(1,p.life));
+    ctx.translate(p.x,p.y);ctx.rotate(p.r);ctx.fillStyle=p.c;
+    ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6);ctx.restore();
+  });
+  if(g.bt>0&&g.banner){
+    ctx.save();ctx.globalAlpha=Math.min(1,g.bt*2);
+    ctx.font="bold 34px 'Varela Round','Trebuchet MS',sans-serif";ctx.textAlign='center';
+    ctx.lineWidth=7;ctx.strokeStyle='#fff';ctx.strokeText(g.banner,W/2,H*.42);
+    ctx.fillStyle='#FF7F8A';ctx.fillText(g.banner,W/2,H*.42);ctx.restore();
+  }
+}
+function hudUpdate(){
+  if(!G)return;
+  $('score').textContent='Score '+G.score+' · Wave '+G.wave;
+  $('lives').textContent='❤️'.repeat(Math.max(0,G.lives))||'💔';
+  $('pow').classList.toggle('hidden',G.power<=0);
+  $('pow').textContent='⭐ Double shots '+Math.ceil(G.power)+'s';
+}
+
+/* ---------- loop ---------- */
+let last=0,acc=0;
+function frame(ts){
+  const dt=Math.min(.05,(ts-last)/1000);last=ts;
+  if(state==='play'&&G){
+    acc+=dt;
+    while(acc>=1/60){step(1/60);acc-=1/60;if(state!=='play')break}
+  }
+  draw();hudUpdate();
+  requestAnimationFrame(frame);
+}
+
+/* ---------- wire up buttons ---------- */
+$('play').onclick=()=>startGame(false);
+$('daily').onclick=()=>startGame(true);
+$('pause').onclick=togglePause;
+$('resume').onclick=togglePause;
+$('quit').onclick=openMenu;
+$('menuBtn').onclick=openMenu;
+$('again').onclick=()=>startGame(lastDaily);
+$('snd').onclick=toggleSound;
+$('share').onclick=shareScore;
+
+openMenu();
+requestAnimationFrame(frame);
+</script>
+
+<!--
+  Candy Blaster · Ashvish Creative Studio · Play Zone
+  Unlocks (by All-Time Best): Pink Cannon 500, Golden Cannon 1500, Rainbow Cannon 3000.
+  Share text: I scored X points in Candy Blaster on Ashvish Creative Studio! Can you beat me? Play free: https://ashvishcreativestudio.com
+  Daily seed: today's local date as YYYYMMDD (e.g. 20261127), driving a seeded generator for candy layout and power-up timing.
+  Audio: Web Audio only, no audio files.
+-->
+</body>
+</html>

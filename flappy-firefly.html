@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Flappy Firefly | Ashvish Creative Studio</title>
+<style>
+  :root{
+    --pink:#FF9AA2; --peach:#FFDAC1; --yellow:#F7F3C7; --mint:#B5EAD7; --lav:#C7CEFF;
+    --cream:#FFF8EC; --ink:#2B2D5C;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden;background:var(--cream);color:var(--ink);
+    font-family:ui-rounded,"SF Pro Rounded","Nunito","Varela Round","Trebuchet MS","Arial Rounded MT Bold",system-ui,sans-serif;
+    -webkit-user-select:none;user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent}
+  body{display:flex;align-items:center;justify-content:center}
+
+  /* The whole game lives in one stage that always fits the screen (portrait or landscape) at 5:8 */
+  #stage{position:relative;width:min(100vw,calc(100vh*.625));width:min(100vw,calc(100dvh*.625));
+    aspect-ratio:5/8;container-type:inline-size;border-radius:clamp(0px,3vmin,24px);overflow:hidden;
+    box-shadow:0 10px 30px rgba(43,45,92,.25);background:#0d1a3f}
+  #game{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+  .hidden{display:none!important}
+
+  /* HUD */
+  #hud{position:absolute;inset:0;pointer-events:none}
+  #lives{position:absolute;left:3cqw;top:3cqw;font-size:8cqw;line-height:1;color:var(--pink);
+    text-shadow:0 .5cqw 0 var(--ink);display:flex;gap:1cqw}
+  #lives span.lost{color:#56608f;text-shadow:none;opacity:.6}
+  #score{position:absolute;top:2cqw;left:50%;transform:translateX(-50%);font-size:17cqw;font-weight:800;
+    color:#fff;text-shadow:0 .8cqw 0 #5b5fb0,0 0 3cqw rgba(255,246,180,.5);line-height:1}
+  #score.pop{animation:pop .25s ease-out}
+  @keyframes pop{0%{transform:translateX(-50%) scale(1.35)}100%{transform:translateX(-50%) scale(1)}}
+  #tools{position:absolute;right:3cqw;top:3cqw;display:flex;gap:2cqw;pointer-events:none}
+  .pill{pointer-events:auto;font-family:inherit;font-weight:800;font-size:3.8cqw;color:var(--ink);
+    background:rgba(255,248,236,.92);border:none;border-radius:999px;padding:1.6cqw 3.2cqw;cursor:pointer;
+    box-shadow:0 .6cqw 0 rgba(43,45,92,.3)}
+  .pill:active{transform:translateY(.4cqw)}
+
+  /* Overlays */
+  .screen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    background:rgba(14,22,56,.35);padding:4cqw}
+  .panel{background:rgba(255,248,236,.97);border-radius:7cqw;padding:5cqw 4.5cqw;width:92%;max-height:100%;
+    overflow:hidden;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3cqw;
+    box-shadow:0 2cqw 0 rgba(43,45,92,.25)}
+  .title{font-family:"Dancing Script",ui-rounded,"Nunito","Trebuchet MS",system-ui,sans-serif;font-weight:700;
+    font-size:17cqw;line-height:.95;color:var(--pink);text-shadow:0 .9cqw 0 var(--ink)}
+  .title.small{font-size:12cqw}
+  #preview{width:26cqw;height:26cqw}
+  .tag{font-size:3.4cqw;font-weight:700;color:#6a6fb0}
+  .bests{display:flex;gap:3cqw;width:100%}
+  .box{flex:1;background:#fff;border-radius:4cqw;padding:2.5cqw 1cqw;box-shadow:0 .8cqw 0 var(--peach)}
+  .box small{display:block;font-size:3.2cqw;font-weight:700;color:#6a6fb0}
+  .box b{display:block;font-size:7cqw;font-weight:800;color:var(--ink);line-height:1.1}
+  .label{font-size:3.6cqw;font-weight:800;color:#6a6fb0}
+  .skins{display:grid;grid-template-columns:repeat(4,1fr);gap:2cqw;width:100%}
+  .skin{font-family:inherit;border:3px solid transparent;background:#fff;border-radius:4cqw;
+    padding:2cqw 0.5cqw;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1cqw;color:var(--ink)}
+  .skin .dot{width:8cqw;height:8cqw;border-radius:50%;box-shadow:inset 0 0 0 2px rgba(0,0,0,.08)}
+  .skin .nm{font-size:3cqw;font-weight:800}
+  .skin .st{font-size:2.6cqw;font-weight:700;color:#6a6fb0}
+  .skin.sel{border-color:var(--mint);box-shadow:0 .6cqw 0 var(--mint)}
+  .skin.locked{filter:grayscale(1);opacity:.5;cursor:not-allowed}
+  .btn{font-family:inherit;font-weight:800;font-size:5.2cqw;color:var(--ink);background:var(--peach);
+    border:none;border-radius:999px;padding:3cqw 7cqw;cursor:pointer;box-shadow:0 1.2cqw 0 rgba(43,45,92,.35);
+    transition:transform .08s}
+  .btn:active{transform:translateY(.8cqw);box-shadow:0 .2cqw 0 rgba(43,45,92,.35)}
+  .btn.big{font-size:7.5cqw;padding:4cqw 10cqw;background:var(--pink);color:#fff;text-shadow:0 .4cqw 0 #d46a75;
+    box-shadow:0 1.6cqw 0 #d46a75}
+  .btn.mint{background:var(--mint)}
+  .btn.lav{background:var(--lav)}
+  .hint{font-size:3.2cqw;font-weight:700;color:#6a6fb0}
+  .final{font-size:6cqw;font-weight:800}
+  .final b{font-size:12cqw;color:var(--pink);text-shadow:0 .6cqw 0 var(--ink);margin-left:1cqw}
+  .msg{font-size:4cqw;font-weight:800;color:#2f8f74;min-height:1.2em}
+  .msg.small{font-size:3.6cqw}
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="game"></canvas>
+
+  <div id="hud" class="hidden">
+    <div id="lives"><span>♥</span><span>♥</span><span>♥</span></div>
+    <div id="score">0</div>
+    <div id="tools">
+      <button class="pill" id="soundBtn">Sound: On</button>
+      <button class="pill" id="pauseBtn" aria-label="Pause">II</button>
+    </div>
+  </div>
+
+  <div id="start" class="screen">
+    <div class="panel">
+      <h1 class="title">Flappy<br>Firefly</h1>
+      <canvas id="preview" width="160" height="160"></canvas>
+      <div class="tag" id="dateTag"></div>
+      <div class="bests">
+        <div class="box"><small>Today's Best</small><b id="dBest">0</b></div>
+        <div class="box"><small>All-Time Best</small><b id="aBest">0</b></div>
+      </div>
+      <div class="label">Pick your firefly</div>
+      <div class="skins" id="skins"></div>
+      <button class="btn big" id="tapBtn">TAP TO FLAP</button>
+      <div class="hint">Tap, click or press Space</div>
+    </div>
+  </div>
+
+  <div id="pauseScreen" class="screen hidden">
+    <div class="panel">
+      <h2 class="title small">Paused</h2>
+      <button class="btn big" id="resumeBtn">Keep Flying</button>
+    </div>
+  </div>
+
+  <div id="overScreen" class="screen hidden">
+    <div class="panel">
+      <h2 class="title small">Game Over</h2>
+      <div class="final">Score <b id="finalScore">0</b></div>
+      <div class="msg" id="overMsg"></div>
+      <div class="bests">
+        <div class="box"><small>Today's Best</small><b id="odBest">0</b></div>
+        <div class="box"><small>All-Time Best</small><b id="oaBest">0</b></div>
+      </div>
+      <button class="btn big" id="againBtn">Play Again</button>
+      <button class="btn mint" id="shareBtn">Share My Score</button>
+      <div class="msg small" id="shareMsg"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  /* ---------- constants ---------- */
+  const W = 400, H = 640, GROUND = 580, BIRD_X = 110, R = 14;
+  const PIPE_W = 64, GRAV = 760, FLAP = -320, MAXFALL = 520;
+  const MINT = '#B5EAD7', MINT_DK = '#7FCFB5', PINK = '#FF9AA2', PINK_DK = '#E8787F', PEACH = '#FFDAC1';
+  const INK = '#2B2D5C';
+  const CONF = ['#FF9AA2', '#FFDAC1', '#F7F3C7', '#B5EAD7', '#C7CEFF', '#FFD36E'];
+
+  const SKINS = {
+    classic: { name: 'Classic', need: 0,    body: '#F7F3C7', glow: '#FFF59D', dot: '#F7F3C7' },
+    pink:    { name: 'Pink',    need: 500,  body: '#FF9AA2', glow: '#FFC2C7', dot: '#FF9AA2' },
+    golden:  { name: 'Golden',  need: 1500, body: '#FFD36E', glow: '#FFE9A0', dot: '#FFD36E' },
+    rainbow: { name: 'Rainbow', need: 3000, body: null,      glow: null,      dot: 'conic-gradient(#FF9AA2,#FFDAC1,#F7F3C7,#B5EAD7,#C7CEFF,#FF9AA2)' }
+  };
+  const ORDER = ['classic', 'pink', 'golden', 'rainbow'];
+
+  /* ---------- DOM ---------- */
+  const $ = id => document.getElementById(id);
+  const cv = $('game'), c = cv.getContext('2d');
+  cv.width = 800; cv.height = 1280; c.setTransform(2, 0, 0, 2, 0, 0);
+  const pv = $('preview'), pc = pv.getContext('2d');
+
+  /* ---------- storage (safe if blocked) ---------- */
+  const LS = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, String(v)); } catch (e) {} }
+  };
+  function todayKey() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+  function getDailyBest() {
+    try { const d = JSON.parse(LS.get('ff_daily', 'null')); if (d && d.date === todayKey()) return d.score | 0; } catch (e) {}
+    return 0;
+  }
+  function setDaily(s) { LS.set('ff_daily', JSON.stringify({ date: todayKey(), score: s })); }
+  function getAllBest() { return parseInt(LS.get('ff_best', '0'), 10) || 0; }
+  function unlocked(k) { return getAllBest() >= SKINS[k].need; }
+  let skinSel = LS.get('ff_skin', 'classic');
+  if (!SKINS[skinSel] || !unlocked(skinSel)) skinSel = 'classic';
+
+  /* ---------- seeded daily layout ---------- */
+  function hashStr(s) {
+    let h = 2166136261 >>> 0;
+    for (const ch of s) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
+    return h >>> 0;
+  }
+  function mulberry32(a) {
+    return () => {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      let t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  let rng = mulberry32(hashStr(todayKey())), layout = [];   // seeded at load so the start screen can draw the daily layout (was null until startGame, which threw "rng is not a function")
+  function ensure(n) {
+    while (layout.length <= n) layout.push({ r: rng(), has: rng() < 0.6, f: rng(), got: false });
+  }
+  // Pipe i: gaps are wide and only narrow very slowly (never below 168 px of 640)
+  function pipeInfo(i) {
+    ensure(i + 1);
+    const gap = Math.max(168, 200 - i * 1.2);
+    const minC = 40 + gap / 2, maxC = GROUND - 30 - gap / 2;
+    const cc = minC + layout[i].r * (maxC - minC);
+    return { D: 420 + i * 240, gap, top: cc - gap / 2, bot: cc + gap / 2 };
+  }
+  // Star sits in the open space between pipe i and i+1, close to the flight path
+  function starPos(i) {
+    const a = pipeInfo(i), b = pipeInfo(i + 1);
+    const mid = ((a.top + a.bot) + (b.top + b.bot)) / 4;
+    const y = Math.max(60, Math.min(GROUND - 60, mid + (layout[i].f - 0.5) * 50));
+    return { x: a.D + 152, y };
+  }
+
+  /* ---------- state ---------- */
+  let state = 'start';
+  let t = 0, dist = 0, y = 288, vy = 0, lives = 3, score = 0, passIdx = 0, shieldT = 0, shake = 0;
+  let parts = [], runSkin = 'classic', runStartAll = 0, lastScore = 0, endTimer = null;
+  const SKY = [];
+  for (let i = 0; i < 70; i++) SKY.push({ x: Math.random() * W, y: Math.random() * (GROUND - 40), r: 0.6 + Math.random() * 1.4, ph: Math.random() * 6.28 });
+
+  function speed() { return Math.min(125, 80 + passIdx * 1.2); }
+
+  /* ---------- audio (Web Audio only) ---------- */
+  let ac = null, master = null, noiseBuf = null;
+  let muted = LS.get('ff_muted', '0') === '1';
+  function initAudio() {
+    try {
+      if (!ac) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        ac = new AC();
+        master = ac.createGain();
+        master.gain.value = muted ? 0 : 0.6;
+        master.connect(ac.destination);
+        noiseBuf = ac.createBuffer(1, Math.floor(ac.sampleRate * 0.6), ac.sampleRate);
+        const d = noiseBuf.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      }
+      if (ac.state === 'suspended') ac.resume();
+    } catch (e) { ac = null; }
+  }
+  function tone(f, t0, dur, type, vol, fEnd) {
+    if (!ac) return;
+    const now = ac.currentTime + t0;
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(f, now);
+    if (fEnd) o.frequency.exponentialRampToValueAtTime(fEnd, now + dur);
+    g.gain.setValueAtTime(0.0001, now);
+    g.gain.exponentialRampToValueAtTime(vol, now + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+    o.connect(g); g.connect(master);
+    o.start(now); o.stop(now + dur + 0.05);
+  }
+  function noiseHit(dur, type, f0, f1, vol) {
+    if (!ac) return;
+    const now = ac.currentTime;
+    const s = ac.createBufferSource(); s.buffer = noiseBuf;
+    const bf = ac.createBiquadFilter(); bf.type = type; bf.Q.value = 1.2;
+    bf.frequency.setValueAtTime(f0, now);
+    bf.frequency.exponentialRampToValueAtTime(f1, now + dur);
+    const g = ac.createGain();
+    g.gain.setValueAtTime(vol, now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+    s.connect(bf); bf.connect(g); g.connect(master);
+    s.start(now); s.stop(now + dur);
+  }
+  const whoosh = () => noiseHit(0.22, 'bandpass', 500, 1800, 0.3);
+  const ding = () => { tone(1046, 0, 0.45, 'sine', 0.25); tone(1568, 0.06, 0.5, 'sine', 0.15); };
+  const chime = () => [784, 988, 1175, 1568].forEach((f, i) => tone(f, i * 0.07, 0.4, 'triangle', 0.18));
+  const thud = () => { tone(160, 0, 0.3, 'sine', 0.5, 45); noiseHit(0.18, 'lowpass', 500, 120, 0.4); };
+  const sadTune = () => [392, 349, 311, 262].forEach((f, i) => tone(f, i * 0.32, 0.45, 'triangle', 0.2));
+  function toggleMute() {
+    muted = !muted;
+    LS.set('ff_muted', muted ? '1' : '0');
+    if (master) master.gain.value = muted ? 0 : 0.6;
+    $('soundBtn').textContent = 'Sound: ' + (muted ? 'Off' : 'On');
+  }
+
+  /* ---------- drawing helpers ---------- */
+  function rr(x, y, w, h, r) {
+    c.beginPath();
+    c.moveTo(x + r, y);
+    c.arcTo(x + w, y, x + w, y + h, r);
+    c.arcTo(x + w, y + h, x, y + h, r);
+    c.arcTo(x, y + h, x, y, r);
+    c.arcTo(x, y, x + w, y, r);
+    c.closePath();
+  }
+  function pill(x, y, w, h, r, fill, stroke) {
+    rr(x, y, w, h, r);
+    c.fillStyle = fill; c.fill();
+    c.strokeStyle = stroke; c.lineWidth = 2; c.stroke();
+  }
+
+  function drawFirefly(ctx, x, yy, skin, time, tilt, s, alpha) {
+    const sk = SKINS[skin];
+    let body = sk.body, glow = sk.glow;
+    if (skin === 'rainbow') {
+      const h = (time * 90) % 360;
+      body = `hsl(${h} 90% 72%)`; glow = `hsl(${h} 100% 80%)`;
+    }
+    ctx.save();
+    ctx.translate(x, yy); ctx.rotate(tilt); ctx.scale(s, s);
+    // soft glow halo
+    ctx.fillStyle = glow;
+    ctx.globalAlpha = alpha * 0.18; ctx.beginPath(); ctx.arc(-2, 0, 34, 0, 7); ctx.fill();
+    ctx.globalAlpha = alpha * 0.3;  ctx.beginPath(); ctx.arc(-2, 0, 22, 0, 7); ctx.fill();
+    ctx.globalAlpha = alpha;
+    // wings flutter
+    const fl = Math.sin(time * 34);
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.save(); ctx.rotate(-0.5 + fl * 0.35); ctx.beginPath(); ctx.ellipse(-4, -11, 8, 4.5, 0, 0, 7); ctx.fill(); ctx.restore();
+    ctx.save(); ctx.rotate(-0.2 - fl * 0.25); ctx.globalAlpha = alpha * 0.55;
+    ctx.beginPath(); ctx.ellipse(-8, -9, 6, 3.5, 0, 0, 7); ctx.fill(); ctx.restore();
+    ctx.globalAlpha = alpha;
+    // glowing abdomen
+    ctx.fillStyle = glow; ctx.beginPath(); ctx.ellipse(-9, 4, 9, 7, 0.3, 0, 7); ctx.fill();
+    // round body
+    ctx.fillStyle = body; ctx.beginPath(); ctx.arc(4, 0, 13, 0, 7); ctx.fill();
+    // big eyes
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(1, -3, 6, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(9, -3, 6, 0, 7); ctx.fill();
+    ctx.fillStyle = INK;
+    ctx.beginPath(); ctx.arc(2.5, -2, 3, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(10.5, -2, 3, 0, 7); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(3.5, -3.5, 1, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(11.5, -3.5, 1, 0, 7); ctx.fill();
+    // cheek + smile
+    ctx.globalAlpha = alpha * 0.6; ctx.fillStyle = PINK;
+    ctx.beginPath(); ctx.arc(7, 5, 2.5, 0, 7); ctx.fill();
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = INK; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(7, 4, 3, 0.2, 1.3); ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawStar(x, yy, time, i) {
+    const bob = Math.sin(time * 3 + i) * 4;
+    const cy = yy + bob;
+    c.save(); c.globalAlpha = 0.25 + 0.15 * Math.sin(time * 4 + i);
+    c.fillStyle = '#FFF3B0'; c.beginPath(); c.arc(x, cy, 20, 0, 7); c.fill(); c.restore();
+    c.save(); c.translate(x, cy); c.beginPath();
+    for (let k = 0; k < 10; k++) {
+      const r = k % 2 === 0 ? 13 : 6;
+      const a = -Math.PI / 2 + k * Math.PI / 5;
+      c.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+    }
+    c.closePath(); c.fillStyle = '#FFD86B'; c.fill();
+    c.strokeStyle = '#E9A93B'; c.lineWidth = 2; c.stroke();
+    c.restore();
+  }
+
+  function drawPipe(px, p) {
+    const w = PIPE_W;
+    // top pipe
+    pill(px + 6, -10, w - 12, p.top - 16, 6, MINT, MINT_DK);
+    pill(px - 6, p.top - 26, w + 12, 26, 8, PINK, PINK_DK);
+    // bottom pipe
+    pill(px - 6, p.bot, w + 12, 26, 8, PINK, PINK_DK);
+    pill(px + 6, p.bot + 26, w - 12, GROUND - p.bot - 26 + 10, 6, MINT, MINT_DK);
+    // shine stripes
+    c.fillStyle = 'rgba(255,255,255,0.45)';
+    c.fillRect(px + 12, -10, 7, p.top - 26 + 10);
+    c.fillRect(px + 12, p.bot + 30, 7, GROUND - p.bot - 34);
+  }
+
+  function trees(speedF, color, base, hBase, period, seedOff) {
+    const off = (dist * speedF) % period;
+    c.fillStyle = color;
+    for (let k = -1; k < W / period + 2; k++) {
+      const x = k * period - off;
+      const v = (((k + seedOff) % 5) + 5) % 5;
+      const h = hBase + v * 14;
+      c.beginPath(); c.moveTo(x - 30, base); c.lineTo(x, base - h); c.lineTo(x + 30, base); c.closePath(); c.fill();
+    }
+    c.fillRect(0, base, W, GROUND - base + 2);
+  }
+
+  function circleRect(cx, cy, r, rx, ry, rw, rh) {
+    const nx = Math.max(rx, Math.min(cx, rx + rw));
+    const ny = Math.max(ry, Math.min(cy, ry + rh));
+    const dx = cx - nx, dy = cy - ny;
+    return dx * dx + dy * dy < r * r;
+  }
+
+  /* ---------- HUD ---------- */
+  function updateHUD(popScore) {
+    $('score').textContent = score;
+    if (popScore) {
+      const el = $('score'); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+    }
+    const hearts = document.querySelectorAll('#lives span');
+    hearts.forEach((h, i) => h.classList.toggle('lost', i >= lives));
+  }
+  function addScore(n) { score += n; updateHUD(true); }
+
+  /* ---------- particles ---------- */
+  function burst(x, yy) {
+    for (let i = 0; i < 26; i++) {
+      const a = Math.random() * Math.PI * 2, sp = 120 + Math.random() * 220;
+      parts.push({ x, y: yy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 120, life: 1,
+        col: CONF[i % CONF.length], rot: Math.random() * 6, vr: (Math.random() - 0.5) * 12 });
+    }
+  }
+  function updateParts(dt) {
+    for (const p of parts) {
+      p.vy += 520 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.vr * dt; p.life -= dt * 0.8;
+    }
+    parts = parts.filter(p => p.life > 0);
+  }
+  function drawParts() {
+    for (const p of parts) {
+      c.save(); c.globalAlpha = Math.max(0, p.life);
+      c.translate(p.x, p.y); c.rotate(p.rot);
+      c.fillStyle = p.col; c.fillRect(-3, -2, 6, 4);
+      c.restore();
+    }
+  }
+
+  /* ---------- game flow ---------- */
+  function hideAllScreens() {
+    ['start', 'pauseScreen', 'overScreen'].forEach(id => $(id).classList.add('hidden'));
+  }
+  function showStart() {
+    state = 'start';
+    hideAllScreens(); $('hud').classList.add('hidden');
+    $('start').classList.remove('hidden');
+    refreshStart();
+  }
+  function startGame() {
+    initAudio();
+    if (endTimer) { clearTimeout(endTimer); endTimer = null; }
+    rng = mulberry32(hashStr(todayKey()));   // same seeded layout for everyone today
+    layout = [];
+    dist = 0; y = 288; vy = 0; lives = 3; score = 0; passIdx = 0; shieldT = 0; shake = 0; parts = [];
+    runSkin = skinSel;
+    runStartAll = getAllBest();
+    state = 'playing';
+    hideAllScreens();
+    $('hud').classList.remove('hidden');
+    $('soundBtn').textContent = 'Sound: ' + (muted ? 'Off' : 'On');
+    updateHUD(false);
+  }
+  function flap() {
+    if (state !== 'playing') return;
+    vy = FLAP;
+    whoosh();
+  }
+  function onFlapInput() {
+    if (state === 'start') { startGame(); flap(); }
+    else if (state === 'playing') flap();
+  }
+  function togglePause() {
+    if (state === 'playing') { state = 'paused'; $('pauseScreen').classList.remove('hidden'); }
+    else if (state === 'paused') { state = 'playing'; $('pauseScreen').classList.add('hidden'); }
+  }
+  function hitLife(kind) {
+    lives--;
+    shieldT = 2;
+    shake = 0.4;
+    thud();
+    if (kind === 'pipe') vy = FLAP * 0.7;   // small hop, same spot
+    updateHUD(false);
+    if (lives <= 0) endGame();
+  }
+  function endGame() {
+    if (state !== 'playing') return;
+    state = 'over';
+    lastScore = score;
+    sadTune();
+    const prevDaily = getDailyBest();
+    const newDaily = score > prevDaily;
+    const newAll = score > getAllBest();
+    if (newDaily) setDaily(score);
+    if (newAll) LS.set('ff_best', score);
+    const unlocks = ORDER.filter(k => SKINS[k].need > 0 && SKINS[k].need > runStartAll && SKINS[k].need <= getAllBest());
+    endTimer = setTimeout(() => showOver(newDaily, newAll, unlocks), 900);
+  }
+  function showOver(newDaily, newAll, unlocks) {
+    endTimer = null;
+    $('hud').classList.add('hidden');
+    $('finalScore').textContent = lastScore;
+    $('odBest').textContent = getDailyBest();
+    $('oaBest').textContent = getAllBest();
+    const lines = [];
+    if (newDaily) lines.push('New Daily Best!');
+    if (newAll) lines.push('New All-Time Best!');
+    unlocks.forEach(k => lines.push(SKINS[k].name + ' Firefly unlocked!'));
+    $('overMsg').textContent = lines.join('  ');
+    $('shareMsg').textContent = '';
+    hideAllScreens();
+    $('overScreen').classList.remove('hidden');
+    state = 'over';
+  }
+
+  /* ---------- update ---------- */
+  function update(dt) {
+    dist += speed() * dt;
+
+    // gravity only; the player just taps to flap
+    vy = Math.min(vy + GRAV * dt, MAXFALL);
+    y += vy * dt;
+    if (y - R < 0) { y = R; vy = Math.max(vy, 0); }   // ceiling is soft
+
+    if (y + R > GROUND) {
+      if (shieldT > 0) { y = GROUND - R; vy = 0; }
+      else {
+        y = Math.min(y, GROUND - R - 40);             // keeps flying from about the same spot
+        vy = FLAP * 0.9;
+        hitLife('ground');
+        if (state !== 'playing') return;
+      }
+    }
+    shieldT = Math.max(0, shieldT - dt);
+
+    // pipes passed: 1 point each
+    while (pipeInfo(passIdx).D - dist + PIPE_W < BIRD_X - R) {
+      passIdx++;
+      addScore(1);
+      ding();
+    }
+
+    // pipe collisions
+    for (let i = passIdx; ; i++) {
+      const p = pipeInfo(i);
+      const px = p.D - dist;
+      if (px > W + 10) break;
+      if (px + PIPE_W < BIRD_X - R - 4) continue;
+      if (shieldT <= 0 &&
+          (circleRect(BIRD_X, y, R - 2, px, 0, PIPE_W, p.top) ||
+           circleRect(BIRD_X, y, R - 2, px, p.bot, PIPE_W, GROUND - p.bot))) {
+        hitLife('pipe');
+        if (state !== 'playing') return;
+        break;
+      }
+    }
+
+    // stars: 5 points each, with confetti and a chime
+    for (let i = Math.max(0, passIdx - 1); ; i++) {
+      const a = pipeInfo(i);
+      if (a.D + 152 - dist > W + 30) break;
+      if (!layout[i].has || layout[i].got) continue;
+      const s = starPos(i);
+      const sx = s.x - dist;
+      const dx = sx - BIRD_X, dy = s.y - y;
+      if (dx * dx + dy * dy < (R + 14) * (R + 14)) {
+        layout[i].got = true;
+        addScore(5);
+        chime();
+        burst(sx, s.y);
+      }
+    }
+  }
+
+  /* ---------- render ---------- */
+  function render() {
+    c.save();
+    c.clearRect(0, 0, W, H);
+    if (shake > 0) c.translate((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8);
+
+    // night sky
+    const g = c.createLinearGradient(0, 0, 0, GROUND);
+    g.addColorStop(0, '#0d1a3f'); g.addColorStop(0.6, '#1b2d6b'); g.addColorStop(1, '#2c3a7d');
+    c.fillStyle = g; c.fillRect(0, 0, W, H);
+
+    // twinkling stars
+    for (const s of SKY) {
+      c.globalAlpha = 0.45 + 0.4 * Math.sin(t * 2 + s.ph);
+      c.fillStyle = '#FFFFFF';
+      c.beginPath(); c.arc(s.x, s.y, s.r, 0, 7); c.fill();
+    }
+    c.globalAlpha = 1;
+
+    // moon
+    c.fillStyle = 'rgba(247,243,199,0.15)'; c.beginPath(); c.arc(318, 120, 46, 0, 7); c.fill();
+    c.fillStyle = '#F7F3C7'; c.beginPath(); c.arc(318, 120, 24, 0, 7); c.fill();
+    c.fillStyle = 'rgba(199,206,255,0.6)';
+    c.beginPath(); c.arc(312, 114, 4, 0, 7); c.fill();
+    c.beginPath(); c.arc(324, 128, 3, 0, 7); c.fill();
+
+    // forest silhouettes (parallax)
+    trees(0.25, '#1f3f72', GROUND - 20, 110, 64, 0);
+    trees(0.5, '#10284d', GROUND, 80, 52, 2);
+
+    // pipes
+    for (let i = Math.max(0, passIdx - 1); ; i++) {
+      const p = pipeInfo(i);
+      const px = p.D - dist;
+      if (px > W + 10) break;
+      if (px + PIPE_W < -10) continue;
+      drawPipe(px, p);
+    }
+
+    // stars
+    for (let i = Math.max(0, passIdx - 1); ; i++) {
+      const a = pipeInfo(i);
+      const sx0 = a.D + 152 - dist;
+      if (sx0 > W + 30) break;
+      if (!layout[i].has || layout[i].got) continue;
+      const s = starPos(i);
+      if (sx0 < -30) continue;
+      drawStar(sx0, s.y, t, i);
+    }
+
+    // ground
+    c.fillStyle = '#1E4D5C'; c.fillRect(0, GROUND, W, H - GROUND);
+    c.fillStyle = MINT; c.fillRect(0, GROUND, W, 8);
+    c.fillStyle = PEACH;
+    for (let x = -((dist * 1) % 30); x < W; x += 30) { c.globalAlpha = 0.5; c.beginPath(); c.arc(x + 15, GROUND + 22, 3, 0, 7); c.fill(); }
+    c.globalAlpha = 1;
+
+    // firefly (idle bob on the start screen)
+    let by = y;
+    if (state === 'start') by = 288 + Math.sin(t * 3) * 10;
+    const tilt = Math.max(-0.5, Math.min(0.8, vy / 500));
+    if (shieldT > 0) {
+      c.strokeStyle = `rgba(181,234,215,${0.55 + 0.3 * Math.sin(t * 10)})`;
+      c.lineWidth = 3; c.beginPath(); c.arc(BIRD_X, by, 24, 0, 7); c.stroke();
+    }
+    const blinkOff = shieldT > 0 && Math.floor(t * 12) % 2 === 1;
+    drawFirefly(c, BIRD_X, by, runSkin === undefined ? skinSel : (state === 'start' ? skinSel : runSkin),
+      t, tilt, 1, blinkOff ? 0.3 : 1);
+
+    drawParts();
+    c.restore();
+  }
+
+  function drawPreview() {
+    if (!$('start') || $('start').classList.contains('hidden')) return;
+    pc.setTransform(1, 0, 0, 1, 0, 0);
+    pc.clearRect(0, 0, pv.width, pv.height);
+    pc.setTransform(2, 0, 0, 2, 0, 0);
+    drawFirefly(pc, 40, 42, skinSel, t, Math.sin(t * 2) * 0.1, 1.4, 1);
+  }
+
+  /* ---------- start-screen UI ---------- */
+  function refreshStart() {
+    $('dBest').textContent = getDailyBest();
+    $('aBest').textContent = getAllBest();
+    const d = new Date();
+    $('dateTag').textContent = "Today's challenge \u00B7 " +
+      d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
+    renderSkins();
+  }
+  function renderSkins() {
+    $('skins').innerHTML = ORDER.map(k => {
+      const sk = SKINS[k];
+      const lock = !unlocked(k);
+      const cls = ['skin', k === skinSel ? 'sel' : '', lock ? 'locked' : ''].join(' ');
+      const status = lock ? '\uD83D\uDD12 ' + sk.need : (k === 'classic' ? 'Ready' : 'Unlocked');
+      return `<button class="${cls}" data-k="${k}" aria-disabled="${lock}">
+        <span class="dot" style="background:${sk.dot}"></span>
+        <span class="nm">${sk.name}</span>
+        <span class="st">${status}</span></button>`;
+    }).join('');
+  }
+
+  /* ---------- share ---------- */
+  function copyText(text, msg) {
+    const done = () => { msg.textContent = 'Copied! Share it anywhere.'; };
+    const fallback = () => {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) {}
+      ta.remove();
+      ok ? done() : (msg.textContent = 'Could not copy. Please copy the text by hand.');
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } else fallback();
+  }
+  function shareScore() {
+    const text = `I scored ${lastScore} points in Flappy Firefly on Ashvish Creative Studio! Can you beat me? Play free: https://ashvishcreativestudio.com`;
+    const msg = $('shareMsg');
+    msg.textContent = '';
+    if (navigator.share) {
+      navigator.share({ title: 'Flappy Firefly', text }).catch(err => {
+        if (err && err.name !== 'AbortError') copyText(text, msg);
+      });
+      return;
+    }
+    copyText(text, msg);
+  }
+
+  /* ---------- input ---------- */
+  document.addEventListener('pointerdown', e => {
+    if (e.target.closest && e.target.closest('button')) return;   // buttons handle themselves
+    onFlapInput();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.code === 'Space') {
+      e.preventDefault();
+      if (document.activeElement && document.activeElement.tagName === 'BUTTON') document.activeElement.blur();
+      if (!e.repeat) onFlapInput();
+    } else if (e.code === 'KeyM') {
+      toggleMute();
+    } else if (e.code === 'KeyP' || e.code === 'Escape') {
+      if (state === 'playing' || state === 'paused') togglePause();
+    }
+  });
+  $('tapBtn').addEventListener('click', () => { startGame(); flap(); });
+  $('againBtn').addEventListener('click', () => startGame());
+  $('shareBtn').addEventListener('click', shareScore);
+  $('pauseBtn').addEventListener('click', togglePause);
+  $('resumeBtn').addEventListener('click', togglePause);
+  $('soundBtn').addEventListener('click', toggleMute);
+  $('skins').addEventListener('click', e => {
+    const b = e.target.closest('.skin');
+    if (!b) return;
+    const k = b.dataset.k;
+    if (!unlocked(k)) return;
+    skinSel = k;
+    LS.set('ff_skin', k);
+    renderSkins();
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && state === 'playing') togglePause();
+  });
+
+  /* ---------- loop ---------- */
+  let last = performance.now();
+  function frame(ts) {
+    const dt = Math.min(0.034, Math.max(0, (ts - last) / 1000));
+    last = ts;
+    t += dt;
+    if (state === 'playing') update(dt);
+    if (shake > 0) shake -= dt;
+    updateParts(dt);
+    render();
+    drawPreview();
+    requestAnimationFrame(frame);
+  }
+
+  $('soundBtn').textContent = 'Sound: ' + (muted ? 'Off' : 'On');
+  updateHUD(false);
+  showStart();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
+
+<!--
+  ===== Flappy Firefly · Ashvish Creative Studio Play Zone · reference notes =====
+  UNLOCKS: Pink Firefly 500 · Golden Firefly 1500 · Rainbow Firefly 3000 (Classic is always available)
+  SHARE TEXT: I scored X points in Flappy Firefly on Ashvish Creative Studio! Can you beat me? Play free: https://ashvishcreativestudio.com
+  DAILY SEED: derived from the local date (YYYY-MM-DD), FNV-1a hash fed into mulberry32. Same pipes and stars for everyone each day.
+  AUDIO: Web Audio API only, no audio files.
+-->

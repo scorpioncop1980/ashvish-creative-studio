@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Brick Breaker · Ashvish Creative Studio</title>
+<style>
+:root{--pink:#FF9AA2;--peach:#FFDAC1;--yel:#F7F3C7;--mint:#B5EAD7;--lav:#C7CEFF;--cream:#FFF9F0;--ink:#7A4A5A;--deep:#E7707A}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--cream);touch-action:none;user-select:none;-webkit-user-select:none}
+body{display:flex;align-items:center;justify-content:center;font-family:"Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif;color:var(--ink)}
+button{font-family:inherit;font-weight:700}
+#stage{position:relative;width:480px;height:720px;flex:none;overflow:hidden;background:var(--cream);transform-origin:center;border-radius:24px}
+canvas{position:absolute;inset:0;width:100%;height:100%}
+.chip{position:absolute;top:12px;height:34px;padding:0 14px;border:none;border-radius:999px;background:var(--mint);color:var(--ink);font-size:15px;box-shadow:0 4px 0 #8fc7b3;cursor:pointer;z-index:6}
+#snd{left:12px}
+#pz{right:12px;background:var(--peach);box-shadow:0 4px 0 #d9a98a;display:none}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px;text-align:center;background:rgba(255,249,240,.95);z-index:5}
+.screen.on{display:flex}
+h1,h2{font-family:"Dancing Script","Brush Script MT","Segoe Script",cursive;font-weight:700;color:var(--deep);line-height:1}
+h1{font-size:68px}
+h2{font-size:56px}
+p{font-size:18px}
+.sub{font-size:17px;max-width:340px}
+.small{font-size:14px;opacity:.85}
+.big{font-size:64px;font-weight:700;color:var(--deep)}
+.btn{min-width:230px;padding:14px 26px;border:none;border-radius:999px;background:var(--pink);color:var(--ink);font-size:24px;box-shadow:0 7px 0 #d96b75;cursor:pointer}
+.btn:active{transform:translateY(4px);box-shadow:0 3px 0 #d96b75}
+.btn.mint{background:var(--mint);box-shadow:0 7px 0 #7fbfa9}
+.btn.lav{background:var(--lav);box-shadow:0 7px 0 #9aa3e0}
+.btn.peach{background:var(--peach);box-shadow:0 7px 0 #d9a98a}
+.stats{display:flex;gap:12px}
+.stats div{background:#fff;border-radius:20px;padding:10px 16px;font-size:15px;min-width:140px}
+.stats b{display:block;font-size:26px;color:var(--deep)}
+.skins{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:400px}
+.skin{border:none;border-radius:16px;padding:8px 10px;font-size:13px;color:var(--ink);background:#fff;cursor:pointer;width:124px;box-shadow:0 3px 0 #eadbd0}
+.skin i{display:block;height:12px;border-radius:6px;margin:6px 0}
+.skin.sel{outline:4px solid var(--mint)}
+.skin.locked{filter:grayscale(1);opacity:.55;cursor:not-allowed}
+#toast{position:absolute;left:50%;bottom:26px;transform:translate(-50%,20px);background:var(--mint);padding:10px 20px;border-radius:999px;font-size:18px;opacity:0;transition:.3s;pointer-events:none;z-index:9;white-space:nowrap}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="c"></canvas>
+  <button class="chip" id="snd">Sound On</button>
+  <button class="chip" id="pz">Pause</button>
+
+  <div id="s-start" class="screen on">
+    <h1>Brick Breaker</h1>
+    <p class="sub">Move the paddle left and right. Keep the golden ball bouncing!</p>
+    <div class="skins" id="skins"></div>
+    <div class="stats">
+      <div>Daily Best<b id="bd">0</b></div>
+      <div>All-Time Best<b id="ba">0</b></div>
+    </div>
+    <button class="btn" data-go="normal">Play</button>
+    <button class="btn mint" data-go="daily">Daily Challenge</button>
+    <p class="small">Today's challenge: <span id="dd"></span> · same bricks and ball speed for everyone</p>
+  </div>
+
+  <div id="s-pause" class="screen">
+    <h2>Paused</h2>
+    <button class="btn" id="resume">Resume</button>
+    <button class="btn lav" id="quit">Quit to Menu</button>
+  </div>
+
+  <div id="s-clear" class="screen">
+    <h2>Level Clear!</h2>
+    <p id="lc"></p>
+    <button class="btn mint" id="next">Next Level</button>
+  </div>
+
+  <div id="s-over" class="screen">
+    <h2>Game Over</h2>
+    <p>Your final score</p>
+    <div class="big" id="fs">0</div>
+    <p class="small" id="ob"></p>
+    <button class="btn" id="again">Play Again</button>
+    <button class="btn peach" id="share">Share My Score</button>
+    <button class="btn lav" id="menu">Menu</button>
+  </div>
+  <div id="toast"></div>
+</div>
+
+<script>
+const W=480,H=720,BW=50,BH=22,GAP=6,BX0=(W-(8*BW+7*GAP))/2,BY0=112,PY=H-56,PH=20;
+const PAL=['#FF9AA2','#B5EAD7','#C7CEFF','#FFDAC1'];
+const INK='#7A4A5A',CREAM='#FFF9F0',FF='"Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif';
+const SKINS=[
+  {id:'candy',name:'Candy Pink',req:0,c:'#FF9AA2'},
+  {id:'mint',name:'Mint',req:0,c:'#B5EAD7'},
+  {id:'lav',name:'Lavender',req:0,c:'#C7CEFF'},
+  {id:'hot',name:'Pink Paddle',req:500,c:'#FF6F91'},
+  {id:'gold',name:'Golden Paddle',req:1500,c:'#F4C94A'},
+  {id:'rain',name:'Rainbow Paddle',req:3000,c:'rain'}];
+
+const $=id=>document.getElementById(id);
+const cv=$('c'),ctx=cv.getContext('2d'),stage=$('stage');
+cv.width=W*2;cv.height=H*2;
+
+const LS={g(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},s(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const S={st:'menu',prev:'',mode:'normal',score:0,level:1,lives:3,bricks:[],balls:[],items:[],parts:[],
+  skin:LS.g('bb_skin','candy'),sndOn:LS.g('bb_snd','1')==='1',
+  best:{all:+LS.g('bb_all',0),daily:0}};
+const P={x:W/2,target:W/2,w:130,tw:0,ts:0};
+const K={};
+
+/* ---------- seeded RNG (daily challenge) ---------- */
+const today=()=>{const d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate()};
+function loadDaily(){try{const v=JSON.parse(LS.g('bb_daily','null'));return v&&v.d===today()?(+v.s||0):0}catch(e){return 0}}
+S.best.daily=loadDaily();
+function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+/* ---------- Web Audio (no files) ---------- */
+let ac=null;
+function A(){if(!ac){try{ac=new(window.AudioContext||window.webkitAudioContext)()}catch(e){return null}}if(ac.state==='suspended')ac.resume();return ac}
+function tone(f,d,type,v,t0,f2){if(!S.sndOn)return;const c=A();if(!c)return;const s=c.currentTime+(t0||0),o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,s);if(f2)o.frequency.exponentialRampToValueAtTime(f2,s+d);g.gain.setValueAtTime(v,s);g.gain.exponentialRampToValueAtTime(.001,s+d);o.connect(g).connect(c.destination);o.start(s);o.stop(s+d+.02)}
+function seq(n,step,type,v){n.forEach((f,i)=>tone(f,step*1.6,type,v,i*step))}
+const sfx={
+  bounce:()=>tone(520,.09,'sine',.25,0,380),
+  pop:()=>tone(900,.07,'triangle',.22,0,1500),
+  tick:()=>tone(300,.05,'square',.08),
+  chime:()=>seq([784,988,1175],.08,'sine',.2),
+  jingle:()=>seq([523,659,784,1047,1319],.11,'triangle',.22),
+  sad:()=>seq([392,349,311,262],.28,'sawtooth',.12),
+  lose:()=>seq([392,262],.2,'triangle',.2)};
+
+/* ---------- layout / scaling ---------- */
+function fit(){const s=Math.min(innerWidth/W,innerHeight/H);stage.style.transform=`scale(${s})`}
+window.addEventListener('resize',fit);fit();
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(e=>e.classList.toggle('on',e.id==='s-'+id));
+  $('pz').style.display=(id===null||id==='pause')?'block':'none';
+}
+function renderStart(){
+  $('bd').textContent=S.best.daily;$('ba').textContent=S.best.all;
+  $('dd').textContent=new Date().toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+  const box=$('skins');box.innerHTML='';
+  SKINS.forEach(k=>{
+    const ok=S.best.all>=k.req;
+    const b=document.createElement('button');
+    b.className='skin'+(ok?'':' locked')+(ok&&S.skin===k.id?' sel':'');
+    const sw=k.c==='rain'?'linear-gradient(90deg,#FF9AA2,#FFDAC1,#F7F3C7,#B5EAD7,#C7CEFF)':k.c;
+    b.innerHTML=`<i style="background:${sw}"></i>${ok?k.name:'🔒 Unlock at '+k.req}`;
+    b.onclick=()=>{if(!ok)return;S.skin=k.id;LS.s('bb_skin',k.id);renderStart()};
+    box.appendChild(b);
+  });
+}
+function toMenu(){S.st='menu';show('start');renderStart()}
+
+/* ---------- game flow ---------- */
+function newBall(){return{x:P.x,y:PY-10,vx:0,vy:0,r:9,off:S.mode==='daily'?0.25:(Math.random()-.5)*.8}}
+function spd(){let s=5.0*Math.min(1+.05*(S.level-1),1.3);return P.ts>0?s*.6:s}
+function makeLevel(){
+  const r=S.mode==='daily'?rng(today()*31+S.level):Math.random;
+  S.bricks=[];
+  const rows=Math.min(2+S.level,7);
+  for(let row=0;row<rows;row++)for(let c=0;c<8;c++){
+    if(r()>=.85)continue;
+    const t=r()<.07?'gold':(S.level>1&&r()<.22)?'crack':'norm';
+    S.bricks.push({x:BX0+c*(BW+GAP),y:BY0+row*(BH+GAP),t,hp:t==='crack'?2:1,cd:0,alive:true,col:t==='gold'?'#FFE27A':PAL[(row+c)%4]});
+  }
+  S.balls=[newBall()];S.items=[];S.parts=[];P.tw=0;P.ts=0;
+}
+function startGame(mode){A();S.mode=mode;S.score=0;S.level=1;S.lives=3;P.x=P.target=W/2;makeLevel();S.st='ready';show(null)}
+function launch(){
+  if(S.st!=='ready')return;
+  const b=S.balls[0],a=-Math.PI/2+b.off,s=spd();
+  b.vx=Math.cos(a)*s;b.vy=Math.sin(a)*s;S.st='play';
+}
+function pause(){if(S.st!=='play'&&S.st!=='ready')return;S.prev=S.st;S.st='paused';show('pause')}
+function resume(){if(S.st!=='paused')return;S.st=S.prev;show(null)}
+function togglePause(){S.st==='paused'?resume():pause()}
+function nextLevel(){S.level++;makeLevel();S.st='ready';show(null)}
+function gameOver(){
+  S.st='over';sfx.sad();
+  S.best.all=Math.max(S.best.all,S.score);LS.s('bb_all',S.best.all);
+  if(S.mode==='daily'){S.best.daily=Math.max(S.best.daily,S.score);LS.s('bb_daily',JSON.stringify({d:today(),s:S.best.daily}))}
+  $('fs').textContent=S.score;
+  $('ob').textContent=`All-Time Best ${S.best.all} · Daily Best ${S.best.daily}`;
+  show('over');
+}
+function toggleSound(){S.sndOn=!S.sndOn;LS.s('bb_snd',S.sndOn?'1':'0');$('snd').textContent=S.sndOn?'Sound On':'Sound Off'}
+
+/* ---------- effects & items ---------- */
+function burst(x,y,col){
+  const cols=[col,'#FFDAC1','#B5EAD7','#C7CEFF','#F7F3C7','#FF9AA2'];
+  for(let i=0;i<18;i++){const a=Math.random()*6.283,s=1.5+Math.random()*3;
+    S.parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-1,life:45+Math.random()*25,c:cols[i%cols.length],r:Math.random()*6})}
+}
+function hitBrick(k){
+  k.hp--;k.cd=6;
+  if(k.hp>0){sfx.tick();return}
+  k.alive=false;
+  S.score+=k.t==='gold'?50:k.t==='crack'?20:10;
+  burst(k.x+BW/2,k.y+BH/2,k.col);sfx.pop();
+  if(Math.random()<.15){
+    const kind=Math.random()<.12?'heart':['wide','multi','slow'][Math.floor(Math.random()*3)];
+    S.items.push({x:k.x+BW/2,y:k.y+BH/2,k:kind});
+  }
+}
+function applyItem(k){
+  sfx.chime();
+  if(k==='heart'){S.lives=Math.min(5,S.lives+1);return}
+  if(k==='wide')P.tw=10000;
+  if(k==='slow')P.ts=10000;
+  if(k==='multi'&&S.balls.length<3){const b=S.balls[0];S.balls.push({...b,vx:-b.vx,off:-b.off})}
+}
+
+/* ---------- update ---------- */
+function update(f,ms){
+  const dir=(K.ArrowRight?1:0)-(K.ArrowLeft?1:0);
+  if(dir)P.target+=dir*9*f;
+  P.target=Math.max(0,Math.min(W,P.target));
+  if(P.tw>0)P.tw-=ms;if(P.ts>0)P.ts-=ms;
+  P.w=P.tw>0?180:130;
+  P.x+=(P.target-P.x)*Math.min(1,.35*f);
+  P.x=Math.max(P.w/2,Math.min(W-P.w/2,P.x));
+  for(const k of S.bricks)if(k.cd>0)k.cd-=f;
+  if(S.st==='ready'){const b=S.balls[0];b.x=P.x;b.y=PY-b.r-1;return}
+
+  const sp=spd();
+  for(const b of S.balls){
+    b.x+=b.vx*f;b.y+=b.vy*f;
+    if(b.x<b.r){b.x=b.r;b.vx=Math.abs(b.vx)}
+    if(b.x>W-b.r){b.x=W-b.r;b.vx=-Math.abs(b.vx)}
+    if(b.y<b.r){b.y=b.r;b.vy=Math.abs(b.vy)}
+    if(b.vy>0&&b.y+b.r>=PY&&b.y+b.r<=PY+PH+10&&Math.abs(b.x-P.x)<P.w/2+b.r){
+      const o=Math.max(-1,Math.min(1,(b.x-P.x)/(P.w/2))),a=-Math.PI/2+o*1.0;
+      b.vx=Math.cos(a)*sp;b.vy=Math.sin(a)*sp;b.y=PY-b.r;sfx.bounce();
+    }
+    for(const k of S.bricks){
+      if(!k.alive||k.cd>0)continue;
+      const cx=Math.max(k.x,Math.min(b.x,k.x+BW)),cy=Math.max(k.y,Math.min(b.y,k.y+BH));
+      const dx=b.x-cx,dy=b.y-cy;
+      if(dx*dx+dy*dy<=b.r*b.r){
+        if(Math.abs(dx)>Math.abs(dy))b.vx=-b.vx;else b.vy=-b.vy;
+        hitBrick(k);break;
+      }
+    }
+    const m=Math.hypot(b.vx,b.vy)||1;b.vx*=sp/m;b.vy*=sp/m;
+  }
+
+  S.balls=S.balls.filter(b=>b.y-b.r<=H);
+  if(S.balls.length===0){
+    S.lives--;sfx.lose();P.tw=0;P.ts=0;S.items=[];
+    if(S.lives<=0){gameOver();return}
+    S.balls=[newBall()];S.st='ready';return;
+  }
+
+  for(const it of S.items){
+    it.y+=2*f;
+    if(it.y+12>=PY&&it.y-12<=PY+PH&&Math.abs(it.x-P.x)<P.w/2+12){it.dead=true;applyItem(it.k)}
+  }
+  S.items=S.items.filter(it=>!it.dead&&it.y<H+20);
+
+  for(const p of S.parts){p.x+=p.vx*f;p.y+=p.vy*f;p.vy+=.12*f;p.life-=f}
+  S.parts=S.parts.filter(p=>p.life>0);
+
+  if(S.bricks.every(k=>!k.alive)){
+    S.st='clear';sfx.jingle();
+    $('lc').textContent=`Level ${S.level} done! The next one has one more row.`;
+    show('clear');
+  }
+}
+
+/* ---------- draw ---------- */
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function draw(){
+  ctx.setTransform(2,0,0,2,0,0);
+  ctx.fillStyle=CREAM;ctx.fillRect(0,0,W,H);
+
+  for(const k of S.bricks){
+    if(!k.alive)continue;
+    rr(k.x,k.y,BW,BH,7);ctx.fillStyle=k.col;ctx.fill();
+    rr(k.x+4,k.y+3,BW-8,6,3);ctx.fillStyle='rgba(255,255,255,.45)';ctx.fill();
+    if(k.t==='crack'){
+      ctx.strokeStyle='rgba(122,74,90,.55)';ctx.lineWidth=k.hp<2?2.5:1.5;
+      ctx.beginPath();ctx.moveTo(k.x+12,k.y+4);ctx.lineTo(k.x+22,k.y+11);ctx.lineTo(k.x+16,k.y+BH-3);
+      ctx.moveTo(k.x+22,k.y+11);ctx.lineTo(k.x+36,k.y+8);ctx.stroke();
+    }
+    if(k.t==='gold'){ctx.fillStyle='#fff';ctx.font='700 14px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('★',k.x+BW/2,k.y+BH/2+1)}
+  }
+
+  for(const it of S.items){
+    const c=it.k==='heart'?'#FF6F91':it.k==='wide'?'#5BBF9C':it.k==='multi'?'#8C95E0':'#E8A77E';
+    ctx.beginPath();ctx.arc(it.x,it.y,13,0,6.283);ctx.fillStyle='#fff';ctx.fill();
+    ctx.fillStyle=c;ctx.font='700 20px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(it.k==='heart'?'♥':'★',it.x,it.y+1);
+  }
+
+  for(const b of S.balls){
+    const g=ctx.createRadialGradient(b.x-3,b.y-3,1,b.x,b.y,b.r);
+    g.addColorStop(0,'#FFF8D0');g.addColorStop(.5,'#FFD54A');g.addColorStop(1,'#E8A93A');
+    ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,6.283);ctx.fillStyle=g;ctx.fill();
+  }
+
+  const sk=SKINS.find(k=>k.id===S.skin)||SKINS[0];
+  let fill=sk.c;
+  if(sk.c==='rain'){
+    fill=ctx.createLinearGradient(P.x-P.w/2,0,P.x+P.w/2,0);
+    ['#FF9AA2','#FFDAC1','#F7F3C7','#B5EAD7','#C7CEFF'].forEach((c,i,a)=>fill.addColorStop(i/(a.length-1),c));
+  }
+  rr(P.x-P.w/2,PY,P.w,PH,10);ctx.fillStyle=fill;ctx.fill();
+  rr(P.x-P.w/2+6,PY+4,P.w-12,4,2);ctx.fillStyle='rgba(255,255,255,.55)';ctx.fill();
+
+  for(const p of S.parts){
+    ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r+p.life*.1);ctx.fillStyle=p.c;ctx.fillRect(-3,-2,6,4);ctx.restore();
+  }
+
+  if(S.st!=='menu'){
+    ctx.fillStyle=INK;ctx.textAlign='center';ctx.textBaseline='alphabetic';
+    ctx.font='700 26px '+FF;ctx.fillText('Score '+S.score,W/2,36);
+    ctx.font='700 17px '+FF;ctx.fillText('Level '+S.level,W/2,60);
+    ctx.textAlign='left';ctx.font='700 22px sans-serif';
+    for(let i=0;i<5;i++){ctx.fillStyle=i<S.lives?'#FF6F91':'#E9DCD6';ctx.fillText('♥',14+i*24,84)}
+    if(S.st==='ready'){ctx.textAlign='center';ctx.fillStyle=INK;ctx.font='700 20px '+FF;ctx.fillText('Tap to launch!',W/2,PY-40)}
+  }
+}
+
+/* ---------- loop ---------- */
+let last=0;
+function loop(t){
+  const dt=Math.min(t-last,50)||16.67;last=t;
+  if(S.st==='play'||S.st==='ready')update(dt/16.67,dt);
+  draw();requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* ---------- input ---------- */
+function lx(e){const r=cv.getBoundingClientRect();return(e.clientX-r.left)*W/r.width}
+stage.addEventListener('pointermove',e=>{if(S.st==='play'||S.st==='ready')P.target=lx(e)});
+stage.addEventListener('pointerdown',e=>{
+  A();
+  if(S.st==='play'||S.st==='ready')P.target=lx(e);
+  if(e.target===cv&&S.st==='ready')launch();
+});
+addEventListener('keydown',e=>{
+  A();
+  const k=e.key;
+  if(['ArrowLeft','ArrowRight',' '].includes(k))e.preventDefault();
+  K[k]=true;
+  if(k===' '){S.st==='ready'?launch():togglePause()}
+  if(k==='p'||k==='P'||k==='Escape')togglePause();
+  if(k==='m'||k==='M')toggleSound();
+});
+addEventListener('keyup',e=>{K[e.key]=false});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pause()});
+
+/* ---------- buttons ---------- */
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>startGame(b.dataset.go));
+$('snd').textContent=S.sndOn?'Sound On':'Sound Off';
+$('snd').onclick=()=>{A();toggleSound()};
+$('pz').onclick=()=>{A();togglePause()};
+$('resume').onclick=resume;
+$('quit').onclick=toMenu;
+$('next').onclick=()=>{A();nextLevel()};
+$('again').onclick=()=>{A();startGame(S.mode)};
+$('menu').onclick=toMenu;
+
+let tt;
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2200)}
+function share(){
+  const t=`I scored ${S.score} points in Brick Breaker on Ashvish Creative Studio! Can you beat me? Play free: https://ashvishcreativestudio.com`;
+  if(navigator.share){navigator.share({text:t}).catch(()=>{});return}
+  const done=()=>toast('Copied! Share it anywhere.');
+  const fallback=()=>{const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy')}catch(e){}ta.remove();done()};
+  if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(t).then(done,fallback);
+  else fallback();
+}
+$('share').onclick=share;
+
+renderStart();
+show('start');
+</script>
+<!--
+Unlocks (based on All-Time Best): Pink Paddle 500, Golden Paddle 1500, Rainbow Paddle 3000.
+Share text: I scored X points in Brick Breaker on Ashvish Creative Studio! Can you beat me? Play free: https://ashvishcreativestudio.com
+Daily seed: today's date as YYYYMMDD drives the daily brick layout (per level); ball speed is the same for everyone.
+Audio: Web Audio only, no audio files.
+-->
+</body>
+</html>

@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<title>Firefly Run · Ashvish Creative Studio</title>
+<style>
+  :root{
+    --pink:#FF9AA2; --peach:#FFDAC1; --yellow:#F7F3C7; --mint:#B5EAD7; --lav:#C7CEFF;
+    --cream:#FFF8EC; --ink:#1d2456; --night:#0d1640;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:var(--cream);overflow:hidden}
+  body{
+    display:flex;align-items:center;justify-content:center;color:var(--ink);
+    font-family:ui-rounded,"SF Pro Rounded","Varela Round","Arial Rounded MT Bold",system-ui,sans-serif;
+    -webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;touch-action:manipulation;
+  }
+  button{font-family:inherit;cursor:pointer}
+  button:focus-visible{outline:4px solid var(--ink);outline-offset:3px}
+
+  /* ---------- frame ---------- */
+  #app{
+    position:relative;width:min(100vw,640px);height:100vh;height:100dvh;
+    display:flex;flex-direction:column;background:var(--cream);overflow:hidden;
+  }
+  @media (min-width:700px){
+    #app{height:min(94vh,920px);border-radius:28px;border:6px solid var(--peach);box-shadow:0 14px 40px rgba(29,36,86,.25)}
+  }
+
+  /* ---------- HUD ---------- */
+  #hud{display:flex;flex-direction:column;gap:8px;padding:12px 14px 8px}
+  .hud-row{display:flex;align-items:center;gap:8px}
+  .spacer{flex:1}
+  .pill{
+    background:var(--yellow);border-radius:999px;padding:6px 16px;white-space:nowrap;
+    font-weight:900;font-size:clamp(16px,4.4vw,22px);box-shadow:0 3px 0 #e2daa0;
+  }
+  .pill small{display:block;font-size:.55em;font-weight:700;opacity:.7;line-height:1.1}
+  .round-btn{
+    width:48px;height:48px;border-radius:50%;border:0;background:var(--peach);
+    font-size:20px;color:var(--ink);box-shadow:0 4px 0 #e0b08f;display:grid;place-items:center;
+  }
+  .round-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #e0b08f}
+  .hearts{font-size:clamp(24px,6.5vw,32px);line-height:1;letter-spacing:4px;color:var(--pink);text-shadow:0 2px 0 #d86f78}
+  .hearts .lost{color:#d9d4e8;text-shadow:none}
+  .tag{background:var(--lav);border-radius:999px;padding:4px 12px;font-size:.8rem;font-weight:800}
+
+  /* ---------- play area ---------- */
+  #stage{
+    position:relative;flex:1;min-height:0;margin:0 10px;border-radius:24px;overflow:hidden;
+    background:var(--night);box-shadow:inset 0 0 0 3px var(--lav);
+  }
+  #cv{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
+
+  /* ---------- jump ---------- */
+  #controls{padding:10px 16px calc(14px + env(safe-area-inset-bottom,0px))}
+  #jumpBtn{
+    width:100%;height:clamp(72px,12vh,100px);border:0;border-radius:999px;color:var(--ink);
+    background:linear-gradient(180deg,#FFB7BD 0%,var(--pink) 60%,#f48790 100%);
+    font-size:clamp(28px,7vw,40px);font-weight:900;letter-spacing:.08em;
+    box-shadow:0 9px 0 #e5767f;
+  }
+  #jumpBtn:active{transform:translateY(5px);box-shadow:0 4px 0 #e5767f}
+
+  /* ---------- overlays ---------- */
+  .overlay{
+    position:absolute;inset:0;z-index:5;display:none;align-items:center;justify-content:center;
+    padding:14px;background:rgba(13,22,64,.5);
+  }
+  .overlay.show{display:flex}
+  .card{
+    width:min(100%,420px);max-height:100%;overflow:auto;text-align:center;
+    background:var(--cream);border:4px solid var(--peach);border-radius:28px;padding:18px 18px 16px;
+    box-shadow:0 10px 0 rgba(13,22,64,.28);
+  }
+  .title{
+    font-family:"Dancing Script","Brush Script MT","Segoe Script","Lucida Handwriting",cursive;
+    font-weight:700;font-size:clamp(50px,13vw,74px);line-height:1;color:var(--ink);
+    text-shadow:3px 3px 0 var(--pink);margin-bottom:6px;
+  }
+  .title.small{font-size:clamp(44px,11vw,60px)}
+  .lead{font-size:1.02rem;line-height:1.4;margin-bottom:12px}
+  .sub{font-size:.85rem;font-weight:700;opacity:.75;margin-top:8px}
+  .h2{font-size:1rem;font-weight:900;margin:12px 0 2px}
+  .daily{display:flex;gap:10px;margin:10px 0 0}
+  .stat{flex:1;border-radius:20px;padding:10px 8px;display:flex;flex-direction:column;gap:2px}
+  .stat .lbl{font-size:.8rem;font-weight:800}
+  .stat b{font-size:1.1rem}
+  .stat small{font-size:.72rem;opacity:.75}
+  .mint{background:var(--mint)} .lav{background:var(--lav)} .pink{background:var(--pink)} .peach{background:var(--peach)} .yel{background:var(--yellow)}
+
+  .outfits{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:4px}
+  .outfit{
+    border:3px solid transparent;border-radius:18px;background:#fff;padding:10px 6px;color:var(--ink);
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+  }
+  .outfit b{font-size:.95rem}
+  .outfit small{font-size:.74rem;opacity:.8}
+  .outfit .swatch{width:34px;height:34px;border-radius:50%;box-shadow:inset 0 -3px 0 rgba(0,0,0,.12)}
+  .outfit.sel{border-color:var(--ink);background:var(--yellow)}
+  .outfit.locked{filter:grayscale(1);opacity:.55;cursor:not-allowed}
+
+  .big{
+    display:block;width:100%;margin-top:12px;padding:16px 20px;border:0;border-radius:999px;
+    font-size:1.2rem;font-weight:900;color:var(--ink);box-shadow:0 7px 0 rgba(29,36,86,.22);
+  }
+  .big:active{transform:translateY(4px);box-shadow:0 3px 0 rgba(29,36,86,.22)}
+  .link{
+    margin-top:12px;background:none;border:0;color:var(--ink);font-weight:800;
+    text-decoration:underline;text-underline-offset:4px;font-size:.95rem;
+  }
+  .score-big{font-size:clamp(56px,16vw,84px);font-weight:900;line-height:1;margin:6px 0 2px}
+  .score-cap{font-size:1rem;font-weight:800}
+  .badge{
+    display:inline-block;margin-top:8px;background:var(--mint);border-radius:999px;
+    padding:4px 14px;font-weight:900;font-size:.9rem;
+  }
+  .badge[hidden]{display:none}
+  .msg{min-height:1.3em;margin-top:8px;font-weight:800;font-size:.95rem}
+  .foot{font-size:.75rem;opacity:.65;margin-top:12px}
+  .paused-note{font-size:1rem;margin-bottom:6px}
+
+  @media (prefers-reduced-motion:reduce){ .big:active,#jumpBtn:active{transform:none} }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header id="hud">
+    <div class="hud-row">
+      <div class="pill"><small>Distance</small><span id="distTxt">0 m</span></div>
+      <div class="pill"><small>Score</small><span id="scoreTxt">0</span></div>
+      <div class="spacer"></div>
+      <button class="round-btn" id="soundBtn" aria-label="Sound on or off" title="Sound (M)">🔊</button>
+      <button class="round-btn" id="pauseBtn" aria-label="Pause" title="Pause (P)">⏸</button>
+    </div>
+    <div class="hud-row">
+      <div class="hearts" id="hearts" aria-label="Lives"></div>
+      <div class="spacer"></div>
+      <div class="tag" id="outfitTag">Classic Runner</div>
+    </div>
+  </header>
+
+  <main id="stage">
+    <canvas id="cv"></canvas>
+  </main>
+
+  <footer id="controls">
+    <button id="jumpBtn" aria-label="Jump">JUMP!</button>
+  </footer>
+
+  <!-- Start / outfit / bests -->
+  <div class="overlay show" id="startOv">
+    <div class="card">
+      <h1 class="title">Firefly Run</h1>
+      <p class="lead">Tap to jump! Grab the gold coins, hop over the logs and rocks, and keep your firefly friend close.</p>
+      <div class="daily">
+        <div class="stat mint"><span class="lbl">Daily Best</span><b id="dailyBest">0 pts</b><small id="dailyNote"></small></div>
+        <div class="stat lav"><span class="lbl">All-Time Best</span><b id="allBest">0 pts</b><small>score and distance</small></div>
+      </div>
+      <p class="sub">Today's challenge: same course for everyone · <span id="todayDate"></span></p>
+      <h2 class="h2">Pick your runner</h2>
+      <div class="outfits" id="outfitGrid"></div>
+      <button class="big mint" id="startBtn">Play Today's Run</button>
+      <p class="foot">A free game from Ashvish Creative Studio · Play Zone</p>
+    </div>
+  </div>
+
+  <!-- Pause -->
+  <div class="overlay" id="pauseOv">
+    <div class="card">
+      <h2 class="title small">Paused</h2>
+      <p class="paused-note">Your firefly is waiting.</p>
+      <button class="big mint" id="resumeBtn">Resume</button>
+      <button class="big lav" id="pauseMenu">Outfits and bests</button>
+    </div>
+  </div>
+
+  <!-- Game over -->
+  <div class="overlay" id="overOv">
+    <div class="card">
+      <h2 class="title small">Game Over</h2>
+      <div class="score-big" id="overScore">0</div>
+      <div class="score-cap">points</div>
+      <span class="badge" id="newBest" hidden>New best score!</span>
+      <div class="daily">
+        <div class="stat yel"><span class="lbl">This run</span><b id="overDist">0 m</b></div>
+        <div class="stat peach"><span class="lbl">Best distance</span><b id="overBest">0 m</b></div>
+      </div>
+      <button class="big pink" id="againBtn">Play Again</button>
+      <button class="big lav" id="shareBtn">Share My Score</button>
+      <p class="msg" id="shareMsg" aria-live="polite"></p>
+      <button class="link" id="menuBtn">Outfits and bests</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const $ = id => document.getElementById(id);
+  const cv = $('cv');
+  const ctx = cv.getContext('2d');
+  const stage = $('stage');
+  const FONT_BODY = 'ui-rounded, "Varela Round", "Arial Rounded MT Bold", system-ui, sans-serif';
+  const COLORS = ['#FF9AA2', '#FFDAC1', '#F7F3C7', '#B5EAD7', '#C7CEFF', '#FFD54A'];
+
+  // ---------- storage ----------
+  const KEY_BEST = 'ashvish.fireflyrun.alltime.v1';
+  const KEY_DAILY = 'ashvish.fireflyrun.daily.v1';
+  const KEY_SOUND = 'ashvish.fireflyrun.sound.v1';
+  const KEY_OUTFIT = 'ashvish.fireflyrun.outfit.v1';
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  };
+
+  // ---------- date + seeded randomness ----------
+  function todayKey() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function hashStr(s) {
+    let h = 2166136261 >>> 0;
+    for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    return h;
+  }
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  // ---------- daily course (same for everyone on the same date) ----------
+  const COURSE_END = 6000; // metres
+  function buildLayout(rng) {
+    const obs = [], coins = [];
+    let pos = 40;
+    while (pos < COURSE_END) {
+      const type = pos < 200 ? 'log' : (rng() < 0.6 ? 'log' : 'rock');
+      obs.push({ at: pos, type, hit: false });
+      // gentle spacing: first 200 m very roomy, later never tighter than 32 m
+      const gap = pos < 200 ? 35 + rng() * 10 : 25 + rng() * 20;
+      const mid = pos + gap / 2;
+      if (rng() < 0.9) {
+        for (let i = 0; i < 5; i++) coins.push({ at: mid + (i - 2) * 2.4, arc: i / 4, taken: false });
+      }
+      pos += gap;
+    }
+    return { obs, coins };
+  }
+
+  // ---------- outfits ----------
+  const OUTFITS = [
+    { id: 'classic', name: 'Classic Runner', need: 0,    shirt: '#B5EAD7', pants: '#4f5b9e', style: 'plain' },
+    { id: 'pink',    name: 'Pink Runner',    need: 500,  shirt: '#FF9AA2', pants: '#6b4a8f', style: 'scarf' },
+    { id: 'golden',  name: 'Golden Runner',  need: 1500, shirt: '#F7C948', pants: '#5a4a2a', style: 'star' },
+    { id: 'rainbow', name: 'Rainbow Runner', need: 3000, shirt: '#C7CEFF', pants: '#3d3b7a', style: 'rainbow', swatch: 'linear-gradient(90deg,#FF9AA2,#FFDAC1,#F7F3C7,#B5EAD7,#C7CEFF)' }
+  ];
+  let outfitId = store.get(KEY_OUTFIT, 'classic');
+  function currentOutfit() { return OUTFITS.find(o => o.id === outfitId) || OUTFITS[0]; }
+
+  // ---------- persisted bests ----------
+  let allTime = store.get(KEY_BEST, { score: 0, distance: 0 });
+  let daily = store.get(KEY_DAILY, null); // { date:'YYYY-MM-DD', score, distance }
+  function dailyBest() {
+    return (daily && daily.date === todayKey()) ? daily : { score: 0, distance: 0 };
+  }
+
+  // ---------- sound (Web Audio only, no files) ----------
+  let soundOn = store.get(KEY_SOUND, true);
+  let actx = null, master = null, noiseBuf = null;
+  function ensureAudio() {
+    if (!actx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      try {
+        actx = new AC();
+        master = actx.createGain();
+        master.gain.value = 0.5;
+        master.connect(actx.destination);
+        const len = Math.floor(actx.sampleRate * 0.3);
+        noiseBuf = actx.createBuffer(1, len, actx.sampleRate);
+        const d = noiseBuf.getChannelData(0);
+        for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+      } catch (e) { actx = null; return; }
+    }
+    if (actx.state === 'suspended') actx.resume();
+  }
+  function tone(f, when, dur, vol, type, f2) {
+    if (!actx || !soundOn) return;
+    const t = actx.currentTime + when;
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(f, t);
+    if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master);
+    o.start(t); o.stop(t + dur + 0.05);
+  }
+  function ding() { tone(988, 0, 0.35, 0.25); tone(1319, 0.09, 0.5, 0.22); }
+  function whoosh() {
+    if (!actx || !soundOn || !noiseBuf) return;
+    const t = actx.currentTime;
+    const src = actx.createBufferSource(); src.buffer = noiseBuf;
+    const bp = actx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 1.2;
+    bp.frequency.setValueAtTime(300, t); bp.frequency.exponentialRampToValueAtTime(1500, t + 0.22);
+    const g = actx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.18, t + 0.05);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.25);
+    src.connect(bp); bp.connect(g); g.connect(master);
+    src.start(t); src.stop(t + 0.3);
+  }
+  function thud() { tone(170, 0, 0.25, 0.5, 'sine', 45); tone(90, 0, 0.2, 0.3, 'triangle', 40); }
+  function sadTune() { [392, 349, 330, 294, 262].forEach((f, i) => tone(f, i * 0.38, 0.5, 0.22, 'triangle')); }
+  function toggleSound() {
+    soundOn = !soundOn;
+    store.set(KEY_SOUND, soundOn);
+    renderSoundBtn();
+  }
+  function renderSoundBtn() {
+    const b = $('soundBtn');
+    b.textContent = soundOn ? '🔊' : '🔇';
+    b.title = soundOn ? 'Sound on (M)' : 'Sound off (M)';
+  }
+
+  // ---------- canvas sizing ----------
+  let W = 300, H = 500, DPR = 1;
+  function resize() {
+    const r = stage.getBoundingClientRect();
+    W = Math.max(200, r.width);
+    H = Math.max(200, r.height);
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = Math.round(W * DPR);
+    cv.height = Math.round(H * DPR);
+  }
+  new ResizeObserver(resize).observe(stage);
+  resize();
+
+  // ---------- scenery (fixed decorative layout) ----------
+  const bgRng = mulberry32(42);
+  const stars = Array.from({ length: 70 }, () => ({ fx: bgRng(), fy: bgRng() * 0.7, r: 0.6 + bgRng() * 1.6, ph: bgRng() * 6.28 }));
+  const flies = Array.from({ length: 10 }, () => ({ fx: bgRng(), fy: 0.3 + bgRng() * 0.45, ph: bgRng() * 6.28 }));
+  function makeTrees(n, a, b) { return Array.from({ length: n }, () => ({ fx: bgRng(), hf: a + bgRng() * (b - a) })); }
+  const treeLayers = [
+    { p: 0.22, color: '#1b2b68', items: makeTrees(16, 0.2, 0.36) },
+    { p: 0.45, color: '#0d1747', items: makeTrees(22, 0.1, 0.2) }
+  ];
+
+  // ---------- game state ----------
+  const SPEED_START = 6.5, SPEED_END = 10.5; // metres per second, lively ramp
+  function speedMs(d) { return SPEED_START + (SPEED_END - SPEED_START) * Math.min(d, 1500) / 1500; }
+  const K = () => H * 0.002;          // unit scale for sprites
+  const PPM = () => H * 0.045;        // pixels per metre
+  const GY = () => H * 0.78;          // ground line
+  const RX = () => W * 0.22;          // runner screen x
+
+  let state = 'ready';                // ready | playing | paused | over
+  let dist = 0, score = 0, bonusCount = 0, hearts = 3;
+  let gtime = 0, anim = 0, runPhase = 0, shieldUntil = -1, shake = 0;
+  let layout = { obs: [], coins: [] };
+  let particles = [], floats = [];
+  let lastScore = 0;
+  const player = { h: 0, vh: 0, jumps: 0 };
+
+  function jump() {
+    if (state !== 'playing') return;
+    if (player.jumps >= 2) return;
+    player.vh = H * 1.2 * (player.jumps === 0 ? 1 : 0.92); // second jump is a little softer
+    player.jumps++;
+    whoosh();
+  }
+
+  function startRun() {
+    ensureAudio();
+    const seed = hashStr('firefly-run|' + todayKey());
+    layout = buildLayout(mulberry32(seed));
+    const cur = currentOutfit();
+    if (allTime.score < cur.need) { outfitId = 'classic'; store.set(KEY_OUTFIT, outfitId); }
+    $('outfitTag').textContent = currentOutfit().name;
+    dist = 0; score = 0; bonusCount = 0; hearts = 3;
+    gtime = 0; runPhase = 0; shieldUntil = -1; shake = 0;
+    particles = []; floats = [];
+    player.h = 0; player.vh = 0; player.jumps = 0;
+    renderHearts();
+    state = 'playing';
+    showOv(null);
+  }
+
+  function renderHearts() {
+    $('hearts').innerHTML = '<span>' + '♥'.repeat(hearts) + '</span><span class="lost">' + '♥'.repeat(3 - hearts) + '</span>';
+  }
+
+  function takeHit() {
+    hearts--;
+    shieldUntil = gtime + 2;
+    shake = 0.35;
+    thud();
+    floatText('Ouch!', RX() + 40 * K(), GY() - 120 * K(), '#FF9AA2');
+    renderHearts();
+    if (hearts <= 0) { hearts = 0; renderHearts(); endGame(); }
+  }
+
+  function endGame() {
+    state = 'over';
+    sadTune();
+    const sc = score, d = Math.floor(dist);
+    const beatAll = sc > allTime.score;
+    allTime = { score: Math.max(allTime.score, sc), distance: Math.max(allTime.distance, d) };
+    store.set(KEY_BEST, allTime);
+    const t = todayKey();
+    const db = dailyBest();
+    daily = { date: t, score: Math.max(db.score, sc), distance: Math.max(db.distance, d) };
+    store.set(KEY_DAILY, daily);
+    lastScore = sc;
+    $('overScore').textContent = sc;
+    $('overDist').textContent = d + ' m';
+    $('overBest').textContent = allTime.distance + ' m';
+    $('newBest').hidden = !(beatAll && sc > 0);
+    $('shareBtn').textContent = 'Share My Score';
+    $('shareMsg').textContent = '';
+    showOv('overOv');
+  }
+
+  function togglePause() {
+    if (state === 'playing') { state = 'paused'; showOv('pauseOv'); }
+    else if (state === 'paused') { state = 'playing'; showOv(null); }
+  }
+
+  function showOv(id) {
+    ['startOv', 'pauseOv', 'overOv'].forEach(o => $(o).classList.toggle('show', o === id));
+  }
+
+  function renderStart() {
+    const t = todayKey();
+    const db = dailyBest();
+    $('dailyBest').textContent = db.score + ' pts · ' + db.distance + ' m';
+    $('dailyNote').textContent = (daily && daily.date === t) ? 'Today\'s best' : 'New day, new best!';
+    $('allBest').textContent = allTime.score + ' pts · ' + allTime.distance + ' m';
+    $('todayDate').textContent = new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+    const grid = $('outfitGrid');
+    grid.innerHTML = '';
+    OUTFITS.forEach(o => {
+      const ok = allTime.score >= o.need;
+      const b = document.createElement('button');
+      b.className = 'outfit' + (ok ? '' : ' locked') + (ok && o.id === outfitId ? ' sel' : '');
+      b.disabled = !ok;
+      b.setAttribute('aria-label', o.name + (ok ? ' unlocked' : ' locked, ' + o.need + ' points needed'));
+      b.innerHTML = '<span class="swatch" style="background:' + (o.swatch || o.shirt) + '"></span>' +
+                    '<b>' + o.name + '</b>' +
+                    '<small>' + (ok ? 'Unlocked' : 'Locked · ' + o.need + ' pts') + '</small>';
+      b.onclick = () => { outfitId = o.id; store.set(KEY_OUTFIT, outfitId); renderStart(); };
+      grid.appendChild(b);
+    });
+  }
+
+  // ---------- sharing ----------
+  async function copyText(text) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); return true; }
+    } catch (e) {}
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      const ok = document.execCommand('copy');
+      ta.remove();
+      return ok;
+    } catch (e) { return false; }
+  }
+  async function shareScore() {
+    const text = 'I scored ' + lastScore + ' points in Firefly Run on Ashvish Creative Studio! Can you beat me? Play free: https://ashvishcreativestudio.com';
+    if (navigator.share) {
+      try { await navigator.share({ text }); return; }
+      catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    const ok = await copyText(text);
+    if (ok) {
+      $('shareBtn').textContent = 'Copied!';
+      $('shareMsg').textContent = 'Copied! Share it anywhere.';
+    } else {
+      $('shareMsg').textContent = 'Copy this to share: ' + text;
+    }
+  }
+
+  // ---------- effects ----------
+  function burst(x, y) {
+    for (let i = 0; i < 22; i++) {
+      const a = Math.random() * Math.PI * 2, sp = H * (0.25 + Math.random() * 0.5);
+      particles.push({
+        x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - H * 0.3,
+        life: 0, max: 0.9 + Math.random() * 0.4, c: COLORS[i % COLORS.length],
+        s: 3 + Math.random() * 4, r: Math.random() * 6
+      });
+    }
+  }
+  function floatText(text, x, y, color) {
+    floats.push({ text, x, y, life: 0, max: 0.9, color: color || '#FFF8EC' });
+  }
+  function updateFx(dt) {
+    for (const p of particles) { p.life += dt; p.vy += H * 1.6 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.r += dt * 8; }
+    particles = particles.filter(p => p.life < p.max);
+    for (const f of floats) f.life += dt;
+    for (const f of floats) f.y -= H * 0.22 * dt;
+    floats = floats.filter(f => f.life < f.max);
+  }
+
+  // ---------- update ----------
+  function update(dt) {
+    anim += dt;
+    updateFx(dt);
+    if (shake > 0) shake = Math.max(0, shake - dt);
+    if (state !== 'playing') return;
+
+    gtime += dt;
+    const k = K(), ppm = PPM(), gy = GY(), rx = RX();
+    const sp = speedMs(dist);
+    dist += sp * dt;
+    runPhase += sp * dt * 2.2;
+
+    // distance bonus: 50 points every 100 m
+    const due = Math.floor(dist / 100);
+    if (due > bonusCount) {
+      const n = due - bonusCount;
+      bonusCount = due;
+      score += 50 * n;
+      ding();
+      floatText('+' + (50 * n) + ' bonus', rx + 60 * k, gy - H * 0.5, '#FFDAC1');
+    }
+
+    // jump physics
+    if (player.h > 0 || player.vh > 0) {
+      player.vh -= 2.4 * H * dt;
+      player.h += player.vh * dt;
+      if (player.h <= 0) { player.h = 0; player.vh = 0; player.jumps = 0; }
+    }
+
+    // coins
+    const feetY = gy - player.h, headY = feetY - 104 * k;
+    for (const c of layout.coins) {
+      if (c.taken) continue;
+      const cx = rx + (c.at - dist) * ppm;
+      if (cx < -40) continue;
+      if (cx > W + 40) break;
+      const cy = gy - (0.07 + 0.16 * Math.sin(Math.PI * c.arc)) * H;
+      const r = 11 * k;
+      if (Math.abs(cx - rx) < 22 * k && cy + r > headY && cy - r < feetY) {
+        c.taken = true;
+        score += 10;
+        ding();
+        burst(cx, cy);
+        floatText('+10', cx, cy - r * 2, '#FFF8EC');
+      }
+    }
+
+    // obstacles
+    for (const o of layout.obs) {
+      if (o.hit) continue;
+      const cx = rx + (o.at - dist) * ppm;
+      if (cx < -120) continue;
+      if (cx > W + 120) break;
+      const isLog = o.type === 'log';
+      const halfW = (isLog ? 25 : 17) * k, oh = (isLog ? 34 : 26) * k;
+      if (Math.abs(cx - rx) < halfW + 12 * k && player.h < oh * 0.9 && gtime >= shieldUntil) {
+        o.hit = true;
+        takeHit();
+        return;
+      }
+    }
+
+    $('distTxt').textContent = Math.floor(dist) + ' m';
+    $('scoreTxt').textContent = score;
+  }
+
+  // ---------- render ----------
+  function rr(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+  function glow(x, y, r, a) {
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, 'rgba(255,250,200,' + a + ')');
+    g.addColorStop(0.3, 'rgba(247,243,160,' + (a * 0.5) + ')');
+    g.addColorStop(1, 'rgba(247,243,160,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  }
+  function drawPine(x, base, h) {
+    const w = h * 0.42;
+    ctx.beginPath();
+    ctx.moveTo(x, base - h); ctx.lineTo(x + w * 0.5, base - h * 0.42); ctx.lineTo(x - w * 0.5, base - h * 0.42);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x, base - h * 0.7); ctx.lineTo(x + w * 0.7, base); ctx.lineTo(x - w * 0.7, base);
+    ctx.closePath(); ctx.fill();
+  }
+  function drawLog(x, gy, k) {
+    const w = 50 * k, h = 34 * k, l = x - w / 2, t = gy - h;
+    ctx.fillStyle = '#8a5a3b'; rr(l, t, w, h, 12 * k); ctx.fill();
+    ctx.fillStyle = '#a8714a';
+    ctx.beginPath(); ctx.ellipse(l + w, t + h / 2, 6 * k, h / 2, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#c9965f';
+    ctx.beginPath(); ctx.ellipse(l + w, t + h / 2, 3 * k, h / 4, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#6fc38b';
+    ctx.beginPath(); ctx.ellipse(x - w * 0.2, t + 2 * k, w * 0.32, 6 * k, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(x + w * 0.25, t + 1 * k, w * 0.14, 4 * k, 0, 0, Math.PI * 2); ctx.fill();
+  }
+  function drawRock(x, gy, k) {
+    const w = 34 * k, h = 26 * k;
+    ctx.fillStyle = '#9aa3c7';
+    ctx.beginPath(); ctx.ellipse(x, gy - h / 2, w / 2, h / 2, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.beginPath(); ctx.ellipse(x - w * 0.15, gy - h * 0.7, w * 0.18, h * 0.12, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#6fc38b';
+    ctx.beginPath(); ctx.ellipse(x - w * 0.1, gy - h + 3 * k, w * 0.3, 4 * k, 0, 0, Math.PI * 2); ctx.fill();
+  }
+  function drawCoin(x, y, r) {
+    glow(x, y, r * 2.2, 0.22);
+    const g = ctx.createRadialGradient(x - r * 0.3, y - r * 0.3, r * 0.1, x, y, r);
+    g.addColorStop(0, '#FFF3A0'); g.addColorStop(0.6, '#FFD54A'); g.addColorStop(1, '#E0A21B');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#C98A12'; ctx.lineWidth = Math.max(1, r * 0.14); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.beginPath(); ctx.arc(x - r * 0.35, y - r * 0.35, r * 0.22, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function drawRunner(rx, gy) {
+    const k = K(), h = player.h, o = currentOutfit();
+    const onAir = h > 1;
+    const sw = onAir ? 0 : Math.sin(runPhase), sw2 = onAir ? 0 : Math.sin(runPhase + Math.PI);
+    const shielded = gtime < shieldUntil;
+    const blink = shielded && Math.floor(anim * 12) % 2 === 0;
+
+    ctx.save();
+    ctx.translate(rx, gy - h);
+    ctx.scale(k, k);
+    ctx.lineCap = 'round';
+
+    if (shielded) {
+      ctx.globalAlpha = 0.28;
+      ctx.fillStyle = '#F7F3C7';
+      ctx.beginPath(); ctx.arc(0, -52, 62, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+    ctx.globalAlpha = blink ? 0.3 : 1;
+
+    // back arm
+    const arm2 = onAir ? [-4, -82] : [-9 - sw * 10, -48];
+    ctx.strokeStyle = '#FFD9BC'; ctx.lineWidth = 6;
+    ctx.beginPath(); ctx.moveTo(-9, -64); ctx.lineTo(arm2[0], arm2[1]); ctx.stroke();
+
+    // legs
+    const f1 = onAir ? [-6, -10] : [sw * 14, 0];
+    const f2 = onAir ? [8, -14] : [sw2 * 14, 0];
+    ctx.strokeStyle = o.pants; ctx.lineWidth = 8;
+    ctx.beginPath(); ctx.moveTo(-3, -40); ctx.lineTo(f1[0], f1[1]); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(3, -40); ctx.lineTo(f2[0], f2[1]); ctx.stroke();
+    ctx.fillStyle = '#2b2b44';
+    ctx.beginPath(); ctx.ellipse(f1[0] + 2, f1[1] - 3, 6, 3.5, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(f2[0] + 2, f2[1] - 3, 6, 3.5, 0, 0, Math.PI * 2); ctx.fill();
+
+    // torso
+    ctx.fillStyle = o.shirt;
+    rr(-13, -72, 26, 34, 9); ctx.fill();
+    if (o.style === 'rainbow') {
+      const cols = ['#FF9AA2', '#FFDAC1', '#F7F3C7', '#B5EAD7', '#C7CEFF'];
+      rr(-13, -72, 26, 34, 9);
+      ctx.save(); ctx.clip();
+      cols.forEach((c, i) => { ctx.fillStyle = c; ctx.fillRect(-13, -72 + i * 7, 26, 7); });
+      ctx.restore();
+    }
+    if (o.style === 'scarf') {
+      ctx.fillStyle = '#FFDAC1';
+      rr(-12, -74, 24, 6, 3); ctx.fill();
+    }
+    if (o.style === 'star') {
+      ctx.fillStyle = '#FFFBE6';
+      ctx.font = 'bold 12px ' + FONT_BODY; ctx.textAlign = 'center';
+      ctx.fillText('★', 0, -54);
+    }
+
+    // front arm
+    const arm1 = onAir ? [14, -80] : [9 + sw * 10, -48];
+    ctx.strokeStyle = '#FFD9BC'; ctx.lineWidth = 6;
+    ctx.beginPath(); ctx.moveTo(9, -64); ctx.lineTo(arm1[0], arm1[1]); ctx.stroke();
+
+    // head
+    ctx.fillStyle = '#FFD9BC';
+    ctx.beginPath(); ctx.arc(2, -88, 15, 0, Math.PI * 2); ctx.fill();
+
+    // spiky black hair
+    ctx.fillStyle = '#17172e';
+    ctx.beginPath();
+    ctx.moveTo(-13, -84); ctx.lineTo(-18, -104); ctx.lineTo(-8, -97); ctx.lineTo(-6, -114);
+    ctx.lineTo(2, -101); ctx.lineTo(8, -116); ctx.lineTo(10, -100); ctx.lineTo(19, -106);
+    ctx.lineTo(15, -90); ctx.lineTo(17, -84); ctx.quadraticCurveTo(2, -96, -13, -84);
+    ctx.closePath(); ctx.fill();
+
+    // face
+    ctx.fillStyle = '#17172e';
+    ctx.beginPath(); ctx.arc(8, -86, 2.2, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#17172e'; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.arc(9, -82, 3, 0.1 * Math.PI, 0.9 * Math.PI); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,154,162,0.75)';
+    ctx.beginPath(); ctx.arc(12, -83, 2.4, 0, Math.PI * 2); ctx.fill();
+
+    // gold earring
+    ctx.fillStyle = '#FFD54A'; ctx.strokeStyle = '#C98A12'; ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.arc(-11, -79, 3, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  function drawFirefly(rx, gy) {
+    const k = K(), h = player.h;
+    const fx = rx + 44 * k + Math.sin(anim * 1.7) * 8 * k;
+    const fy = gy - h - 98 * k + Math.cos(anim * 2.3) * 9 * k;
+    const blink = 0.6 + 0.4 * Math.sin(anim * 6);
+    glow(fx, fy, 26 * k, 0.6 * blink);
+    ctx.fillStyle = '#FFFBD0';
+    ctx.beginPath(); ctx.arc(fx, fy, 3.5 * k, 0, Math.PI * 2); ctx.fill();
+  }
+
+  function render() {
+    const k = K(), gy = GY(), ppm = PPM(), rx = RX();
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    ctx.save();
+    if (shake > 0) ctx.translate((Math.random() - 0.5) * 16 * shake, (Math.random() - 0.5) * 10 * shake);
+
+    // sky
+    const sky = ctx.createLinearGradient(0, 0, 0, gy);
+    sky.addColorStop(0, '#0a1036'); sky.addColorStop(0.6, '#1a2a6c'); sky.addColorStop(1, '#34479a');
+    ctx.fillStyle = sky; ctx.fillRect(-20, -20, W + 40, H + 40);
+
+    // stars
+    for (const s of stars) {
+      const a = 0.5 + 0.5 * Math.sin(anim * 2 + s.ph);
+      ctx.globalAlpha = 0.35 + 0.65 * a;
+      ctx.fillStyle = '#FFF8EC';
+      ctx.beginPath(); ctx.arc(s.fx * W, s.fy * H, s.r, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // moon
+    const mx = W * 0.8, my = H * 0.16, mr = H * 0.05;
+    const mg = ctx.createRadialGradient(mx, my, mr * 0.5, mx, my, mr * 3.5);
+    mg.addColorStop(0, 'rgba(247,243,199,0.45)'); mg.addColorStop(1, 'rgba(247,243,199,0)');
+    ctx.fillStyle = mg; ctx.beginPath(); ctx.arc(mx, my, mr * 3.5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#F7F3C7'; ctx.beginPath(); ctx.arc(mx, my, mr, 0, Math.PI * 2); ctx.fill();
+
+    // forest (two parallax layers)
+    const P = W * 1.25;
+    for (const layer of treeLayers) {
+      const scroll = (dist * ppm * layer.p) % P;
+      ctx.fillStyle = layer.color;
+      for (const t of layer.items) {
+        const x0 = ((t.fx * P - scroll) % P + P) % P;
+        for (const x of [x0, x0 - P]) {
+          if (x > W + 60 || x < -60) continue;
+          drawPine(x, gy, t.hf * H);
+        }
+      }
+    }
+
+    // floating fireflies in the forest
+    for (const f of flies) {
+      const x = ((f.fx * W + Math.sin(anim * 0.5 + f.ph) * 20) % W + W) % W;
+      const y = f.fy * H + Math.cos(anim * 0.7 + f.ph) * 10;
+      glow(x, y, 14, 0.25 + 0.25 * Math.sin(anim * 3 + f.ph));
+    }
+
+    // ground
+    const gg = ctx.createLinearGradient(0, gy, 0, H);
+    gg.addColorStop(0, '#24446e'); gg.addColorStop(1, '#111d48');
+    ctx.fillStyle = gg; ctx.fillRect(-20, gy, W + 40, H - gy + 20);
+    ctx.fillStyle = '#3f8f7c'; ctx.fillRect(-20, gy, W + 40, 5 * k);
+    ctx.fillStyle = '#B5EAD7'; ctx.globalAlpha = 0.5; ctx.fillRect(-20, gy, W + 40, 1.5 * k); ctx.globalAlpha = 1;
+    ctx.fillStyle = 'rgba(181,234,215,0.28)';
+    const dashGap = 60 * k, dOff = (dist * ppm) % dashGap;
+    for (let x = -dOff; x < W + dashGap; x += dashGap) ctx.fillRect(x, gy + H * 0.1, 26 * k, 4 * k);
+
+    // coins
+    for (const c of layout.coins) {
+      if (c.taken) continue;
+      const cx = rx + (c.at - dist) * ppm;
+      if (cx < -30 || cx > W + 30) continue;
+      const cy = gy - (0.07 + 0.16 * Math.sin(Math.PI * c.arc)) * H + Math.sin(anim * 4 + c.at) * 3 * k;
+      drawCoin(cx, cy, 11 * k);
+    }
+
+    // obstacles
+    for (const o of layout.obs) {
+      const cx = rx + (o.at - dist) * ppm;
+      if (cx < -120 || cx > W + 120) continue;
+      if (o.type === 'log') drawLog(cx, gy, k); else drawRock(cx, gy, k);
+    }
+
+    // runner and firefly
+    drawRunner(rx, gy);
+    drawFirefly(rx, gy);
+
+    // effects
+    for (const p of particles) {
+      ctx.globalAlpha = Math.max(0, 1 - p.life / p.max);
+      ctx.fillStyle = p.c;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r);
+      ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s * 1.6);
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+    ctx.textAlign = 'center';
+    for (const f of floats) {
+      ctx.globalAlpha = Math.max(0, 1 - f.life / f.max);
+      ctx.fillStyle = f.color;
+      ctx.font = '900 ' + Math.round(H * 0.045) + 'px ' + FONT_BODY;
+      ctx.fillText(f.text, f.x, f.y);
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  // ---------- input ----------
+  // Tap or click anywhere on the play screen (not on buttons or cards) to jump / start.
+  document.addEventListener('pointerdown', e => {
+    if (e.target.closest && e.target.closest('button, .card')) return;
+    ensureAudio();
+    if (state === 'ready') startRun();
+    else if (state === 'playing') jump();
+  });
+  $('jumpBtn').addEventListener('pointerdown', e => {
+    e.preventDefault();
+    ensureAudio();
+    if (state === 'ready') startRun(); else jump();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.code === 'Space' || e.code === 'ArrowUp') {
+      e.preventDefault();
+      if (e.repeat) return;
+      ensureAudio();
+      if (state === 'ready') startRun(); else jump();
+      if (document.activeElement && document.activeElement.tagName === 'BUTTON') document.activeElement.blur();
+    } else if (e.code === 'KeyM') {
+      toggleSound();
+    } else if (e.code === 'KeyP' || e.code === 'Escape') {
+      togglePause();
+    }
+  });
+  document.addEventListener('keyup', e => { if (e.code === 'Space') e.preventDefault(); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden && state === 'playing') togglePause(); });
+
+  $('startBtn').onclick = () => { ensureAudio(); startRun(); };
+  $('againBtn').onclick = () => { ensureAudio(); startRun(); };
+  $('pauseBtn').onclick = togglePause;
+  $('resumeBtn').onclick = togglePause;
+  $('pauseMenu').onclick = openMenu;
+  $('menuBtn').onclick = openMenu;
+  $('soundBtn').onclick = () => { ensureAudio(); toggleSound(); };
+  $('shareBtn').onclick = shareScore;
+
+  function openMenu() {
+    state = 'ready';
+    renderStart();
+    showOv('startOv');
+  }
+
+  // ---------- loop ----------
+  let lastT = performance.now();
+  function frame(t) {
+    const dt = Math.min(0.05, (t - lastT) / 1000);
+    lastT = t;
+    update(dt);
+    render();
+    requestAnimationFrame(frame);
+  }
+
+  renderSoundBtn();
+  renderHearts();
+  renderStart();
+  showOv('startOv');
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
+<!--
+  FIREFLY RUN: SETUP NOTES FOR THE PLAY ZONE
+  - Outfit unlocks (by best score): Pink Runner 500, Golden Runner 1500, Rainbow Runner 3000. Classic Runner is always open.
+  - Share text: "I scored X points in Firefly Run on Ashvish Creative Studio! Can you beat me? Play free: https://ashvishcreativestudio.com"
+    Uses the phone share sheet when available; otherwise copies the text and shows "Copied! Share it anywhere."
+  - Daily challenge: the course is seeded from the local date (YYYY-MM-DD), so everyone gets the same obstacles and coins that day.
+    Daily Best is stored with its date and shows 0 once the date changes. All-Time Best is stored separately.
+  - Audio: Web Audio only, no sound files. Sound On/Off button plus the M key to mute.
+  - Fully offline: no external fonts, images, scripts or audio.
+-->
