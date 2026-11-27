@@ -104,7 +104,7 @@
       .card{background:var(--card);border:2px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
       .stage-card{padding:14px;position:relative}
       .stage{position:relative;max-width:540px;margin:0 auto}
-      .stage canvas.pic-canvas{width:100%;height:auto;display:block;background:#fff;border-radius:10px;cursor:pointer;touch-action:manipulation}
+      .stage canvas.pic-canvas{width:100%;height:auto;display:block;background:#fff;border-radius:10px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none;transform:translateZ(0);will-change:transform}
       .pic-box{position:relative}
       .pic-loading{position:absolute;inset:0;display:grid;place-items:center;font-weight:800;color:var(--ink-soft);background:#fff;border-radius:10px}
       .pic-loading.hide{display:none}
@@ -320,6 +320,7 @@
       var magic = false;
       var hue = 0;
       var undoStack = [];
+      var celebrated = false; /* true once the 100% celebration has fired for this picture */
       var soundOn = true;
       var audioCtx = null;
 
@@ -365,6 +366,7 @@
       function loadFriend(a){
         current = a;
         undoStack = [];
+        celebrated = false;
         FRIENDS.forEach(function(x){ x._btn.classList.toggle('active', x === a); });
         friendNameEl.textContent = a.name;
         updateNav();
@@ -424,7 +426,8 @@
         totalParts:0,
         fills:null,
         canvas:null, ctx:null, imgData:null,
-        srcImg:null
+        srcImg:null,
+        renderCanvas:null, renderCtx:null /* offscreen paint surface: putImageData NEVER touches the visible canvas, so taps cannot flash it */
       };
       function hexToRgb(hex){
         var n = parseInt(hex.slice(1), 16);
@@ -453,6 +456,11 @@
       }
       function showPic(){
         pic.imgData = pic.ctx.createImageData(TW, TW);
+        if (!pic.renderCanvas){
+          pic.renderCanvas = document.createElement('canvas');
+          pic.renderCanvas.width = TW; pic.renderCanvas.height = TW;
+          pic.renderCtx = pic.renderCanvas.getContext('2d');
+        }
         renderPicAll();
         hidePicLoading();
         updateProgress();
@@ -547,12 +555,18 @@
             paintPicPixel(i, pic.fills[id]);
           }
         }
-        pic.ctx.putImageData(pic.imgData, 0, 0);
+        pic.renderCtx.putImageData(pic.imgData, 0, 0);
+        pic.ctx.drawImage(pic.renderCanvas, 0, 0);
       }
       function renderPicRegion(id){
         var list = pic.pixels[id];
         for (var i = 0; i < list.length; i++) paintPicPixel(list[i], pic.fills[id]);
-        pic.ctx.putImageData(pic.imgData, 0, 0);
+        /* Paint into the OFFSCREEN canvas (never visible), then blit onto the
+           visible canvas with drawImage — a composited blit that cannot
+           flash, unlike putImageData straight to the visible canvas on
+           tablet browsers. */
+        pic.renderCtx.putImageData(pic.imgData, 0, 0);
+        pic.ctx.drawImage(pic.renderCanvas, 0, 0);
       }
       function picRegionAt(x, y){
         if (x < 0 || y < 0 || x >= TW || y >= TW) return -1;
@@ -613,6 +627,9 @@
       stage.addEventListener('click', function(ev){
         if (ev.target && ev.target.id === 'picCanvas') picTap(ev);
       });
+      stage.addEventListener('pointerdown', function(ev){
+        if (ev.target && ev.target.id === 'picCanvas') picTap(ev);
+      });
 
       function updateProgress(){
         var tp = picProgress();
@@ -624,7 +641,30 @@
         var pct = tp.total ? Math.round(tp.done / tp.total * 100) : 0;
         progressBar.style.width = pct + '%';
         progressLabel.textContent = tp.done + ' of ' + tp.total + ' parts coloured';
+        /* Auto-celebrate the moment every part is coloured — banner,
+           confetti and sound fire on their own, no "I'm done" press needed.
+           Fires once per picture; undo / start-over resets it. */
+        if (tp.total && tp.done === tp.total){
+          if (!celebrated){ celebrated = true; celebrateDone(tp); }
+        } else if (celebrated){
+          celebrated = false;
+          banner.className = 'banner';
+          banner.innerHTML = '';
+        }
         return tp;
+      }
+
+      /* Shared celebration: banner + confetti + sound. The "I'm done" button
+         calls it on demand; updateProgress calls it automatically the moment
+         every part is coloured. */
+      function celebrateDone(p){
+        banner.innerHTML = '<span class="stars">★ ★ ★</span><br>' +
+          (p.total && p.done === p.total
+            ? 'Wow — you coloured every part of ' + current.name + '! Merry Christmas, artist!'
+            : 'Beautiful work, artist! ' + current.name + ' looks lovely and festive.');
+        banner.className = 'banner show';
+        celebrate();
+        fanfare();
       }
 
       /* ---------- tools ---------- */
@@ -670,14 +710,7 @@
         if (soundOn) pop();
       });
       document.getElementById('doneBtn').addEventListener('click', function(){
-        var p = updateProgress();
-        banner.innerHTML = '<span class="stars">★ ★ ★</span><br>' +
-          (p.total && p.done === p.total
-            ? 'Wow — you coloured every part of ' + current.name + '! Merry Christmas, artist!'
-            : 'Beautiful work, artist! ' + current.name + ' looks lovely and festive.');
-        banner.className = 'banner show';
-        celebrate();
-        fanfare();
+        celebrateDone(updateProgress());
       });
       document.getElementById('saveBtn').addEventListener('click', function(){ downloadPNG(false); });
       document.getElementById('blankBtn').addEventListener('click', function(){ downloadPNG(true); });
